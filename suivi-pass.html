@@ -83,6 +83,22 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .pass.due{border-color:var(--due);color:var(--due);background:var(--due-soft)}
 .star{border:0;background:transparent;cursor:pointer;font-size:1rem;color:var(--ink-3);padding:0 2px}
 .star.on{color:var(--late)}
+/* ressenti + QCM */
+.pass.d1{background:#cdebd6;border-color:#3f9e62;color:#1f5a36}.pass.d2{background:#e4f2cb;border-color:#7cae3c;color:#3f5c16}.pass.d3{background:#fcefc3;border-color:#c9a21c;color:#6b5306}.pass.d4{background:#fcdcc6;border-color:#d9793a;color:#7a3a10}.pass.d5{background:#f9d0d2;border-color:#cc4b52;color:#7a1f25}
+.pass small{display:block;font-size:.65rem;line-height:1.1;opacity:.85}
+.qline{font-size:.75rem;color:var(--ink-2);display:flex;gap:8px;flex-wrap:wrap}
+.qline b{font-family:var(--font-m);font-weight:500}
+.diffs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.diffs button{border:2px solid transparent;border-radius:10px;padding:8px 2px;font:700 .72rem var(--font-b);cursor:pointer;color:var(--ink)}
+.diffs button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px #fff inset}
+/* camemberts */
+.pies{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.pie{display:grid;justify-items:center;gap:4px;text-align:center;padding:8px;border-radius:12px;background:var(--mbg,var(--surface-2))}
+.pie svg{width:100%;max-width:120px;height:auto;display:block}
+.pie .nm{font-weight:700;font-size:.85rem;color:var(--mfg,var(--ink))}
+.pie .sub{font-size:.75rem;color:var(--ink-2)}
+.pie-main{display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:20px;align-items:center}
+@media (max-width:620px){.pie-main{grid-template-columns:1fr;justify-items:center}}
 /* planning */
 .plan-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .plan-nav .lbl{font-family:var(--font-d);font-weight:700;font-size:1.1rem;min-width:13ch}
@@ -178,6 +194,11 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;p
       </div>
     </div>
     <div class="panel">
+      <header><h2>Avancement</h2><span class="muted small">part des cours selon le nombre de passages faits</span></header>
+      <div class="pie-main"><div id="pieAll" class="pie" style="background:transparent"></div><div class="legend" id="pieLegend" style="display:grid;gap:6px"></div></div>
+      <div class="pies" id="pies"></div>
+    </div>
+    <div class="panel">
       <header><h2>Jusqu'au concours</h2><span class="muted small">fins de cours, ED, kholles et échéances, semaine par semaine</span></header>
       <div class="weeks" id="weeks"></div>
     </div>
@@ -206,7 +227,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;p
       <header><h2>Avancement des cours</h2>
         <div class="legend"><span style="--c:#7c6fd6">3 passages</span><span style="--c:#a9a0e6">2 passages</span><span style="--c:#d6d1f5">1 passage</span><span style="--c:var(--surface-2)">pas commencé</span></div>
       </header>
-      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre. Touche encore pour annuler. ★ = cours difficile, il ira dans le créneau du samedi matin. « Anki » = les cartes du cours sont activées. ✎ pour renommer, changer les dates ou ajouter une note.</p>
+      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre et tu peux noter ton score au QCM et ton ressenti, du vert (facile) au rouge (difficile). Touche un passage déjà fait pour le modifier. ★ = cours difficile, il ira dans le créneau du samedi matin. « Anki » = les cartes du cours sont activées. ✎ pour renommer, changer les dates ou ajouter une note.</p>
       <div class="chips" id="matChips"></div>
     </div>
     <div id="coursList" style="display:grid;gap:20px"></div>
@@ -354,6 +375,26 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   <label>Ce que je retiens<input type="text" id="k-com"></label>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="k-cancel" type="button">Annuler</button><button class="btn primary" id="k-save" type="button">Enregistrer</button></div>
 </div></div>
+<div class="modal" id="pmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+  <div><span class="eyebrow" id="pm-eye"></span><h3 id="pm-title"></h3></div>
+  <label>Date du passage<input type="date" id="pm-date"></label>
+  <div><span class="eyebrow">QCM du cours</span>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-top:4px">
+      <label>Bonnes réponses<input type="number" id="pm-score" min="0" inputmode="numeric"></label><span class="muted" style="padding-bottom:9px">sur</span><label>Total<input type="number" id="pm-total" min="1" inputmode="numeric"></label>
+    </div>
+  </div>
+  <div><span class="eyebrow">Ressenti</span>
+    <div class="diffs" id="pm-diffs" style="margin-top:4px">
+      <button type="button" data-d="1" style="background:#cdebd6">Très facile</button><button type="button" data-d="2" style="background:#e4f2cb">Facile</button><button type="button" data-d="3" style="background:#fcefc3">Moyen</button><button type="button" data-d="4" style="background:#fcdcc6">Difficile</button><button type="button" data-d="5" style="background:#f9d0d2">Très difficile</button>
+    </div>
+  </div>
+  <label>Note (pièges, notions à revoir)<input type="text" id="pm-note"></label>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn danger" id="pm-undo" type="button">Annuler ce passage</button>
+    <div style="display:flex;gap:8px"><button class="btn ghost" id="pm-later" type="button">Plus tard</button><button class="btn primary" id="pm-save" type="button">Enregistrer</button></div>
+  </div>
+  <p class="small" id="pm-confirm" hidden style="margin:0;color:var(--late)">Touche encore pour effacer la date, le QCM et le ressenti de ce passage.</p>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -444,7 +485,7 @@ function renderAuj(){
   const ul=$("#todo");
   if(!items.length){ul.innerHTML=`<li class="muted">Aucun passage en attente. Fais les 1ers passages des cours qui sortent aujourd'hui, et coche P1 dans l'onglet Cours.</li>`}
   else ul.innerHTML=items.slice(0,14).map(i=>`<li class="task" style="${mvars(i.c.matiere)}"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom)} · ${esc(i.why)}</span></span><span class="acts"><button class="btn sm" data-plan="${esc(i.c.id)}" data-k="${i.kind}" aria-label="Ajouter à mon planning d'aujourd'hui">+</button><button class="btn sm" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></span></li>`).join("")+(items.length>14?`<li class="small muted">+ ${items.length-14} autres dans l'onglet Cours</li>`:"");
-  ul.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const k=b.dataset.k;setField(b.dataset.done,k==="Anki"?{anki:true}:{[k.toLowerCase()]:today()})});
+  ul.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k==="Anki")setField(b.dataset.done,{anki:true});else openPass(b.dataset.done,k.toLowerCase())});
   ul.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.plan);addTask({date:today(),heure:"",texte:(b.dataset.k==="Anki"?"Activer les cartes · ":b.dataset.k+" · ")+c.titre,matiere:c.matiere})});
   $("#todayDay").innerHTML=dayHtml(today(),true);
   wireDay($("#todayDay"));
@@ -507,6 +548,51 @@ async function addTask(t){
 async function updTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign(t,patch);renderAll();try{await db.doc("taches/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
 async function delTask(id){try{await db.doc("taches/"+id).delete()}catch(e){toast("Suppression impossible")}}
 
+/* PASSAGES : QCM + ressenti */
+const DIFF={1:"très facile",2:"facile",3:"moyen",4:"difficile",5:"très difficile"};
+const DCOL={1:"#3f9e62",2:"#7cae3c",3:"#c9a21c",4:"#d9793a",5:"#cc4b52"};
+function pct(r){return r&&r.total&&r.score!=null&&r.score!==""?Math.round(r.score/r.total*100):null}
+function qline(c){const r=c.r||{};const parts=["p1","p2","p3"].filter(p=>pct(r[p])!=null||(r[p]&&r[p].diff)).map(p=>`${p.toUpperCase()} <b>${pct(r[p])!=null?pct(r[p])+" %":"–"}</b>${r[p].diff?` <span class="mdot" style="--mfg:${DCOL[r[p].diff]}" title="${DIFF[r[p].diff]}"></span>`:""}`);return parts.length?`<span class="qline">QCM · ${parts.join(" · ")}</span>`:""}
+let pEdit=null,pDiff=null;
+function openPass(id,p){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  if(!c[p])setField(id,{[p]:today()});
+  const r=(c.r||{})[p]||{};pEdit={id,p};pDiff=r.diff||null;
+  $("#pm-eye").textContent={p1:"1er passage",p2:"2e passage",p3:"3e passage"}[p]+" · "+matById(c.matiere).nom;
+  $("#pm-title").textContent=c.titre;
+  $("#pm-date").value=c[p]||today();$("#pm-score").value=r.score??"";$("#pm-total").value=r.total??"";$("#pm-note").value=r.note||"";
+  $("#pm-confirm").hidden=true;paintDiffs();$("#pmodal").hidden=false;$("#pm-score").focus();
+}
+function paintDiffs(){$("#pm-diffs").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.d===pDiff)))}
+$("#pm-diffs").querySelectorAll("button").forEach(b=>b.onclick=()=>{pDiff=+b.dataset.d===pDiff?null:+b.dataset.d;paintDiffs()});
+$("#pm-later").onclick=()=>{$("#pmodal").hidden=true};
+$("#pm-save").onclick=async()=>{const {id,p}=pEdit;const n=v=>v===""?null:Number(v);
+  const r={score:n($("#pm-score").value),total:n($("#pm-total").value),diff:pDiff,note:$("#pm-note").value.trim()};
+  $("#pmodal").hidden=true;await setField(id,{[p]:$("#pm-date").value||today(),r:{[p]:r}})};
+$("#pm-undo").onclick=async()=>{if($("#pm-confirm").hidden){$("#pm-confirm").hidden=false;return}const {id,p}=pEdit;$("#pmodal").hidden=true;await setField(id,{[p]:"",r:{[p]:{score:null,total:null,diff:null,note:""}}})};
+
+/* CAMEMBERTS */
+function donut(parts,colors,center,sub,size){
+  const tot=parts.reduce((a,b)=>a+b,0)||1,R=50,r=32,cx=60,cy=60;let a0=-Math.PI/2,out="";
+  const labels=["3 passages","2 passages","1 passage","pas commencé"];
+  parts.forEach((v,i)=>{if(!v)return;const a1=a0+v/tot*Math.PI*2;
+    if(v===tot){out+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${colors[i]}" stroke-width="${R-r}"><title>${labels[i]} : ${v}</title></circle>`}
+    else{const la=a1-a0>Math.PI?1:0,p=(ang,rad)=>[cx+rad*Math.cos(ang),cy+rad*Math.sin(ang)];const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
+      out+=`<path d="M${x0} ${y0}A${R} ${R} 0 ${la} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${la} 0 ${x3} ${y3}Z" fill="${colors[i]}" stroke="#fff" stroke-width="2"><title>${labels[i]} : ${v} cours</title></path>`}
+    a0=a1});
+  return `<svg viewBox="0 0 120 120" role="img" aria-label="${esc(sub)}">${out}<text x="60" y="${size?62:64}" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="700" font-size="${size||20}" fill="var(--ink)">${center}</text>${size?`<text x="60" y="78" text-anchor="middle" font-size="9" fill="var(--ink-2)">ancrés</text>`:""}</svg>`;
+}
+function counts(cs){const n3=cs.filter(c=>c.p3).length,n2=cs.filter(c=>c.p2&&!c.p3).length,n1=cs.filter(c=>c.p1&&!c.p2).length;return [n3,n2,n1,cs.length-n3-n2-n1]}
+function avgPct(cs){const v=[];cs.forEach(c=>{const r=c.r||{};for(const p of ["p3","p2","p1"]){const x=pct(r[p]);if(x!=null){v.push(x);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
+function renderPies(){
+  const acc=["#7c6fd6","#a9a0e6","#d9d4f6","#ececf3"];const all=counts(C);const tot=C.length||1;
+  $("#pieAll").innerHTML=donut(all,acc,Math.round(all[0]/tot*100)+" %","Avancement global",22)+`<span class="nm">Tous les cours</span><span class="sub">${C.length} cours</span>`;
+  const av=avgPct(C);
+  $("#pieLegend").innerHTML=["3 passages · ancrés","2 passages","1 passage","pas commencé"].map((l,i)=>`<span style="--c:${acc[i]}">${l} : <b class="num">${all[i]}</b> (${Math.round(all[i]/tot*100)} %)</span>`).join("")+(av!=null?`<span class="small muted" style="margin-top:4px">Score moyen à ton dernier QCM : <b class="num">${av} %</b></span>`:"");
+  $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const k=counts(cs);const a=avgPct(cs);
+    return `<div class="pie" style="${mvars(m.id)}">${donut(k,[mc,mc+"99",mc+"4d",mc+"1a"],Math.round(k[0]/cs.length*100)+" %",m.nom+" : "+k[0]+" ancrés sur "+cs.length)}<span class="nm">${esc(m.nom.replace(/ \(.*\)/,""))}</span><span class="sub">${k[0]+k[1]+k[2]}/${cs.length} vus${a!=null?" · QCM "+a+" %":""}</span></div>`}).join("");
+}
+
 /* COURS */
 function renderCours(){
   const mats=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0));
@@ -524,18 +610,18 @@ function renderCours(){
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
     html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} ancrés · ${n2} en P2 · ${n1} en P1 · ${all} cours</span></div>
      <div class="bar" role="img" aria-label="${n3} cours à 3 passages, ${n2} à 2, ${n1} à 1, sur ${all}">${n3?`<i style="width:${n3/tot*100}%;background:${mc[1]}"></i>`:""}${n2?`<i style="width:${n2/tot*100}%;background:${mc[1]};opacity:.55"></i>`:""}${n1?`<i style="width:${n1/tot*100}%;background:${mc[1]};opacity:.25"></i>`:""}</div>
-     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}</span></div>
-       <div class="passes">${["p1","p2","p3"].map(p=>`<button class="pass ${c[p]?"on":s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p]):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}</button>`).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
+     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
+       <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt===m.id||filt==="all"?`<div><button class="btn ghost" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
   }
   list.innerHTML=html||`<p class="muted">Rien à afficher avec ce filtre.</p>`;
-  list.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.id);const p=b.dataset.p;setField(c.id,p==="anki"?{anki:!c.anki}:{[p]:c[p]?"":today()})});
+  list.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.id);const p=b.dataset.p;if(p==="anki"){setField(c.id,{anki:!c.anki});return}openPass(c.id,p)});
   list.querySelectorAll("[data-star]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.star);setField(c.id,{difficile:!c.difficile})});
   list.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openModal(b.dataset.edit));
   list.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCours(b.dataset.add));
 }
 async function setField(id,patch){
-  const c=C.find(x=>x.id===id);if(!c||!db)return;Object.assign(c,patch);renderAll();
+  const c=C.find(x=>x.id===id);if(!c||!db)return;const{r,...rest}=patch;Object.assign(c,rest);if(r){c.r={...(c.r||{})};for(const k in r)c.r[k]={...(c.r[k]||{}),...r[k]}}renderAll();
   try{await db.doc("cours/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
 }
 async function addCours(mid){
@@ -550,7 +636,7 @@ function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)ret
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
 $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
@@ -608,7 +694,7 @@ function renderBilan(){
 $("#bilanForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   try{await db.doc("bilans/"+WK).set({ok:$("#b-ok").value.trim(),ko:$("#b-ko").value.trim(),change:$("#b-change").value.trim(),energie:$("#b-energie").value,stress:$("#b-stress").value,date:today()});toast("Bilan enregistré")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
-function renderAll(){renderAuj();renderPlanning();renderCours();renderKholles();renderMat();renderBilan()}
+function renderAll(){renderAuj();renderPies();renderPlanning();renderCours();renderKholles();renderMat();renderBilan()}
 renderSemaine();renderAll();
 
 /* DATA */
