@@ -223,10 +223,22 @@ button.pie[aria-pressed="true"]{border-color:var(--mfg)}
 .rows .row:last-child{border-bottom:0}
 .pass{border-color:var(--line);background:#fff}
 .pdfv{position:fixed;inset:0;z-index:40;background:#e9e9ef;display:grid;grid-template-rows:auto 1fr}
-.pdfbar{display:flex;align-items:center;gap:10px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#fff;box-shadow:0 1px 3px rgb(42 44 63 / .1)}
+.pdfbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#fff;box-shadow:0 1px 3px rgb(42 44 63 / .1)}
 .pdfbar #pdf-title{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pdfpages{overflow:auto;padding:16px;display:grid;justify-items:center;gap:12px;-webkit-overflow-scrolling:touch}
-.pdfpages canvas{max-width:100%;height:auto;background:#fff;box-shadow:0 1px 4px rgb(0 0 0 / .15)}
+.pdfpages{overflow:auto;padding:16px;display:grid;justify-items:center;align-content:start;gap:12px;-webkit-overflow-scrolling:touch}
+.pdftools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:2px}
+.seg button{border:0;background:transparent;font:700 .8rem var(--font-b);color:var(--ink-2);padding:6px 10px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgb(42 44 63 / .12)}
+.zoom{display:inline-flex;align-items:center;gap:4px}
+.zoom .btn.icon{width:30px;height:30px}
+.zoom span{min-width:4.2em;text-align:center}
+.pdfpages figure{margin:0;display:grid;justify-items:center;gap:4px}
+.pdfpages img{display:block;background:#fff;box-shadow:0 1px 4px rgb(0 0 0 / .15);max-width:none}
+.pdfpages figcaption{display:none;font:500 .75rem var(--font-m);color:var(--ink-2)}
+.pdfpages.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-items:start}
+.pdfpages.grid img{width:100%!important;height:auto!important;cursor:pointer}
+.pdfpages.grid figcaption{display:block}
 .polybox{display:grid;gap:6px;background:var(--surface-2);border-radius:12px;padding:10px 12px}
 .polybox a{color:var(--accent);font-weight:700}
 .pass.poly{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2)}
@@ -464,7 +476,12 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   <p class="small" id="tm-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
 </div></div>
 <div class="pdfv" id="pdfv" hidden role="dialog" aria-modal="true" aria-labelledby="pdf-title">
-  <div class="pdfbar"><button class="btn sm" type="button" id="pdf-close">Fermer</button><span id="pdf-title"></span><button class="btn sm primary" type="button" id="pdf-save">Enregistrer / ouvrir dans une app</button></div>
+  <div class="pdfbar"><button class="btn sm" type="button" id="pdf-close">Fermer</button><span id="pdf-title"></span>
+    <div class="pdftools">
+      <div class="seg" role="group" aria-label="Affichage"><button type="button" data-pm="fit" aria-pressed="true">Page entière</button><button type="button" data-pm="width" aria-pressed="false">Largeur</button><button type="button" data-pm="grid" aria-pressed="false">Vue d'ensemble</button></div>
+      <div class="zoom"><button class="btn sm icon" type="button" id="pdf-zo" aria-label="Dézoomer">−</button><span id="pdf-z" class="num small">100 %</span><button class="btn sm icon" type="button" id="pdf-zi" aria-label="Zoomer">+</button></div>
+      <button class="btn sm primary" type="button" id="pdf-save">Enregistrer / ouvrir dans une app</button>
+    </div></div>
   <div class="pdfpages" id="pdf-pages"></div>
 </div>
 <div class="toast" id="toast" hidden></div>
@@ -790,24 +807,39 @@ $("#m-polyfile").addEventListener("change",async e=>{const f=e.target.files&&e.t
     await setField(editing,{poly:res.id,polyNom:f.name});if(old){try{await assets.delete(old)}catch(_){}}toast("Polycopié joint");paintPoly(C.find(x=>x.id===editing))}
   catch(err){const m={too_large:"Fichier trop lourd (20 Mo maximum). Utilise plutôt un lien.",unsupported_type:"Seuls les PDF sont acceptés.",quota_or_state:"Espace de stockage plein.",rate_limited:"Trop d'envois d'un coup, réessaie dans un instant."}[err&&err.code]||"Envoi impossible ("+(err&&err.code||"erreur")+").";el.textContent=m}});
 /* Visionneuse PDF (pdf.js, sans worker séparé) */
+const pv={mode:"fit",z:1};
+function applyView(){const pages=$("#pdf-pages");pages.classList.toggle("grid",pv.mode==="grid");
+  document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pm===pv.mode)));
+  $("#pdf-z").textContent=pv.mode==="grid"?"–":Math.round(pv.z*100)+" %";$("#pdf-zo").disabled=$("#pdf-zi").disabled=pv.mode==="grid";
+  const H=Math.max(200,pages.clientHeight-32),Wd=Math.max(200,pages.clientWidth-32);
+  pages.querySelectorAll("img").forEach(im=>{if(pv.mode==="grid"){im.style.width=im.style.height="";return}
+    const ar=+im.dataset.ar||1.414;const w=pv.mode==="fit"?Math.min(H/ar,Wd*4)*pv.z:Wd*pv.z;im.style.width=Math.round(w)+"px";im.style.height=Math.round(w*ar)+"px"})}
+document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.onclick=()=>{pv.mode=b.dataset.pm;pv.z=1;applyView();$("#pdf-pages").scrollTop=0});
+$("#pdf-zi").onclick=()=>{pv.z=Math.min(4,pv.z*1.25);applyView()};
+$("#pdf-zo").onclick=()=>{pv.z=Math.max(.3,pv.z/1.25);applyView()};
+$("#pdf-pages").addEventListener("click",e=>{if(pv.mode!=="grid")return;const f=e.target.closest("figure");if(!f)return;pv.mode="fit";pv.z=1;applyView();f.scrollIntoView({block:"start"})});
+window.addEventListener("resize",()=>{if(!$("#pdfv").hidden)applyView()});
 let downloads=null,pdfLib=null,pdfCur=null;
 function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
 async function getPdfLib(){if(pdfLib)return pdfLib;const B="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
   await loadScript(B+"pdf.min.js");await loadScript(B+"pdf.worker.min.js");pdfLib=window.pdfjsLib;return pdfLib}
 async function openPdf(id){
   const c=C.find(x=>x.id===id);if(!c||!c.poly)return;
-  const v=$("#pdfv"),pages=$("#pdf-pages");$("#pdf-title").textContent=c.titre;$("#pdf-save").hidden=!downloads;
+  const v=$("#pdfv"),pages=$("#pdf-pages");pv.mode="fit";pv.z=1;applyView();$("#pdf-title").textContent=c.titre;$("#pdf-save").hidden=!downloads;
   pages.innerHTML=`<p class="muted" style="text-align:center;padding:40px 0">Ouverture du polycopié…</p>`;v.hidden=false;
   try{
     const buf=await (await fetch("/_blob/"+c.poly)).arrayBuffer();pdfCur={name:(c.polyNom||c.titre||"polycopie").replace(/\.pdf$/i,"")+".pdf",buf};
     const lib=await getPdfLib();const doc=await lib.getDocument({data:new Uint8Array(buf.slice(0)),isEvalSupported:false}).promise;
-    pages.innerHTML="";const W=Math.min(pages.clientWidth||800,1100),dpr=Math.min(window.devicePixelRatio||1,2);
-    for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i);const vp0=pg.getViewport({scale:1});const sc=W/vp0.width;const vp=pg.getViewport({scale:sc*dpr});
-      const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=(vp.width/dpr)+"px";pages.appendChild(cv);
-      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;if(v.hidden)break}
+    pages.innerHTML="";pv.aspects=[];
+    for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i);const vp0=pg.getViewport({scale:1});const sc=Math.min(1100/vp0.width,2.2);const vp=pg.getViewport({scale:sc});
+      const cv=document.createElement("canvas");cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
+      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;if(v.hidden)break;
+      const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.88));cv.width=cv.height=0;
+      const fig=document.createElement("figure");fig.dataset.n=i;const im=document.createElement("img");im.alt="Page "+i;im.src=URL.createObjectURL(blob);im.dataset.ar=vp0.height/vp0.width;
+      const cap=document.createElement("figcaption");cap.textContent=i;fig.append(im,cap);pages.appendChild(fig);applyView()}
   }catch(e){pages.innerHTML=`<p style="text-align:center;padding:40px 0">Impossible d'afficher ce PDF ici.${downloads?" Utilise « Enregistrer » pour l'ouvrir dans une app.":""}</p>`}
 }
-$("#pdf-close").onclick=()=>{$("#pdfv").hidden=true;$("#pdf-pages").innerHTML=""};
+$("#pdf-close").onclick=()=>{$("#pdfv").hidden=true;$("#pdf-pages").querySelectorAll("img").forEach(im=>URL.revokeObjectURL(im.src));$("#pdf-pages").innerHTML=""};
 $("#pdf-save").onclick=async()=>{if(!downloads||!pdfCur)return;try{await downloads.save({filename:pdfCur.name,data:new Blob([pdfCur.buf],{type:"application/pdf"})});}catch(e){if(e&&e.code!=="declined")toast("Enregistrement impossible ("+(e.code||"erreur")+")")}};
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;$("#m-lien").value=c.lien||"";paintPoly(c);
   $("#m-titre").value=c.titre||"";$("#m-donne").value=c.donne||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
