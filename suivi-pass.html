@@ -222,6 +222,9 @@ button.pie[aria-pressed="true"]{border-color:var(--mfg)}
 .row{background:transparent;border-bottom:1px solid var(--line);border-radius:0;padding:7px 2px}
 .rows .row:last-child{border-bottom:0}
 .pass{border-color:var(--line);background:#fff}
+.polybox{display:grid;gap:6px;background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.polybox a{color:var(--accent);font-weight:700}
+.pass.poly{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2)}
 .addc{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:2px}
 .addc input{border-color:transparent;background:var(--surface-2);font-size:.88rem}
 details.fold{padding:0}
@@ -400,6 +403,11 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
     <label>P1<input type="date" id="m-p1"></label><label>P2<input type="date" id="m-p2"></label><label>P3<input type="date" id="m-p3"></label>
   </div>
   <label><span><input type="checkbox" id="m-anki" style="width:auto"> Cartes activées dans Anki</span></label>
+  <div class="polybox"><span class="eyebrow">Polycopié</span>
+    <div id="m-polycur" class="small"></div>
+    <label class="btn sm" id="m-polypick" style="display:inline-flex;width:auto">Joindre le PDF<input type="file" id="m-polyfile" accept="application/pdf,.pdf" hidden></label>
+    <label>ou un lien vers le fichier (iCloud, Drive…)<input type="url" id="m-lien" placeholder="https://"></label>
+  </div>
   <label>Note<textarea id="m-note"></textarea></label>
   <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
     <button class="btn danger" id="m-del" type="button">Supprimer</button>
@@ -737,7 +745,7 @@ function renderCours(){
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
     html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${C.filter(c=>c.matiere===m.id&&isEu(c)).length} / ${all} cours eus</span></div>
      <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
-       <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${(c.extra||[]).map((e,i)=>{const pc=pct(e);return `<button class="pass ${e.diff?"d"+e.diff:"on"}" data-id="${esc(c.id)}" data-p="x${i}" title="P${i+4} · ${fmt(e.date)}">${fmt(e.date)}${pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${c.p3?`<button class="pass" data-id="${esc(c.id)}" data-p="xnew" title="Ajouter un passage" aria-label="Ajouter un passage">+</button>`:""}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
+       <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${(c.extra||[]).map((e,i)=>{const pc=pct(e);return `<button class="pass ${e.diff?"d"+e.diff:"on"}" data-id="${esc(c.id)}" data-p="x${i}" title="P${i+4} · ${fmt(e.date)}">${fmt(e.date)}${pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${c.p3?`<button class="pass" data-id="${esc(c.id)}" data-p="xnew" title="Ajouter un passage" aria-label="Ajouter un passage">+</button>`:""}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}${polyUrl(c)?`<a class="pass poly" href="${esc(polyUrl(c))}" target="_blank" rel="noopener" title="Ouvrir le polycopié" aria-label="Ouvrir le polycopié">📄</a>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt==="all"||filt===m.id?`<form class="addc" data-add="${esc(m.id)}"><input type="text" name="t" placeholder="+ Ajouter un cours en ${esc(m.nom.replace(/ \(.*\)/,""))}" aria-label="Nouveau cours en ${esc(m.nom)}" autocomplete="off"><button class="btn sm primary" type="submit">Ajouter</button></form>`:""}</div>`;
   }
   list.innerHTML=html||`<p class="muted">Rien à afficher avec ce filtre.</p>`;
@@ -758,10 +766,22 @@ async function addCours(mid,titre){
   try{await db.doc("cours/"+id).set(doc);toast("Cours ajouté : "+doc.titre)}catch(e){toast("Ajout impossible : "+(e.code||"erreur"))}
 }
 let editing=null;
-function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;
+let assets=null;
+const polyUrl=c=>c.poly?"/_blob/"+c.poly:(c.lien||"");
+function paintPoly(c){const el=$("#m-polycur");
+  el.innerHTML=c.poly?`📄 <a href="/_blob/${esc(c.poly)}" target="_blank" rel="noopener">${esc(c.polyNom||"Polycopié")}</a> · <button type="button" class="link" id="m-polydel">Retirer</button>`:(assets?`<span class="muted">Aucun fichier joint.</span>`:`<span class="muted">Joindre un fichier n'est pas possible dans cet affichage. Utilise un lien.</span>`);
+  $("#m-polypick").hidden=!assets;
+  const d=$("#m-polydel");if(d)d.onclick=async()=>{if(!d.dataset.arm){d.dataset.arm=1;d.textContent="Confirmer le retrait";return}
+    const old=c.poly;await setField(c.id,{poly:"",polyNom:""});try{if(assets&&old)await assets.delete(old)}catch(e){}paintPoly(C.find(x=>x.id===c.id)||c)}}
+$("#m-polyfile").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f||!assets||!editing)return;
+  const el=$("#m-polycur");el.textContent="Envoi de « "+f.name+" »…";
+  try{const res=await assets.upload(f,{type:"application/pdf"});const c=C.find(x=>x.id===editing);const old=c&&c.poly;
+    await setField(editing,{poly:res.id,polyNom:f.name});if(old){try{await assets.delete(old)}catch(_){}}toast("Polycopié joint");paintPoly(C.find(x=>x.id===editing))}
+  catch(err){const m={too_large:"Fichier trop lourd (20 Mo maximum). Utilise plutôt un lien.",unsupported_type:"Seuls les PDF sont acceptés.",quota_or_state:"Espace de stockage plein.",rate_limited:"Trop d'envois d'un coup, réessaie dans un instant."}[err&&err.code]||"Envoi impossible ("+(err&&err.code||"erreur")+").";el.textContent=m}});
+function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;$("#m-lien").value=c.lien||"";paintPoly(c);
   $("#m-titre").value=c.titre||"";$("#m-donne").value=c.donne||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
-$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
+$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim(),lien:$("#m-lien").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
@@ -827,6 +847,7 @@ renderSemaine();renderAll();
 
 /* DATA */
 (async()=>{
+  window.claude?.use&&window.claude.use("assets").then(a=>{assets=a}).catch(()=>{});
   db=await (window.claude?.use?window.claude.use("db"):Promise.resolve(null));
   if(!db){$("#dbnote").hidden=false;return}
   let pend=0;const later=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;renderAll()})};
