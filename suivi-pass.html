@@ -390,6 +390,7 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
 <div class="modal" id="modal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <h3 id="m-title">Modifier le cours</h3>
   <label>Titre<input type="text" id="m-titre"></label>
+  <label>Cours donné le<input type="date" id="m-donne"></label>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
     <label>P1<input type="date" id="m-p1"></label><label>P2<input type="date" id="m-p2"></label><label>P3<input type="date" id="m-p3"></label>
   </div>
@@ -636,45 +637,54 @@ async function delTask(id){try{await db.doc("taches/"+id).delete()}catch(e){toas
 const DIFF={1:"très facile",2:"facile",3:"moyen",4:"difficile",5:"très difficile"};
 const DCOL={1:"#3f9e62",2:"#7cae3c",3:"#c9a21c",4:"#d9793a",5:"#cc4b52"};
 function pct(r){return r&&r.total&&r.score!=null&&r.score!==""?Math.round(r.score/r.total*100):null}
-function qline(c){const r=c.r||{};const parts=["p1","p2","p3"].filter(p=>pct(r[p])!=null||(r[p]&&r[p].diff)).map(p=>`${p.toUpperCase()} <b>${pct(r[p])!=null?pct(r[p])+" %":"–"}</b>${r[p].diff?` <span class="mdot" style="--mfg:${DCOL[r[p].diff]}" title="${DIFF[r[p].diff]}"></span>`:""}`);return parts.length?`<span class="qline">QCM · ${parts.join(" · ")}</span>`:""}
+function passList(c){const r=c.r||{};const L=["p1","p2","p3"].map((p,i)=>({key:p,n:i+1,date:c[p],...(r[p]||{})}));(c.extra||[]).forEach((e,i)=>L.push({key:"x"+i,n:i+4,...e}));return L}
+function qline(c){const parts=passList(c).filter(x=>pct(x)!=null||x.diff).map(x=>`P${x.n} <b>${pct(x)!=null?pct(x)+" %":"–"}</b>${x.diff?` <span class="mdot" style="--mfg:${DCOL[x.diff]}" title="${DIFF[x.diff]}"></span>`:""}`);
+  const bits=[];if(c.donne)bits.push(`cours du ${fmt(c.donne)}`);if(parts.length)bits.push("QCM · "+parts.join(" · "));return bits.length?`<span class="qline">${bits.join(" · ")}</span>`:""}
 let pEdit=null,pDiff=null;
 function openPass(id,p){
   const c=C.find(x=>x.id===id);if(!c)return;
-  if(!c[p])setField(id,{[p]:today()});
-  const r=(c.r||{})[p]||{};pEdit={id,p};pDiff=r.diff||null;
-  $("#pm-eye").textContent={p1:"1er passage",p2:"2e passage",p3:"3e passage"}[p]+" · "+matById(c.matiere).nom;
+  let r,date,n;
+  if(p[0]==="x"){const ex=c.extra||[];const i=p==="xnew"?ex.length:+p.slice(1);r=ex[i]||{};date=r.date||today();n=i+4}
+  else{if(!c[p])setField(id,{[p]:today()});r=(c.r||{})[p]||{};date=c[p]||today();n=+p[1]}
+  pEdit={id,p};pDiff=r.diff||null;
+  $("#pm-eye").textContent=(n===1?"1er":n+"e")+" passage · "+matById(c.matiere).nom;
   $("#pm-title").textContent=c.titre;
-  $("#pm-date").value=c[p]||today();$("#pm-score").value=r.score??"";$("#pm-total").value=r.total??"";$("#pm-note").value=r.note||"";
-  $("#pm-confirm").hidden=true;paintDiffs();$("#pmodal").hidden=false;$("#pm-score").focus();
+  $("#pm-date").value=date;$("#pm-score").value=r.score??"";$("#pm-total").value=r.total??"";$("#pm-note").value=r.note||"";
+  $("#pm-undo").hidden=p==="xnew";$("#pm-confirm").hidden=true;paintDiffs();$("#pmodal").hidden=false;$("#pm-score").focus();
 }
 function paintDiffs(){$("#pm-diffs").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.d===pDiff)))}
 $("#pm-diffs").querySelectorAll("button").forEach(b=>b.onclick=()=>{pDiff=+b.dataset.d===pDiff?null:+b.dataset.d;paintDiffs()});
 $("#pm-later").onclick=()=>{$("#pmodal").hidden=true};
 $("#pm-save").onclick=async()=>{const {id,p}=pEdit;const n=v=>v===""?null:Number(v);
   const r={score:n($("#pm-score").value),total:n($("#pm-total").value),diff:pDiff,note:$("#pm-note").value.trim()};
-  $("#pmodal").hidden=true;await setField(id,{[p]:$("#pm-date").value||today(),r:{[p]:r}})};
-$("#pm-undo").onclick=async()=>{if($("#pm-confirm").hidden){$("#pm-confirm").hidden=false;return}const {id,p}=pEdit;$("#pmodal").hidden=true;await setField(id,{[p]:"",r:{[p]:{score:null,total:null,diff:null,note:""}}})};
+  $("#pmodal").hidden=true;
+  if(p[0]==="x"){const c=C.find(x=>x.id===id);const ex=[...(c.extra||[])];const o={date:$("#pm-date").value||today(),...r};if(p==="xnew")ex.push(o);else ex[+p.slice(1)]=o;await setField(id,{extra:ex});return}
+  await setField(id,{[p]:$("#pm-date").value||today(),r:{[p]:r}})};
+$("#pm-undo").onclick=async()=>{if($("#pm-confirm").hidden){$("#pm-confirm").hidden=false;return}const {id,p}=pEdit;$("#pmodal").hidden=true;
+  if(p[0]==="x"){const c=C.find(x=>x.id===id);const ex=[...(c.extra||[])];ex.splice(+p.slice(1),1);await setField(id,{extra:ex});return}
+  await setField(id,{[p]:"",r:{[p]:{score:null,total:null,diff:null,note:""}}})};
 
 /* CAMEMBERTS */
-function donut(parts,colors,center,sub,size){
+function donut(parts,colors,center,sub,size,labels,under){
   const tot=parts.reduce((a,b)=>a+b,0)||1,R=50,r=32,cx=60,cy=60;let a0=-Math.PI/2,out="";
-  const labels=["3 passages","2 passages","1 passage","pas commencé"];
+  labels=labels||["","","",""];
   parts.forEach((v,i)=>{if(!v)return;const a1=a0+v/tot*Math.PI*2;
     if(v===tot){out+=`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${colors[i]}" stroke-width="${R-r}"><title>${labels[i]} : ${v}</title></circle>`}
     else{const la=a1-a0>Math.PI?1:0,p=(ang,rad)=>[cx+rad*Math.cos(ang),cy+rad*Math.sin(ang)];const [x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
-      out+=`<path d="M${x0} ${y0}A${R} ${R} 0 ${la} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${la} 0 ${x3} ${y3}Z" fill="${colors[i]}" stroke="#fff" stroke-width="2"><title>${labels[i]} : ${v} cours</title></path>`}
+      out+=`<path d="M${x0} ${y0}A${R} ${R} 0 ${la} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${la} 0 ${x3} ${y3}Z" fill="${colors[i]}" stroke="#fff" stroke-width="2"><title>${labels[i]} : ${v}</title></path>`}
     a0=a1});
-  return `<svg viewBox="0 0 120 120" role="img" aria-label="${esc(sub)}">${out}<text x="60" y="${size?62:64}" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="700" font-size="${size||20}" fill="var(--ink)">${center}</text>${size?`<text x="60" y="78" text-anchor="middle" font-size="9" fill="var(--ink-2)">ancrés</text>`:""}</svg>`;
+  return `<svg viewBox="0 0 120 120" role="img" aria-label="${esc(sub)}">${out}<text x="60" y="${size?62:64}" text-anchor="middle" font-family="Bricolage Grotesque,sans-serif" font-weight="700" font-size="${size||20}" fill="var(--ink)">${center}</text>${under?`<text x="60" y="${size?78:77}" text-anchor="middle" font-size="9" fill="var(--ink-2)">${under}</text>`:""}</svg>`;
 }
 function counts(cs){const n3=cs.filter(c=>c.p3).length,n2=cs.filter(c=>c.p2&&!c.p3).length,n1=cs.filter(c=>c.p1&&!c.p2).length;return [n3,n2,n1,cs.length-n3-n2-n1]}
-function avgPct(cs){const v=[];cs.forEach(c=>{const r=c.r||{};for(const p of ["p3","p2","p1"]){const x=pct(r[p]);if(x!=null){v.push(x);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
+function avgPct(cs){const v=[];cs.forEach(c=>{const L=passList(c).reverse();for(const x of L){const q=pct(x);if(q!=null){v.push(q);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
+const isEu=c=>!!(c.donne||c.p1||!/à venir/i.test(c.titre||""));
 function renderPies(){
-  const acc=["#7c6fd6","#a9a0e6","#d9d4f6","#ececf3"];const all=counts(C);const tot=C.length||1;
-  $("#pieAll").innerHTML=donut(all,acc,Math.round(all[0]/tot*100)+" %","Avancement global",22);
+  const eu=C.filter(isEu).length,tot=C.length,anc=C.filter(c=>c.p3).length;
+  $("#pieAll").innerHTML=donut([eu,tot-eu],["#7c6fd6","#ececf3"],`${eu}/${tot}`,`${eu} cours eus sur ${tot}`,20,["Déjà eus","À venir"],"cours eus");
   const av=avgPct(C);
-  $("#pieLegend").innerHTML=["Ancrés","2 passages","1 passage","Pas commencés"].map((l,i)=>`<span style="--c:${acc[i]}">${l} <b class="num">${all[i]}</b></span>`).join("")+(av!=null?`<span class="small muted" style="margin-top:6px">QCM moyen <b class="num">${av} %</b></span>`:"");
-  $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const k=counts(cs);const a=avgPct(cs);
-    return `<button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut(k,[mc,mc+"99",mc+"4d",mc+"1a"],Math.round(k[0]/cs.length*100)+" %",m.nom+" : "+k[0]+" ancrés sur "+cs.length)}<span class="nm">${esc(m.nom.replace(/ \(.*\)/,""))}</span><span class="sub">${k[0]+k[1]+k[2]}/${cs.length} vus${a!=null?" · QCM "+a+" %":""}</span></button>`}).join("");
+  $("#pieLegend").innerHTML=`<span style="--c:#7c6fd6">Déjà eus <b class="num">${eu}</b></span><span style="--c:#ececf3">À venir <b class="num">${tot-eu}</b></span><span class="small muted" style="margin-top:6px">dont <b class="num">${anc}</b> déjà vus 3 fois${av!=null?` · QCM moyen <b class="num">${av} %</b>`:""}</span>`;
+  $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const e=cs.filter(isEu).length,k3=cs.filter(c=>c.p3).length;const a=avgPct(cs);
+    return `<button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut([e,cs.length-e],[mc,mc+"26"],`${e}/${cs.length}`,m.nom+" : "+e+" cours eus sur "+cs.length,17,["Déjà eus","À venir"],"eus")}<span class="nm">${esc(m.nom.replace(/ \(.*\)/,""))}</span><span class="sub">${k3} vus 3 fois${a!=null?" · QCM "+a+" %":""}</span></button>`}).join("");
   $("#pies").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=filt===b.dataset.f?"all":b.dataset.f;renderPies();renderCours()});
 }
 
@@ -694,9 +704,9 @@ function renderCours(){
     if((filt==="late"||filt==="star")&&!cs.length)continue;
     const mc=MCOL[m.id]||["#eee","#7c6fd6"];
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
-    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} / ${all} ancrés</span></div>
+    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${C.filter(c=>c.matiere===m.id&&isEu(c)).length} / ${all} cours eus</span></div>
      <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
-       <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
+       <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${(c.extra||[]).map((e,i)=>{const pc=pct(e);return `<button class="pass ${e.diff?"d"+e.diff:"on"}" data-id="${esc(c.id)}" data-p="x${i}" title="P${i+4} · ${fmt(e.date)}">${fmt(e.date)}${pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${c.p3?`<button class="pass" data-id="${esc(c.id)}" data-p="xnew" title="Ajouter un passage" aria-label="Ajouter un passage">+</button>`:""}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt==="all"||filt===m.id?`<form class="addc" data-add="${esc(m.id)}"><input type="text" name="t" placeholder="+ Ajouter un cours en ${esc(m.nom.replace(/ \(.*\)/,""))}" aria-label="Nouveau cours en ${esc(m.nom)}" autocomplete="off"><button class="btn sm primary" type="submit">Ajouter</button></form>`:""}</div>`;
   }
   list.innerHTML=html||`<p class="muted">Rien à afficher avec ce filtre.</p>`;
@@ -713,14 +723,14 @@ async function setField(id,patch){
 async function addCours(mid,titre){
   if(!db){toast("Données indisponibles ici");return}const cs=C.filter(c=>c.matiere===mid);const ordre=cs.reduce((a,c)=>Math.max(a,c.ordre||0),0)+1;
   const id=mid+"-"+String(ordre).padStart(2,"0")+"-"+Math.random().toString(36).slice(2,6);
-  const doc={matiere:mid,ordre,titre:titre||"Nouveau cours",p1:"",p2:"",p3:"",anki:false,difficile:false,note:""};
+  const doc={matiere:mid,ordre,titre:titre||"Nouveau cours",donne:today(),p1:"",p2:"",p3:"",anki:false,difficile:false,note:""};
   try{await db.doc("cours/"+id).set(doc);toast("Cours ajouté : "+doc.titre)}catch(e){toast("Ajout impossible : "+(e.code||"erreur"))}
 }
 let editing=null;
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;
-  $("#m-titre").value=c.titre||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
+  $("#m-titre").value=c.titre||"";$("#m-donne").value=c.donne||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
-$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
+$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
