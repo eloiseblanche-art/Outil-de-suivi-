@@ -282,7 +282,6 @@ td,th{border-bottom-color:#f0f0f5}
         <button class="btn icon" type="button" id="pNext" aria-label="Semaine suivante">›</button>
         <button class="link" type="button" id="pNow">Aujourd'hui</button>
       </div>
-      <label class="toggle"><input type="checkbox" id="pTpl" checked> Semaine type</label>
     </div>
     <div class="cal" id="cal"></div>
     <p class="hint">Touche un créneau vide pour ajouter une tâche.</p>
@@ -489,7 +488,7 @@ document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("clic
 document.addEventListener("click",e=>{const g=e.target.closest("[data-goto]");if(g)showTab(g.dataset.goto)});
 function showTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));document.querySelectorAll("section.view").forEach(s=>s.hidden=s.id!=="v-"+t);try{localStorage.setItem("tab",t)}catch(e){}}
 try{const t=localStorage.getItem("tab");if(t&&$("#v-"+t))showTab(t)}catch(e){}
-try{showTpl=localStorage.getItem("tpl")!=="0";$("#pTpl").checked=showTpl}catch(e){}
+showTpl=false;
 const hsh=(location.hash||"").slice(1);if(hsh&&$("#v-"+hsh))showTab(hsh);
 
 /* countdown */
@@ -624,7 +623,7 @@ setInterval(()=>{if(!$("#v-planning").hidden&&weekOff===0)renderPlanning()},6000
 $("#pPrev").onclick=()=>{weekOff--;renderPlanning()};
 $("#pNext").onclick=()=>{weekOff++;renderPlanning()};
 $("#pNow").onclick=()=>{weekOff=0;renderPlanning()};
-$("#pTpl").onchange=e=>{showTpl=e.target.checked;try{localStorage.setItem("tpl",showTpl?"1":"0")}catch(_){}renderPlanning();renderAuj()};
+
 async function addTask(t){
   if(!db){toast("Données indisponibles ici");return}
   const doc={date:t.date,heure:t.heure||"",fin:t.fin||"",texte:t.texte,matiere:t.matiere||"",fait:!!t.fait,crt:Date.now()};
