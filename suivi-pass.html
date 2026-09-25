@@ -177,79 +177,132 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;p
 .modal .card{background:var(--surface);border-radius:16px;padding:18px;width:min(460px,100%);display:grid;gap:12px;max-height:90vh;overflow:auto}
 .toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:10px;font-size:.88rem;z-index:30}
 @media (prefers-reduced-motion:no-preference){.pass,.chip,.btn{transition:background .12s,color .12s}}
+
+/* ---- Épuré ---- */
+body{background:#f6f6fa}
+.panel{border:0;border-radius:18px;padding:18px 20px;box-shadow:0 1px 2px rgb(42 44 63 / .04),0 8px 28px rgb(42 44 63 / .05)}
+header.top{padding-block:28px 14px}
+.brand h1{font-size:1.9rem}
+.brand p{font-size:.95rem}
+.countdown{background:#fff;box-shadow:0 1px 2px rgb(42 44 63 / .05);padding:10px 18px;border-radius:16px;gap:10px}
+.countdown span{color:var(--ink-2)}
+nav.tabs{border-bottom:0;gap:2px;padding-block:10px;background:#f6f6fa}
+nav.tabs button{font-weight:700;color:var(--ink-3);padding:8px 16px}
+nav.tabs button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgb(42 44 63 / .1)}
+section.view{gap:18px;padding-top:14px}
+h2{font-size:1.15rem}
+.link{border:0;background:transparent;color:var(--accent);font:700 .85rem var(--font-b);cursor:pointer;padding:0}
+.btn.icon{width:34px;height:34px;padding:0;font-size:1.2rem;line-height:1;border-radius:50%}
+.hint{margin:0;font-size:.8rem;color:var(--ink-3);text-align:center}
+.bar-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.auj{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+.auj .side{display:grid;gap:18px}
+@media (max-width:860px){.auj{grid-template-columns:1fr}}
+#todayDay{display:grid;gap:5px}
+#todayDay .pitem.tpl{background:transparent;opacity:1;border-left:3px solid var(--c);border-radius:0 6px 6px 0;color:var(--ink-2)}
+.addf{margin-top:8px}
+.addf input,.addf select{border-color:transparent;background:var(--surface-2)}
+.task{background:transparent;padding:6px 0;border-bottom:1px solid var(--line);border-radius:0}
+ul.clean li.task:last-child{border-bottom:0}
+.task .acts .btn{border-color:transparent;background:var(--surface-2)}
+.pie-main{grid-template-columns:130px 1fr}
+.legend-col{display:grid;gap:5px;font-size:.85rem;color:var(--ink-2)}
+.legend-col span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:var(--c)}
+.pies{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+button.pie{border:2px solid transparent;cursor:pointer;font:inherit;color:inherit}
+button.pie[aria-pressed="true"]{border-color:var(--mfg)}
+.pie svg{max-width:88px}
+.chip{border-color:transparent;background:#fff;box-shadow:0 1px 2px rgb(42 44 63 / .06)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mat{border-top:0;box-shadow:inset 4px 0 0 var(--mfg),0 1px 2px rgb(42 44 63 / .04),0 8px 28px rgb(42 44 63 / .05)}
+.row{background:transparent;border-bottom:1px solid var(--line);border-radius:0;padding:7px 2px}
+.rows .row:last-child{border-bottom:0}
+.pass{border-color:var(--line);background:#fff}
+details.fold{padding:0}
+details.fold>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"+";font:700 1.2rem var(--font-b);color:var(--ink-3)}
+details.fold[open]>summary::after{content:"–"}
+details.fold>*:not(summary){margin:0 20px 18px}
+.prose{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink-2)}
+.cal{border:0;box-shadow:0 1px 2px rgb(42 44 63 / .04),0 8px 28px rgb(42 44 63 / .05);border-radius:18px}
+.cb.tpl{opacity:.8}
+#todayDay .pitem.task{border:0;border-left:3px solid var(--mfg,var(--accent));border-radius:0 8px 8px 0;background:var(--mbg,var(--accent-soft))}
+#todayDay .mtag{background:transparent;padding:0}
+th{font-weight:700}
+td,th{border-bottom-color:#f0f0f5}
 </style>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>Carnet PASS S1</h1>
-      <p>Nantes · objectif médecine · concours écrit du jeudi 17 décembre</p>
+      <h1>Carnet PASS</h1>
+      <p id="hello">Concours le jeudi 17 décembre</p>
     </div>
-    <div class="countdown"><b class="num" id="jminus">J-?</b><span class="muted small" id="jtxt">avant le concours</span></div>
+    <div class="countdown"><b class="num" id="jminus">J-?</b><span class="small" id="jtxt"></span></div>
   </header>
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" data-tab="auj" aria-selected="true">Aujourd'hui</button>
     <button role="tab" data-tab="planning" aria-selected="false">Planning</button>
     <button role="tab" data-tab="cours" aria-selected="false">Cours</button>
     <button role="tab" data-tab="kholles" aria-selected="false">Kholles</button>
-    <button role="tab" data-tab="semaine" aria-selected="false">Semaine type</button>
     <button role="tab" data-tab="methode" aria-selected="false">Méthode</button>
-    <button role="tab" data-tab="bilan" aria-selected="false">Bilan</button>
   </nav>
-  <div id="dbnote" class="notice" hidden style="margin-top:16px">Tes données ne sont pas disponibles dans cet affichage. Ouvre la page depuis claude.ai pour voir et cocher ton suivi.</div>
+  <div id="dbnote" class="notice" hidden style="margin-top:16px">Tes données ne sont pas disponibles dans cet affichage. Ouvre la page depuis claude.ai.</div>
 
   <!-- AUJOURD'HUI -->
   <section class="view" id="v-auj">
-    <div class="stats" id="stats"></div>
-    <div class="grid2">
+    <div class="auj">
       <div class="panel">
-        <header><h2>Cours à reprendre</h2><span class="muted small" id="todayLabel"></span></header>
-        <p class="muted small" style="margin:0">« Fait » coche le passage. « + » l'ajoute à ton planning d'aujourd'hui.</p>
-        <ul class="clean" id="todo"></ul>
-      </div>
-      <div class="panel">
-        <header><h2>Ma journée</h2><button class="btn sm" type="button" data-goto="planning">Ouvrir le planning</button></header>
+        <header><h2>Ma journée</h2><span class="muted small" id="todayLabel"></span></header>
         <div id="todayDay"></div>
       </div>
-    </div>
-    <div class="panel">
-      <header><h2>Avancement</h2><span class="muted small">part des cours selon le nombre de passages faits</span></header>
-      <div class="pie-main"><div id="pieAll" class="pie" style="background:transparent"></div><div class="legend" id="pieLegend" style="display:grid;gap:6px"></div></div>
-      <div class="pies" id="pies"></div>
-    </div>
-    <div class="panel">
-      <header><h2>Jusqu'au concours</h2><span class="muted small">fins de cours, ED, kholles et échéances, semaine par semaine</span></header>
-      <div class="weeks" id="weeks"></div>
+      <div class="side">
+        <div class="panel">
+          <header><h2>À reprendre</h2><span id="lateBadge"></span></header>
+          <ul class="clean" id="todo"></ul>
+          <button class="link" type="button" id="seeAll" data-goto="cours" hidden></button>
+        </div>
+        <div class="panel">
+          <header><h2>Avancement</h2><button class="link" type="button" data-goto="cours">par matière</button></header>
+          <div class="pie-main"><div id="pieAll"></div><div id="pieLegend" class="legend-col"></div></div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- PLANNING -->
   <section class="view" id="v-planning" hidden>
-    <div class="panel">
-      <header>
-        <div class="plan-nav">
-          <button class="btn sm" type="button" id="pPrev" aria-label="Semaine précédente">◀</button>
-          <span class="lbl" id="pLbl"></span>
-          <button class="btn sm" type="button" id="pNext" aria-label="Semaine suivante">▶</button>
-          <button class="btn sm ghost" type="button" id="pNow">Cette semaine</button>
-        </div>
-        <label class="toggle"><input type="checkbox" id="pTpl" checked> Afficher la semaine type</label>
-      </header>
-      <p class="muted small" style="margin:0">Touche un créneau vide pour ajouter une tâche à cette heure-là, ou « + tâche » sous le jour pour une tâche sans heure. Touche une tâche pour la modifier ou la cocher. Les kholles, les ED et ta semaine type (en fond pâle) s'affichent tout seuls.</p>
+    <div class="bar-top">
+      <div class="plan-nav">
+        <button class="btn icon" type="button" id="pPrev" aria-label="Semaine précédente">‹</button>
+        <span class="lbl" id="pLbl"></span>
+        <button class="btn icon" type="button" id="pNext" aria-label="Semaine suivante">›</button>
+        <button class="link" type="button" id="pNow">Aujourd'hui</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="pTpl" checked> Semaine type</label>
     </div>
     <div class="cal" id="cal"></div>
+    <p class="hint">Touche un créneau vide pour ajouter une tâche.</p>
+    <details class="panel fold">
+      <summary><h2>Bilan de la semaine</h2><span class="muted small num" id="wkId"></span></summary>
+      <form class="f" id="bilanForm">
+        <label class="full">Ce qui a bien marché<textarea id="b-ok"></textarea></label>
+        <label class="full">Ce qui a coincé<textarea id="b-ko"></textarea></label>
+        <label class="full">Ce que je change la semaine prochaine<textarea id="b-change"></textarea></label>
+        <label>Énergie (1 à 5)<select id="b-energie"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+        <label>Stress (1 à 5)<select id="b-stress"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+        <div><button class="btn primary" type="submit">Enregistrer</button></div>
+      </form>
+      <div id="bilans" class="rows"></div>
+    </details>
   </section>
 
   <!-- COURS -->
   <section class="view" id="v-cours" hidden>
-    <div class="panel">
-      <header><h2>Avancement des cours</h2>
-        <div class="legend"><span style="--c:#7c6fd6">3 passages</span><span style="--c:#a9a0e6">2 passages</span><span style="--c:#d6d1f5">1 passage</span><span style="--c:var(--surface-2)">pas commencé</span></div>
-      </header>
-      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre et tu peux noter ton score au QCM et ton ressenti, du vert (facile) au rouge (difficile). Touche un passage déjà fait pour le modifier. ★ = cours difficile, il ira dans le créneau du samedi matin. « Anki » = les cartes du cours sont activées. ✎ pour renommer, changer les dates ou ajouter une note.</p>
-      <div class="chips" id="matChips"></div>
-    </div>
-    <div id="coursList" style="display:grid;gap:20px"></div>
+    <div class="pies" id="pies"></div>
+    <div class="chips" id="matChips"></div>
+    <div id="coursList" style="display:grid;gap:16px"></div>
   </section>
 
   <!-- KHOLLES -->
@@ -259,87 +312,68 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;p
       <div class="chart" id="chart"></div>
     </div>
     <div class="panel">
-      <header><h2>Ajouter une kholle</h2><span class="muted small">sans classement = kholle à venir, elle apparaît dans ton calendrier</span></header>
-      <form class="f" id="khForm">
+      <header><h2>Kholles</h2><button class="link" type="button" id="khAddBtn">+ Ajouter</button></header>
+      <form class="f" id="khForm" hidden>
         <label>Date<input type="date" id="kh-date" required></label>
         <label>Matière<select id="kh-mat"></select></label>
         <label>Organisme<select id="kh-org"><option>Tutorat</option><option>Prépa</option></select></label>
         <label>Rang<input type="number" id="kh-rang" min="1" inputmode="numeric"></label>
         <label>Sur<input type="number" id="kh-total" min="1" inputmode="numeric"></label>
         <label>Note /20<input type="number" id="kh-note" step="0.01" min="0" max="20" inputmode="decimal"></label>
-        <label class="full">Ce que je retiens (erreurs, pièges)<input type="text" id="kh-com"></label>
+        <label class="full">Ce que je retiens<input type="text" id="kh-com"></label>
         <div><button class="btn primary" type="submit">Enregistrer</button></div>
       </form>
+      <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Matière</th><th class="n">Rang</th><th class="n">Top %</th><th>Retour</th><th></th></tr></thead><tbody id="khRows"></tbody></table></div>
     </div>
     <div class="panel">
-      <header><h2>Toutes les kholles</h2><span class="muted small">✎ pour ajouter ton rang quand tu as le résultat</span></header>
-      <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Matière</th><th>Orga</th><th class="n">Rang</th><th class="n">Top %</th><th class="n">Note</th><th>Retour</th><th></th></tr></thead><tbody id="khRows"></tbody></table></div>
+      <header><h2>Jusqu'au concours</h2></header>
+      <div class="weeks" id="weeks"></div>
     </div>
-  </section>
-
-  <!-- SEMAINE -->
-  <section class="view" id="v-semaine" hidden>
-    <div class="panel">
-      <header><h2>Ta semaine type</h2><span class="muted small">Lever 6 h 30 · écrans coupés 22 h 45 · coucher 23 h 30</span></header>
-      <p class="muted small prose" style="margin:0">Les nouveaux cours sortent du mardi midi au vendredi, donc la semaine sert aux 1ers et 2es passages. Du vendredi soir au mardi midi : ancrage, blocs de révision et rattrapage. Les blocs durent 50 min avec 10 min de pause, et tu changes de manière de travailler à chaque bloc (lecture → ardoise → QCM).</p>
-      <p class="small prose" style="margin:0"><b>Bloc de révision kholle</b> : lundi 8 h–10 h et dimanche 8 h 30–12 h. <b>Cahier d'exos du tutorat</b> : lundi 17 h 30–19 h et samedi 10 h 45–12 h 30.</p>
-      <div class="legend">
-        <span style="--c:var(--k-anki)">Anki</span><span style="--c:var(--k-p1)">1er passage</span><span style="--c:var(--k-p2)">2e passage</span><span style="--c:var(--k-p3)">3e passage</span><span style="--c:var(--k-bloc)">Bloc kholle</span><span style="--c:var(--k-diff)">Cours difficiles</span><span style="--c:var(--k-tut)">Tutorat / kholle</span><span style="--c:var(--k-shs)">SHS mineure</span><span style="--c:var(--k-libre)">Libre</span>
-      </div>
-    </div>
-    <div class="week" id="week"></div>
   </section>
 
   <!-- METHODE -->
   <section class="view" id="v-methode" hidden>
     <div class="panel">
-      <header><h2>Le cycle d'un cours</h2><span class="eyebrow">J = jour de sortie</span></header>
+      <header><h2>Le cycle d'un cours</h2></header>
       <div class="steps">
-        <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découverte</h3><span class="small">Tu lis pour comprendre, sur tablette. Tu surlignes <b>dans une seule couleur</b> ce qui mérite une carte (chiffres, listes, exceptions, pièges). Tu regardes les QCM du cours pour voir ce qu'on attend de toi. Puis tu envoies le PDF surligné à l'IA pour tes cartes.</span></div>
-        <div class="step"><span class="k">P2 · J+1 à J+3</span><h3>Appropriation</h3><span class="small">À l'ardoise : schémas, moyens mnémotechniques, tu réexpliques à voix haute. Puis QCM du cours. Tu vois les nouvelles cartes pour la première fois et tu suspends tout de suite celles qui sont évidentes pour toi.</span></div>
-        <div class="step"><span class="k">P3 · week-end</span><h3>Ancrage</h3><span class="small">Sans relire : page blanche ou ardoise, tu restitues de mémoire le plan, les schémas et les chiffres. Tu compares, puis QCM. Tu ne relis que les trous.</span></div>
-        <div class="step"><span class="k">Ensuite · tous les jours</span><h3>Entretien</h3><span class="small">Anki chaque matin, un bloc de révision avant chaque kholle, et des QCM mélangés en fin de journée.</span></div>
+        <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découvrir</h3><span class="small">Lire pour comprendre. Surligner d'une seule couleur ce qui mérite une carte. Regarder les QCM du cours.</span></div>
+        <div class="step"><span class="k">P2 · J+1 à J+3</span><h3>S'approprier</h3><span class="small">Ardoise, schémas, voix haute, puis QCM du cours. Réactiver les cartes du cours dans Anki.</span></div>
+        <div class="step"><span class="k">P3 · week-end</span><h3>Ancrer</h3><span class="small">Tout restituer de mémoire, comparer, puis QCM. Relire seulement les trous.</span></div>
+        <div class="step"><span class="k">Chaque jour</span><h3>Entretenir</h3><span class="small">Anki le matin, bloc de révision avant les kholles, QCM mélangés le soir.</span></div>
       </div>
     </div>
-    <div class="grid2">
-      <div class="panel prose">
-        <header><h2>Anki</h2></header>
-        <ul>
-          <li><b>Chaque jour, tu vides les cartes « à revoir » du paquet parent.</b> Anki ne te montre que les cartes arrivées à échéance.</li>
-          <li><b>Réglages</b> : FSRS activé, rétention visée 0,90, intervalle maximal 21 jours, révisions max 9999.</li>
-          <li><b>Tes cartes</b> : l'IA les fait à partir de ce que tu as surligné, en en faisant le moins possible sans perdre d'info. Tu suspends les évidentes à la première vue.</li>
-          <li><b>Le vrai indicateur</b> : le temps passé par jour (Statistiques d'Anki). Vise 45 à 60 min. Si tu dépasses 1 h 15 plusieurs jours de suite, surligne moins et suspends plus. Ne saute jamais un jour.</li>
-          <li>Les cartes d'un cours sont activées le <b>jour de son 2e passage</b>.</li>
-        </ul>
-      </div>
-      <div class="panel prose">
-        <header><h2>Règles pour tenir jusqu'en décembre</h2></header>
-        <ul>
-          <li><b>Organisation : 10 min par jour à 19 h</b>, plus 20 min le dimanche pour le bilan et le planning de la semaine. En dehors, tu ne touches pas au planning.</li>
-          <li><b>Un seul outil de suivi</b> : cette page. Plus de tableau à côté.</li>
-          <li><b>Un retard ne se rattrape pas « comme il faut »</b> : un seul passage actif (ardoise de mémoire puis QCM), dans le créneau de rattrapage du dimanche.</li>
-          <li><b>Le cours le plus difficile va dans un créneau réservé</b> (samedi matin, vendredi en fin de journée), pas au milieu d'une journée chargée.</li>
-          <li><b>Barème −1 par item faux</b> en chimie, histo et embryo : en QCM, entraîne-toi à laisser un item vide quand tu doutes.</li>
-          <li><b>Parler à voix haute : en P2 et P3</b>, jamais en P1.</li>
-          <li>Une soirée par semaine avec ta famille ou tes amis, et le samedi soir libre. Ça ne se négocie pas.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="panel prose" style="max-width:none">
-      <header><h2>Ne rien louper</h2><span class="eyebrow">chaque info a sa place</span></header>
-      <div class="steps">
-        <div class="step"><span class="k">La fiche</span><h3>Contient tout</h3><span class="small">Ta fiche annotée reste la référence complète. À chaque 3e passage et à chaque bloc kholle, tu restitues <b>tout le cours</b> de mémoire, pas seulement tes cartes.</span></div>
-        <div class="step"><span class="k">Les QCM</span><h3>Repèrent les trous</h3><span class="small">Chaque item raté ou deviné te montre une info qui manque. Tu en fais une carte « erreur », et ce sont les cartes les plus rentables.</span></div>
-        <div class="step"><span class="k">Ton surlignage</span><h3>Choisit les cartes</h3><span class="small">C'est toi qui décides ce qui va dans Anki, au moment où tu découvres le cours. L'IA ne fait que le mettre en forme.</span></div>
-        <div class="step"><span class="k">Le filet de sécurité</span><h3>Vérifier la couverture</h3><span class="small">L'IA liste les infos importantes que tu n'as pas surlignées. Tu lis cette liste en 2 min et tu ajoutes seulement ce qui peut tomber.</span></div>
-      </div>
-    </div>
-    <div class="panel">
-      <header><h2>Tes matières</h2><span class="muted small">d'après les guides de la prépa</span></header>
-      <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin des cours</th><th>Priorité de méthode</th></tr></thead><tbody id="matRows"></tbody></table></div>
-    </div>
-    <div class="panel">
-      <header><h2>Demande de cartes Anki à l'IA</h2><button class="btn" id="copyPrompt" type="button">Copier</button></header>
+    <details class="panel fold">
+      <summary><h2>Anki</h2></summary>
+      <ul class="prose">
+        <li>Chaque jour, vider les cartes « à revoir » du paquet parent.</li>
+        <li>Réglages : FSRS, rétention 0,90, intervalle max 21 jours, révisions max 9999.</li>
+        <li>Les cartes d'un cours restent suspendues jusqu'à son 2e passage.</li>
+        <li>Suspendre tout de suite les cartes évidentes, à la première vue.</li>
+        <li>Indicateur : 45 à 60 min par jour. Au-delà de 1 h 15 plusieurs jours de suite, surligner moins.</li>
+      </ul>
+    </details>
+    <details class="panel fold">
+      <summary><h2>Règles pour tenir</h2></summary>
+      <ul class="prose">
+        <li>Organisation : 10 min par jour à 19 h, 20 min le dimanche. Un seul outil : cette page.</li>
+        <li>Un retard se rattrape en un seul passage actif, dans le créneau du dimanche.</li>
+        <li>Les cours ★ difficiles vont dans le créneau du samedi matin.</li>
+        <li>−1 par item faux en chimie, histo, embryo : laisser vide quand on doute.</li>
+        <li>Voix haute en P2 et P3, jamais en P1.</li>
+        <li>Une soirée par semaine avec la famille ou les amis, et le samedi soir libre.</li>
+      </ul>
+    </details>
+    <details class="panel fold">
+      <summary><h2>Semaine type</h2><span class="muted small">lever 6 h 30 · coucher 23 h 30</span></summary>
+      <div class="week" id="week"></div>
+    </details>
+    <details class="panel fold">
+      <summary><h2>Mes matières</h2></summary>
+      <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin</th><th>Priorité</th></tr></thead><tbody id="matRows"></tbody></table></div>
+    </details>
+    <details class="panel fold">
+      <summary><h2>Demande de cartes à l'IA</h2></summary>
+      <div style="display:flex;justify-content:flex-end"><button class="btn" id="copyPrompt" type="button">Copier</button></div>
       <pre class="prompt" id="promptTxt">Voici mon cours de [MATIÈRE] – [TITRE DU COURS], en PDF. J'ai surligné les passages à mettre en cartes.
 Règles :
 - Fais des cartes UNIQUEMENT pour les passages surlignés, en gardant toutes leurs infos.
@@ -347,27 +381,7 @@ Règles :
 - Formule les trous sur les pièges des items de QCM (valeurs proches, « sauf », inversions).
 - Donne le résultat en TSV : Texte[TAB]Extra[TAB]Tags, avec le tag PASS::[Matière]::[Cours].
 Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'ai PAS surlignées et qui pourraient tomber en QCM, pour que je vérifie.</pre>
-    </div>
-  </section>
-
-  <!-- BILAN -->
-  <section class="view" id="v-bilan" hidden>
-    <div class="panel">
-      <header><h2>Bilan de la semaine</h2><span class="muted small num" id="wkId"></span></header>
-      <p class="muted small" style="margin:0">20 minutes le dimanche soir. Je le lis quand tu me demandes d'ajuster la méthode.</p>
-      <form class="f" id="bilanForm">
-        <label class="full">Ce qui a bien marché<textarea id="b-ok"></textarea></label>
-        <label class="full">Ce qui a coincé<textarea id="b-ko"></textarea></label>
-        <label class="full">Ce que je change la semaine prochaine<textarea id="b-change"></textarea></label>
-        <label>Énergie (1 à 5)<select id="b-energie"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
-        <label>Stress (1 à 5)<select id="b-stress"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
-        <div><button class="btn primary" type="submit">Enregistrer le bilan</button></div>
-      </form>
-    </div>
-    <div class="panel">
-      <header><h2>Bilans précédents</h2></header>
-      <div id="bilans" class="rows"></div>
-    </div>
+    </details>
   </section>
 </div>
 
@@ -477,7 +491,7 @@ const hsh=(location.hash||"").slice(1);if(hsh&&$("#v-"+hsh))showTab(hsh);
 
 /* countdown */
 const jm=dayN(CONCOURS)-dayN(today());$("#jminus").textContent=jm>0?"J-"+jm:"J";
-$("#jtxt").textContent=jm>0?"avant le concours · "+Math.ceil(jm/7)+" semaines":"le concours, c'est aujourd'hui";
+$("#jtxt").textContent=jm>0?Math.ceil(jm/7)+" semaines":"c'est aujourd'hui";
 
 /* status logic */
 function status(c){
@@ -507,17 +521,15 @@ function renderAuj(){
   const done3=C.filter(c=>c.p3).length, started=C.filter(c=>c.p1).length;
   const next=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
   const tDay=T.filter(t=>t.date===today()), tDone=tDay.filter(t=>t.fait).length;
-  $("#stats").innerHTML=
-   `<div class="stat ${late?"late":""}"><span class="eyebrow">En retard</span><b class="num">${late}</b><span class="small muted">passages</span></div>`+
-   `<div class="stat"><span class="eyebrow">Tâches du jour</span><b class="num">${tDone}<span class="small muted"> / ${tDay.length}</span></b><span class="small muted">faites</span></div>`+
-   `<div class="stat"><span class="eyebrow">Cours vus</span><b class="num">${started}<span class="small muted"> / ${C.length}</span></b><span class="small muted">au moins 1 passage</span></div>`+
-   `<div class="stat"><span class="eyebrow">Ancrés</span><b class="num">${done3}</b><span class="small muted">3 passages faits</span></div>`+
-   `<div class="stat" style="${next?mvars(next.matiere)+";background:var(--mbg)":""}"><span class="eyebrow">Prochaine kholle</span><b style="font-size:1.1rem">${next?esc(matById(next.matiere).nom):"–"}</b><span class="small muted">${next?fmt(next.date)+" · "+esc(next.orga||""):"ajoute-la dans Kholles"}</span></div>`;
-  const wd=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][new Date().getDay()];
-  $("#todayLabel").textContent=wd+" "+fmt(today());
+  const DJ=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  const nd=next?new Date(next.date+"T12:00:00"):null;
+  $("#hello").innerHTML=next?`Prochaine kholle : <span class="mtag" style="${mvars(next.matiere)}">${esc(matById(next.matiere).nom.replace(/ \(.*\)/,""))}</span> ${next.date===today()?"aujourd'hui":DJ[nd.getDay()]+" "+fmt(next.date)}`:"Concours le jeudi 17 décembre";
+  $("#lateBadge").innerHTML=late?`<span class="pill late">${late} en retard</span>`:`<span class="pill ok">à jour</span>`;
+  $("#todayLabel").textContent=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
   const ul=$("#todo");
-  if(!items.length){ul.innerHTML=`<li class="muted">Aucun passage en attente. Fais les 1ers passages des cours qui sortent aujourd'hui, et coche P1 dans l'onglet Cours.</li>`}
-  else ul.innerHTML=items.slice(0,14).map(i=>`<li class="task" style="${mvars(i.c.matiere)}"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom)} · ${esc(i.why)}</span></span><span class="acts"><button class="btn sm" data-plan="${esc(i.c.id)}" data-k="${i.kind}" aria-label="Ajouter à mon planning d'aujourd'hui">+</button><button class="btn sm" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></span></li>`).join("")+(items.length>14?`<li class="small muted">+ ${items.length-14} autres dans l'onglet Cours</li>`:"");
+  if(!items.length){ul.innerHTML=`<li class="muted small">Rien en attente.</li>`}
+  else ul.innerHTML=items.slice(0,5).map(i=>`<li class="task" style="${mvars(i.c.matiere)}"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom.replace(/ \(.*\)/,""))} · ${esc(i.why)}</span></span><span class="acts"><button class="btn sm" data-plan="${esc(i.c.id)}" data-k="${i.kind}" aria-label="Ajouter à mon planning d'aujourd'hui">+</button><button class="btn sm" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></span></li>`).join("");
+  const sa=$("#seeAll");sa.hidden=items.length<=5;sa.textContent=`Voir les ${items.length} cours à reprendre`;sa.onclick=()=>{filt="late";renderCours()};
   ul.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k==="Anki")setField(b.dataset.done,{anki:true});else openPass(b.dataset.done,k.toLowerCase())});
   ul.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.plan);addTask({date:today(),heure:"",texte:(b.dataset.k==="Anki"?"Activer les cartes · ":b.dataset.k+" · ")+c.titre,matiere:c.matiere})});
   $("#todayDay").innerHTML=dayHtml(today(),true);
@@ -551,7 +563,7 @@ function matOptions(){return `<option value="">Matière…</option>`+[...M].sort
 function dayHtml(dIso,compact){
   const its=dayItems(dIso);
   return `${its.map(i=>i.html).join("")||`<p class="muted small" style="margin:0">Rien de prévu.</p>`}
-   <form class="addf" data-date="${dIso}" style="margin-top:6px"><div class="r"><input type="text" name="texte" placeholder="Ajouter une tâche" aria-label="Nouvelle tâche" required><button class="btn sm primary" type="submit">+</button></div><div class="r" style="grid-template-columns:1fr 1fr"><input type="time" name="heure" aria-label="Heure"><select name="matiere" aria-label="Matière">${matOptions()}</select></div></form>`;
+   <form class="addf" data-date="${dIso}"><div class="r" style="grid-template-columns:1fr 92px 120px auto"><input type="text" name="texte" placeholder="Ajouter une tâche…" aria-label="Nouvelle tâche" required><input type="time" name="heure" aria-label="Heure"><select name="matiere" aria-label="Matière">${matOptions()}</select><button class="btn primary" type="submit" aria-label="Ajouter">+</button></div></form>`;
 }
 function wireDay(root){
   root.querySelectorAll("[data-tdone]").forEach(b=>b.onchange=()=>updTask(b.dataset.tdone,{fait:b.checked}));
@@ -656,18 +668,19 @@ function counts(cs){const n3=cs.filter(c=>c.p3).length,n2=cs.filter(c=>c.p2&&!c.
 function avgPct(cs){const v=[];cs.forEach(c=>{const r=c.r||{};for(const p of ["p3","p2","p1"]){const x=pct(r[p]);if(x!=null){v.push(x);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
 function renderPies(){
   const acc=["#7c6fd6","#a9a0e6","#d9d4f6","#ececf3"];const all=counts(C);const tot=C.length||1;
-  $("#pieAll").innerHTML=donut(all,acc,Math.round(all[0]/tot*100)+" %","Avancement global",22)+`<span class="nm">Tous les cours</span><span class="sub">${C.length} cours</span>`;
+  $("#pieAll").innerHTML=donut(all,acc,Math.round(all[0]/tot*100)+" %","Avancement global",22);
   const av=avgPct(C);
-  $("#pieLegend").innerHTML=["3 passages · ancrés","2 passages","1 passage","pas commencé"].map((l,i)=>`<span style="--c:${acc[i]}">${l} : <b class="num">${all[i]}</b> (${Math.round(all[i]/tot*100)} %)</span>`).join("")+(av!=null?`<span class="small muted" style="margin-top:4px">Score moyen à ton dernier QCM : <b class="num">${av} %</b></span>`:"");
+  $("#pieLegend").innerHTML=["Ancrés","2 passages","1 passage","Pas commencés"].map((l,i)=>`<span style="--c:${acc[i]}">${l} <b class="num">${all[i]}</b></span>`).join("")+(av!=null?`<span class="small muted" style="margin-top:6px">QCM moyen <b class="num">${av} %</b></span>`:"");
   $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const k=counts(cs);const a=avgPct(cs);
-    return `<div class="pie" style="${mvars(m.id)}">${donut(k,[mc,mc+"99",mc+"4d",mc+"1a"],Math.round(k[0]/cs.length*100)+" %",m.nom+" : "+k[0]+" ancrés sur "+cs.length)}<span class="nm">${esc(m.nom.replace(/ \(.*\)/,""))}</span><span class="sub">${k[0]+k[1]+k[2]}/${cs.length} vus${a!=null?" · QCM "+a+" %":""}</span></div>`}).join("");
+    return `<button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut(k,[mc,mc+"99",mc+"4d",mc+"1a"],Math.round(k[0]/cs.length*100)+" %",m.nom+" : "+k[0]+" ancrés sur "+cs.length)}<span class="nm">${esc(m.nom.replace(/ \(.*\)/,""))}</span><span class="sub">${k[0]+k[1]+k[2]}/${cs.length} vus${a!=null?" · QCM "+a+" %":""}</span></button>`}).join("");
+  $("#pies").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=filt===b.dataset.f?"all":b.dataset.f;renderPies();renderCours()});
 }
 
 /* COURS */
 function renderCours(){
   const mats=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0));
-  $("#matChips").innerHTML=`<button class="chip" data-f="all" aria-pressed="${filt==="all"}">Toutes</button><button class="chip" data-f="late" aria-pressed="${filt==="late"}">En retard</button><button class="chip" data-f="star" aria-pressed="${filt==="star"}">★ Difficiles</button>`+mats.map(m=>`<button class="chip" style="${mvars(m.id)}" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}"><span class="mdot"></span>${esc(m.nom)}</button>`).join("");
-  $("#matChips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderCours()});
+  $("#matChips").innerHTML=`<button class="chip" data-f="all" aria-pressed="${filt==="all"}">Tous les cours</button><button class="chip" data-f="late" aria-pressed="${filt==="late"}">En retard</button><button class="chip" data-f="star" aria-pressed="${filt==="star"}">★ Difficiles</button>`;
+  $("#matChips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderCours();renderPies()});
   const list=$("#coursList");let html="";
   for(const m of mats){
     let cs=C.filter(c=>c.matiere===m.id).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
@@ -678,11 +691,10 @@ function renderCours(){
     if((filt==="late"||filt==="star")&&!cs.length)continue;
     const mc=MCOL[m.id]||["#eee","#7c6fd6"];
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
-    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} ancrés · ${n2} en P2 · ${n1} en P1 · ${all} cours</span></div>
-     <div class="bar" role="img" aria-label="${n3} cours à 3 passages, ${n2} à 2, ${n1} à 1, sur ${all}">${n3?`<i style="width:${n3/tot*100}%;background:${mc[1]}"></i>`:""}${n2?`<i style="width:${n2/tot*100}%;background:${mc[1]};opacity:.55"></i>`:""}${n1?`<i style="width:${n1/tot*100}%;background:${mc[1]};opacity:.25"></i>`:""}</div>
+    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} / ${all} ancrés</span></div>
      <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
        <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
-     ${filt===m.id||filt==="all"?`<div><button class="btn ghost" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
+     ${filt===m.id?`<div><button class="link" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
   }
   list.innerHTML=html||`<p class="muted">Rien à afficher avec ce filtre.</p>`;
   list.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.id);const p=b.dataset.p;if(p==="anki"){setField(c.id,{anki:!c.anki});return}openPass(c.id,p)});
@@ -712,11 +724,11 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
 function renderKholles(){
   const {lo,hi,c}=refs();
-  $("#refTxt").textContent=hi?`zone d'admission estimée : top ${lo.toFixed(1)} % à ${hi.toFixed(1)} % (${c.placesMed} places, ≈ ${c.candidats} candidats en médecine, ${c.promo} en PASS)`:"";
+  $("#refTxt").textContent=hi?`zone verte : top ${lo.toFixed(0)} à ${hi.toFixed(0)} %`:"";
   $("#kh-mat").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>`<option value="${esc(m.id)}">${esc(m.nom)}</option>`).join("");
   const rows=[...K].sort((a,b)=>a.date<b.date?1:-1);
   $("#khRows").innerHTML=rows.map(k=>{const p=k.rang&&k.total?k.rang/k.total*100:null;const cls=p==null?"":lo!=null&&p<=lo?"ok":hi!=null&&p<=hi?"info":"due";
-    return `<tr><td class="num">${fmt(k.date)}</td><td><span class="mtag" style="${mvars(k.matiere)}">${esc(matById(k.matiere).nom)}</span></td><td>${esc(k.orga||"")}</td><td class="n">${k.rang?k.rang+" / "+k.total:"à venir"}</td><td class="n">${p!=null?`<span class="pill ${cls}">${p.toFixed(1)} %</span>`:"–"}</td><td class="n">${k.note!=null&&k.note!==""?esc(k.note):"–"}</td><td class="small">${esc(k.com||"")}</td><td style="white-space:nowrap"><button class="btn ghost sm" data-kedit="${esc(k.id)}" aria-label="Modifier">✎</button><button class="btn ghost sm" data-kdel="${esc(k.id)}" aria-label="Supprimer">✕</button></td></tr>`}).join("")||`<tr><td colspan="8" class="muted">Aucune kholle enregistrée.</td></tr>`;
+    return `<tr><td class="num">${fmt(k.date)}</td><td><span class="mtag" style="${mvars(k.matiere)}">${esc(matById(k.matiere).nom.replace(/ \(.*\)/,""))}</span> <span class="muted small">${esc(k.orga||"")}</span></td><td class="n">${k.rang?k.rang+" / "+k.total:"<span class='muted'>à venir</span>"}</td><td class="n">${p!=null?`<span class="pill ${cls}">${p.toFixed(1)} %</span>`:""}</td><td class="small">${esc(k.com||"")}</td><td style="white-space:nowrap"><button class="btn ghost sm" data-kedit="${esc(k.id)}" aria-label="Modifier">✎</button><button class="btn ghost sm" data-kdel="${esc(k.id)}" aria-label="Supprimer">✕</button></td></tr>`}).join("")||`<tr><td colspan="6" class="muted">Aucune kholle enregistrée.</td></tr>`;
   $("#khRows").querySelectorAll("[data-kdel]").forEach(b=>b.onclick=async()=>{if(b.dataset.arm){try{await db.doc("kholles/"+b.dataset.kdel).delete()}catch(e){toast("Suppression impossible")}}else{b.dataset.arm=1;b.textContent="Confirmer";setTimeout(()=>{delete b.dataset.arm;b.textContent="✕"},3000)}});
   $("#khRows").querySelectorAll("[data-kedit]").forEach(b=>b.onclick=()=>openK(b.dataset.kedit));
   drawChart(lo,hi);
@@ -742,8 +754,9 @@ function drawChart(lo,hi){
 $("#khForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   const n=v=>v===""?null:Number(v);
   const doc={date:$("#kh-date").value,matiere:$("#kh-mat").value,orga:$("#kh-org").value,rang:n($("#kh-rang").value),total:n($("#kh-total").value),note:n($("#kh-note").value),com:$("#kh-com").value.trim()};
-  try{await db.collection("kholles").add(doc);e.target.reset();toast("Kholle enregistrée")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
+  try{await db.collection("kholles").add(doc);e.target.reset();e.target.hidden=true;toast("Kholle enregistrée")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
+$("#khAddBtn").onclick=()=>{const f=$("#khForm");f.hidden=!f.hidden;if(!f.hidden)$("#kh-date").focus()};
 /* SEMAINE TYPE */
 function renderSemaine(){const t=(new Date().getDay()+6)%7;
   $("#week").innerHTML=WEEK.map((d,i)=>`<div class="day ${i===t?"today":""}"><h3>${d.d}</h3>${d.b.map(x=>`<div class="blk" style="--c:var(${KCOL[x[3]]})"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}</div>`).join("")}</div>`).join("")}
