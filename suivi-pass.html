@@ -222,23 +222,33 @@ button.pie[aria-pressed="true"]{border-color:var(--mfg)}
 .row{background:transparent;border-bottom:1px solid var(--line);border-radius:0;padding:7px 2px}
 .rows .row:last-child{border-bottom:0}
 .pass{border-color:var(--line);background:#fff}
-.pdfv{position:fixed;inset:0;z-index:40;background:#e9e9ef;display:grid;grid-template-rows:auto 1fr}
-.pdfbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#fff;box-shadow:0 1px 3px rgb(42 44 63 / .1)}
-.pdfbar #pdf-title{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pdfpages{overflow:auto;padding:16px;display:grid;justify-items:center;align-content:start;gap:12px;-webkit-overflow-scrolling:touch}
-.pdftools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.seg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:2px}
-.seg button{border:0;background:transparent;font:700 .8rem var(--font-b);color:var(--ink-2);padding:6px 10px;border-radius:8px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgb(42 44 63 / .12)}
-.zoom{display:inline-flex;align-items:center;gap:4px}
-.zoom .btn.icon{width:30px;height:30px}
-.zoom span{min-width:4.2em;text-align:center}
-.pdfpages figure{margin:0;display:grid;justify-items:center;gap:4px}
-.pdfpages img{display:block;background:#fff;box-shadow:0 1px 4px rgb(0 0 0 / .15);max-width:none}
-.pdfpages figcaption{display:none;font:500 .75rem var(--font-m);color:var(--ink-2)}
-.pdfpages.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-items:start}
+.pdfv{position:fixed;inset:0;z-index:40;background:#dcdce2;display:grid;grid-template-rows:auto 1fr;font-family:var(--font-b)}
+.pdfbar{display:flex;align-items:center;gap:6px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:#f7f7f9;border-bottom:1px solid #d5d5dc}
+.pdfbar .ttl{flex:1;min-width:0;text-align:center;font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2a2c3f}
+.tb{border:0;background:transparent;color:#3a3d52;min-width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:700 .82rem var(--font-b);cursor:pointer;padding:0 8px}
+.tb svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb[aria-pressed="true"]{background:#e3e1f7;color:#5b4fc4}
+.tb:disabled{opacity:.35}
+.tb.back{color:#5b4fc4}
+.pdfbody{display:grid;grid-template-columns:auto 1fr;min-height:0}
+.pdfside{width:132px;background:#eeeef2;border-right:1px solid #d5d5dc;overflow:auto;padding:10px 12px;display:grid;align-content:start;gap:10px}
+.pdfside[hidden]{display:none!important}
+.pdfside button{border:0;background:transparent;padding:0;cursor:pointer;display:grid;gap:3px;justify-items:center}
+.pdfside img{width:100%;height:auto;background:#fff;border:2px solid transparent;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / .15)}
+.pdfside button[aria-current="true"] img{border-color:#6a5cd6}
+.pdfside span{font:500 .7rem var(--font-m);color:#6b6f85}
+.pdfmain{position:relative;min-width:0;min-height:0}
+.pdfpages{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.pdfinner{display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px;min-width:100%;width:max-content;transform-origin:0 0}
+.pdfinner figure{margin:0;display:grid;justify-items:center;gap:4px}
+.pdfinner img{display:block;background:#fff;box-shadow:0 1px 5px rgb(0 0 0 / .18);max-width:none}
+.pdfinner figcaption{display:none;font:500 .75rem var(--font-m);color:#55586b}
+.pdfpages.grid .pdfinner{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));width:auto;align-items:start}
 .pdfpages.grid img{width:100%!important;height:auto!important;cursor:pointer}
 .pdfpages.grid figcaption{display:block}
+.pgpill{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgb(42 44 63 / .78);color:#fff;font:500 .78rem var(--font-m);padding:5px 12px;border-radius:999px;pointer-events:none}
+.zlabel{font:500 .75rem var(--font-m);color:#6b6f85;min-width:3.6em;text-align:center}
+@media (max-width:700px){.pdfbar .tb .lbl{display:none}}
 .polybox{display:grid;gap:6px;background:var(--surface-2);border-radius:12px;padding:10px 12px}
 .polybox a{color:var(--accent);font-weight:700}
 .pass.poly{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2)}
@@ -476,13 +486,20 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   <p class="small" id="tm-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
 </div></div>
 <div class="pdfv" id="pdfv" hidden role="dialog" aria-modal="true" aria-labelledby="pdf-title">
-  <div class="pdfbar"><button class="btn sm" type="button" id="pdf-close">Fermer</button><span id="pdf-title"></span>
-    <div class="pdftools">
-      <div class="seg" role="group" aria-label="Affichage"><button type="button" data-pm="fit" aria-pressed="true">Page entière</button><button type="button" data-pm="width" aria-pressed="false">Largeur</button><button type="button" data-pm="grid" aria-pressed="false">Vue d'ensemble</button></div>
-      <div class="zoom"><button class="btn sm icon" type="button" id="pdf-zo" aria-label="Dézoomer">−</button><span id="pdf-z" class="num small">100 %</span><button class="btn sm icon" type="button" id="pdf-zi" aria-label="Zoomer">+</button></div>
-      <button class="btn sm primary" type="button" id="pdf-save">Enregistrer / ouvrir dans une app</button>
-    </div></div>
-  <div class="pdfpages" id="pdf-pages"></div>
+  <div class="pdfbar">
+    <button class="tb back" type="button" id="pdf-close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span class="lbl">Cours</span></button>
+    <button class="tb" type="button" id="pdf-side" aria-pressed="true" aria-label="Miniatures"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="tb" type="button" data-pm="grid" aria-pressed="false" aria-label="Vue d'ensemble"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></button>
+    <span class="ttl" id="pdf-title"></span>
+    <button class="tb" type="button" data-pm="fit" aria-pressed="true" aria-label="Page entière"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="1.5"/></svg><span class="lbl">Page</span></button>
+    <button class="tb" type="button" data-pm="width" aria-pressed="false" aria-label="Largeur"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M7 9l-3 3 3 3M17 9l3 3-3 3"/></svg><span class="lbl">Largeur</span></button>
+    <button class="tb" type="button" id="pdf-zo" aria-label="Dézoomer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><span class="zlabel" id="pdf-z">100 %</span><button class="tb" type="button" id="pdf-zi" aria-label="Zoomer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
+    <button class="tb" type="button" id="pdf-save" aria-label="Enregistrer ou ouvrir dans une app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M5 19h14"/></svg><span class="lbl">Exporter</span></button>
+  </div>
+  <div class="pdfbody">
+    <nav class="pdfside" id="pdf-thumbs" aria-label="Pages"></nav>
+    <div class="pdfmain"><div class="pdfpages" id="pdf-pages"><div class="pdfinner" id="pdf-inner"></div></div><span class="pgpill" id="pdf-pg" hidden></span></div>
+  </div>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -806,47 +823,76 @@ $("#m-polyfile").addEventListener("change",async e=>{const f=e.target.files&&e.t
   try{const res=await assets.upload(f,{type:"application/pdf"});const c=C.find(x=>x.id===editing);const old=c&&c.poly;
     await setField(editing,{poly:res.id,polyNom:f.name});if(old){try{await assets.delete(old)}catch(_){}}toast("Polycopié joint");paintPoly(C.find(x=>x.id===editing))}
   catch(err){const m={too_large:"Fichier trop lourd (20 Mo maximum). Utilise plutôt un lien.",unsupported_type:"Seuls les PDF sont acceptés.",quota_or_state:"Espace de stockage plein.",rate_limited:"Trop d'envois d'un coup, réessaie dans un instant."}[err&&err.code]||"Envoi impossible ("+(err&&err.code||"erreur")+").";el.textContent=m}});
-/* Visionneuse PDF (pdf.js, sans worker séparé) */
-const pv={mode:"fit",z:1};
-function applyView(){const pages=$("#pdf-pages");pages.classList.toggle("grid",pv.mode==="grid");
-  document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pm===pv.mode)));
-  $("#pdf-z").textContent=pv.mode==="grid"?"–":Math.round(pv.z*100)+" %";$("#pdf-zo").disabled=$("#pdf-zi").disabled=pv.mode==="grid";
-  const H=Math.max(200,pages.clientHeight-32),Wd=Math.max(200,pages.clientWidth-32);
-  pages.querySelectorAll("img").forEach(im=>{if(pv.mode==="grid"){im.style.width=im.style.height="";return}
-    const ar=+im.dataset.ar||1.414;const w=pv.mode==="fit"?Math.min(H/ar,Wd*4)*pv.z:Wd*pv.z;im.style.width=Math.round(w)+"px";im.style.height=Math.round(w*ar)+"px"})}
-document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.onclick=()=>{pv.mode=b.dataset.pm;pv.z=1;applyView();$("#pdf-pages").scrollTop=0});
-$("#pdf-zi").onclick=()=>{pv.z=Math.min(4,pv.z*1.25);applyView()};
-$("#pdf-zo").onclick=()=>{pv.z=Math.max(.3,pv.z/1.25);applyView()};
-$("#pdf-pages").addEventListener("click",e=>{if(pv.mode!=="grid")return;const f=e.target.closest("figure");if(!f)return;pv.mode="fit";pv.z=1;applyView();f.scrollIntoView({block:"start"})});
-window.addEventListener("resize",()=>{if(!$("#pdfv").hidden)applyView()});
+/* Visionneuse PDF (pdf.js, sans worker séparé) : miniatures, page entière / largeur / vue d'ensemble, zoom au pincement */
 let downloads=null,pdfLib=null,pdfCur=null;
+const pv={mode:"fit",z:1,n:0,cur:1};
 function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
 async function getPdfLib(){if(pdfLib)return pdfLib;const B="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
   await loadScript(B+"pdf.min.js");await loadScript(B+"pdf.worker.min.js");pdfLib=window.pdfjsLib;return pdfLib}
+const PP=()=>$("#pdf-pages"),PI=()=>$("#pdf-inner");
+function applyView(){const pages=PP(),grid=pv.mode==="grid";pages.classList.toggle("grid",grid);
+  document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pm===pv.mode)));
+  $("#pdf-z").textContent=grid?"":Math.round(pv.z*100)+" %";$("#pdf-zo").disabled=$("#pdf-zi").disabled=grid;
+  const H=Math.max(200,pages.clientHeight-36),Wd=Math.max(200,pages.clientWidth-36);
+  PI().querySelectorAll("img").forEach(im=>{if(grid){im.style.width=im.style.height="";return}
+    const ar=+im.dataset.ar||1.414;const w=(pv.mode==="fit"?Math.min(H/ar,Wd):Wd)*pv.z;im.style.width=Math.round(w)+"px";im.style.height=Math.round(w*ar)+"px"});
+  $("#pdf-pg").hidden=grid||!pv.n}
+function curPage(){const pages=PP();const y=pages.scrollTop+pages.clientHeight*.35;let n=1;PI().querySelectorAll("figure").forEach(f=>{if(f.offsetTop<=y)n=+f.dataset.n});return n}
+function paintCur(){if(pv.mode==="grid")return;const n=curPage();if(n===pv.cur&&$("#pdf-pg").textContent)return;pv.cur=n;$("#pdf-pg").textContent=n+" / "+pv.n;
+  $("#pdf-thumbs").querySelectorAll("button").forEach(b=>{const on=+b.dataset.n===n;b.setAttribute("aria-current",String(on));if(on&&!$("#pdf-thumbs").hidden){const t=$("#pdf-thumbs"),r=b.offsetTop;if(r<t.scrollTop||r>t.scrollTop+t.clientHeight-80)t.scrollTop=r-40}})}
+function goPage(n){if(pv.mode==="grid"){pv.mode="fit";pv.z=1;applyView()}const f=PI().querySelector(`figure[data-n="${n}"]`);if(f)PP().scrollTop=f.offsetTop-12;paintCur()}
 async function openPdf(id){
   const c=C.find(x=>x.id===id);if(!c||!c.poly)return;
-  const v=$("#pdfv"),pages=$("#pdf-pages");pv.mode="fit";pv.z=1;applyView();$("#pdf-title").textContent=c.titre;$("#pdf-save").hidden=!downloads;
-  pages.innerHTML=`<p class="muted" style="text-align:center;padding:40px 0">Ouverture du polycopié…</p>`;v.hidden=false;
+  const v=$("#pdfv");$("#pdf-title").textContent=c.titre;$("#pdf-save").hidden=!downloads;
+  const side=$("#pdf-thumbs");side.innerHTML="";side.hidden=window.innerWidth<700;$("#pdf-side").setAttribute("aria-pressed",String(!side.hidden));
+  pv.mode="fit";pv.z=1;pv.n=0;pv.cur=0;PI().innerHTML=`<p style="padding:40px 0;color:#55586b">Ouverture du polycopié…</p>`;v.hidden=false;applyView();
   try{
     const buf=await (await fetch("/_blob/"+c.poly)).arrayBuffer();pdfCur={name:(c.polyNom||c.titre||"polycopie").replace(/\.pdf$/i,"")+".pdf",buf};
     const lib=await getPdfLib();const doc=await lib.getDocument({data:new Uint8Array(buf.slice(0)),isEvalSupported:false}).promise;
-    pages.innerHTML="";pv.aspects=[];
-    for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i);const vp0=pg.getViewport({scale:1});const sc=Math.min(1100/vp0.width,2.2);const vp=pg.getViewport({scale:sc});
+    PI().innerHTML="";pv.n=doc.numPages;
+    for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:Math.min(1400/vp0.width,2.4)});
       const cv=document.createElement("canvas");cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
-      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;if(v.hidden)break;
-      const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.88));cv.width=cv.height=0;
-      const fig=document.createElement("figure");fig.dataset.n=i;const im=document.createElement("img");im.alt="Page "+i;im.src=URL.createObjectURL(blob);im.dataset.ar=vp0.height/vp0.width;
-      const cap=document.createElement("figcaption");cap.textContent=i;fig.append(im,cap);pages.appendChild(fig);applyView()}
-  }catch(e){pages.innerHTML=`<p style="text-align:center;padding:40px 0">Impossible d'afficher ce PDF ici.${downloads?" Utilise « Enregistrer » pour l'ouvrir dans une app.":""}</p>`}
+      await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;if(v.hidden)return;
+      const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.9));cv.width=cv.height=0;const url=URL.createObjectURL(blob);
+      const fig=document.createElement("figure");fig.dataset.n=i;const im=document.createElement("img");im.alt="Page "+i;im.src=url;im.dataset.ar=vp0.height/vp0.width;
+      const cap=document.createElement("figcaption");cap.textContent=i;fig.append(im,cap);PI().appendChild(fig);
+      const tb=document.createElement("button");tb.type="button";tb.dataset.n=i;tb.innerHTML=`<img alt="" src="${url}"><span>${i}</span>`;tb.onclick=()=>goPage(i);side.appendChild(tb);
+      applyView();paintCur()}
+  }catch(e){PI().innerHTML=`<p style="padding:40px 16px;text-align:center;color:#55586b">Impossible d'afficher ce PDF ici.${downloads?" Utilise « Exporter » pour l'ouvrir dans une app.":""}</p>`}
 }
-$("#pdf-close").onclick=()=>{$("#pdfv").hidden=true;$("#pdf-pages").querySelectorAll("img").forEach(im=>URL.revokeObjectURL(im.src));$("#pdf-pages").innerHTML=""};
-$("#pdf-save").onclick=async()=>{if(!downloads||!pdfCur)return;try{await downloads.save({filename:pdfCur.name,data:new Blob([pdfCur.buf],{type:"application/pdf"})});}catch(e){if(e&&e.code!=="declined")toast("Enregistrement impossible ("+(e.code||"erreur")+")")}};
+function closePdf(){$("#pdfv").hidden=true;PI().querySelectorAll("img").forEach(im=>URL.revokeObjectURL(im.src));PI().innerHTML="";$("#pdf-thumbs").innerHTML=""}
+$("#pdf-close").onclick=closePdf;
+$("#pdf-side").onclick=()=>{const s=$("#pdf-thumbs");s.hidden=!s.hidden;$("#pdf-side").setAttribute("aria-pressed",String(!s.hidden));applyView()};
+document.querySelectorAll("#pdfv [data-pm]").forEach(b=>b.onclick=()=>{const n=pv.cur||1;pv.mode=b.dataset.pm;pv.z=1;applyView();if(pv.mode==="grid")PP().scrollTop=0;else goPage(n)});
+function zoomTo(nz,cx,cy){const pages=PP(),r0=pages.getBoundingClientRect();nz=Math.min(5,Math.max(.25,nz));
+  if(cx==null){cx=r0.left+r0.width/2;cy=r0.top+r0.height/2}
+  const ox=pages.scrollLeft+(cx-r0.left),oy=pages.scrollTop+(cy-r0.top),k=nz/pv.z;pv.z=nz;applyView();
+  pages.scrollLeft=ox*k-(cx-r0.left);pages.scrollTop=oy*k-(cy-r0.top);paintCur()}
+$("#pdf-zi").onclick=()=>zoomTo(pv.z*1.25);
+$("#pdf-zo").onclick=()=>zoomTo(pv.z/1.25);
+$("#pdf-save").onclick=async()=>{if(!downloads||!pdfCur)return;try{await downloads.save({filename:pdfCur.name,data:new Blob([pdfCur.buf],{type:"application/pdf"})})}catch(e){if(e&&e.code!=="declined")toast("Export impossible ("+(e.code||"erreur")+")")}};
+PP().addEventListener("scroll",()=>{if(!paintCur.q){paintCur.q=requestAnimationFrame(()=>{paintCur.q=0;paintCur()})}},{passive:true});
+PP().addEventListener("click",e=>{if(pv.mode!=="grid")return;const f=e.target.closest("figure");if(f)goPage(+f.dataset.n)});
+/* pincement à deux doigts : aperçu fluide par transform, puis mise en page réelle au relâchement */
+(()=>{const pts=new Map();let g=null;const pages=PP(),inner=PI();
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  pages.addEventListener("pointerdown",e=>{if(e.pointerType!=="touch"||pv.mode==="grid")return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const [a,b]=[...pts.values()];const r=pages.getBoundingClientRect();const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;
+      g={d0:dist(a,b),cx,cy,ox:pages.scrollLeft+cx-r.left,oy:pages.scrollTop+cy-r.top,k:1};inner.style.transformOrigin=g.ox+"px "+g.oy+"px"}});
+  pages.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(g&&pts.size===2){const [a,b]=[...pts.values()];g.k=Math.min(5/pv.z,Math.max(.25/pv.z,dist(a,b)/g.d0));inner.style.transform=`scale(${g.k})`;$("#pdf-z").textContent=Math.round(pv.z*g.k*100)+" %";e.preventDefault()}},{passive:false});
+  const up=e=>{pts.delete(e.pointerId);if(g&&pts.size<2){const k=g.k,G=g;g=null;inner.style.transform="";if(Math.abs(k-1)>.01)zoomTo(pv.z*k,G.cx,G.cy)}};
+  pages.addEventListener("pointerup",up);pages.addEventListener("pointercancel",up);
+  pages.addEventListener("wheel",e=>{if(!e.ctrlKey||pv.mode==="grid")return;e.preventDefault();zoomTo(pv.z*Math.exp(-e.deltaY/400),e.clientX,e.clientY)},{passive:false});
+  document.addEventListener("gesturestart",e=>{if(!$("#pdfv").hidden)e.preventDefault()});
+})();
+window.addEventListener("resize",()=>{if(!$("#pdfv").hidden)applyView()});
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;$("#m-lien").value=c.lien||"";paintPoly(c);
   $("#m-titre").value=c.titre||"";$("#m-donne").value=c.donne||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
 $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim(),lien:$("#m-lien").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#pdfv").hidden=true;$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
