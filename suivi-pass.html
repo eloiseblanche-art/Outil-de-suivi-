@@ -166,7 +166,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
       <header><h2>Avancement des cours</h2>
         <div class="legend"><span style="--c:var(--accent)">3 passages</span><span style="--c:#5b8fd6">2 passages</span><span style="--c:#9fb8dc">1 passage</span><span style="--c:var(--surface-2)">pas commencé</span></div>
       </header>
-      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre. Touche encore pour annuler. ★ = cours difficile, il ira dans le créneau du samedi matin. Le bouton ✎ sert à renommer, changer les dates ou ajouter une note.</p>
+      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre. Touche encore pour annuler. ★ = cours difficile, il ira dans le créneau du samedi matin. Le bouton ✎ sert à renommer, changer les dates, noter le nombre de cartes ou ajouter une note. « Anki » veut dire que les cartes du cours sont réactivées et que tu les révises.</p>
       <div class="chips" id="matChips"></div>
     </div>
     <div id="coursList" style="display:grid;gap:20px"></div>
@@ -298,7 +298,7 @@ Ensuite, sous le TSV : liste en une ligne chacune TOUTES les infos du cours qui 
   <div class="f" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
     <label>P1<input type="date" id="m-p1"></label><label>P2<input type="date" id="m-p2"></label><label>P3<input type="date" id="m-p3"></label>
   </div>
-  <label><span><input type="checkbox" id="m-anki" style="width:auto"> Cartes ajoutées dans Anki</span></label>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end"><label>Nombre de cartes<input type="number" id="m-cartes" min="0" inputmode="numeric"></label><label><span><input type="checkbox" id="m-anki" style="width:auto"> Cartes activées dans Anki</span></label></div>
   <label>Note<textarea id="m-note"></textarea></label>
   <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
     <button class="btn danger" id="m-del" type="button">Supprimer</button>
@@ -314,8 +314,8 @@ const CONCOURS = "2026-12-17";
 const WEEK = [
  {d:"Lundi",b:[["6:30","","Lever","libre"],["7:00","7:45","Anki : révisions du jour","anki"],["8:00","10:00","Bloc révision : matière de la kholle de jeudi (QCM de la banque + ardoise)","bloc"],["10:15","12:00","3es passages restants","p3"],["13:00","17:00","SHS mineure (fac)","shs"],["17:30","19:00","Cahier d'exos du tutorat","tut"],["19:00","19:10","Organisation (10 min)","org"],["20:30","21:30","Rattrapage léger ou libre","libre"]]},
  {d:"Mardi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages restants de la semaine d'avant","p2"],["10:15","12:00","Cours difficile n°1 (★)","diff"],["13:30","15:30","1ers passages : nouveaux cours sortis","p1"],["15:45","17:45","2es passages","p2"],["18:00","19:00","QCM mélangés (chimie + matière du jour)","p3"],["19:00","19:10","Organisation","org"],["20:30","21:30","Libre ou lecture légère","libre"]]},
- {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","QCM mélangés","p3"],["19:00","19:10","Organisation","org"]]},
- {d:"Jeudi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","16:30","2es passages + QCM du cours","p2"],["16:30","18:30","Kholle (horaire à confirmer)","tut"],["19:00","19:10","Organisation","org"],["19:30","","Soirée famille / amis (une semaine sur deux)","libre"]]},
+ {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","Kholle prépa si tu en as une (tu choisis ce créneau), sinon QCM mélangés","tut"],["19:00","19:10","Organisation","org"]]},
+ {d:"Jeudi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","17:00","2es passages + QCM du cours","p2"],["17:30","18:30","Kholle du tutorat","tut"],["18:45","18:55","Organisation","org"],["19:30","","Soirée famille / amis (une semaine sur deux)","libre"]]},
  {d:"Vendredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:00","Polycopiés + déjeuner","libre"],["13:00","15:00","2es passages : finir ceux de la semaine","p2"],["15:00","17:00","SHS mineure (13 h–17 h une semaine sur 4)","shs"],["17:30","19:00","Cours difficile n°2 (★) ou QCM","diff"],["19:00","","Soirée libre","libre"]]},
  {d:"Samedi",b:[["7:00","7:45","Anki","anki"],["8:00","10:30","Créneau réservé aux cours difficiles (★)","diff"],["10:45","12:30","Cahier d'exos du tutorat","tut"],["14:00","17:30","3es passages : ardoise de mémoire puis QCM","p3"],["17:30","","Soirée libre","libre"]]},
  {d:"Dimanche",b:[["7:30","8:15","Anki","anki"],["8:30","12:00","Bloc révision : matière de la kholle de jeudi","bloc"],["14:00","16:00","3es passages restants","p3"],["16:00","18:00","Rattrapage, ou libre si tu es à jour","diff"],["18:30","18:50","Bilan de la semaine + plan (onglet Bilan)","org"],["19:00","","Soirée libre","libre"]]}
@@ -371,6 +371,7 @@ function renderAuj(){
    `<div class="stat ${late?"late":""}"><span class="eyebrow">En retard</span><b class="num">${late}</b><span class="small muted">passages</span></div>`+
    `<div class="stat"><span class="eyebrow">Cours vus</span><b class="num">${started}<span class="small muted"> / ${C.length}</span></b><span class="small muted">au moins 1 passage</span></div>`+
    `<div class="stat"><span class="eyebrow">Ancrés</span><b class="num">${done3}</b><span class="small muted">3 passages faits</span></div>`+
+   `<div class="stat"><span class="eyebrow">Cartes Anki</span><b class="num">${C.reduce((a,c)=>a+(c.cartes||0),0)}</b><span class="small muted">≈ ${Math.round(C.reduce((a,c)=>a+(c.cartes||0),0)/Math.max(1,C.filter(c=>c.cartes).length))} par cours</span></div>`+
    `<div class="stat"><span class="eyebrow">Prochaine kholle</span><b style="font-size:1.1rem">${next?esc(matById(next.matiere).nom):"–"}</b><span class="small muted">${next?fmt(next.date)+" · "+esc(next.orga||""):"ajoute-la dans Kholles"}</span></div>`;
   const wd=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][new Date().getDay()];
   $("#todayLabel").textContent=wd+" "+fmt(today());
@@ -410,7 +411,7 @@ function renderCours(){
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
     html+=`<div class="panel mat"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} ancrés · ${n2} en P2 · ${n1} en P1 · ${all} cours</span></div>
      <div class="bar" role="img" aria-label="${n3} cours à 3 passages, ${n2} à 2, ${n1} à 1, sur ${all}">${n3?`<i style="width:${n3/tot*100}%;background:var(--accent)"></i>`:""}${n2?`<i style="width:${n2/tot*100}%;background:#5b8fd6"></i>`:""}${n1?`<i style="width:${n1/tot*100}%;background:#9fb8dc"></i>`:""}</div>
-     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}</span></div>
+     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.cartes!=null?` <span class="pill ${c.cartes===0?"due":c.cartes>100?"late":c.cartes>70?"due":"info"}" title="cartes Anki">${c.cartes} cartes</span>`:""}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}</span></div>
        <div class="passes">${["p1","p2","p3"].map(p=>`<button class="pass ${c[p]?"on":s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p]):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}</button>`).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt===m.id||filt==="all"?`<div><button class="btn ghost" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
   }
@@ -432,9 +433,9 @@ async function addCours(mid){
 }
 let editing=null;
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;
-  $("#m-titre").value=c.titre||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
+  $("#m-titre").value=c.titre||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-cartes").value=c.cartes??"";$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
-$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
+$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,cartes:$("#m-cartes").value===""?null:Number($("#m-cartes").value),note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#modal").hidden=true});
 
