@@ -3,94 +3,115 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
+/* Thème clair unique, voulu : fond blanc lumineux et pastels. */
 :root{
-  --bg:#f3f5f4; --surface:#ffffff; --surface-2:#e9eeec; --ink:#17221f; --ink-2:#4d5b57; --ink-3:#7b8783;
-  --line:#d6dedb; --accent:#0c7263; --accent-soft:#d5ece7; --on-accent:#ffffff;
-  --late:#b3372a; --late-soft:#f7e0dc; --due:#9a6700; --due-soft:#f6ecd3; --ok:#2b7a48; --ok-soft:#dcefe2;
-  --k-anki:#d5ece7; --k-p1:#e4e8f6; --k-p2:#dfe9f7; --k-p3:#e7e1f3; --k-bloc:#f6e6d6; --k-diff:#f7e0dc; --k-shs:#ececec; --k-tut:#f6ecd3; --k-libre:#dcefe2; --k-org:#f0f0e4;
-  --radius:10px; --font-d:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif; --font-b:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif; --font-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+  --bg:#f7f7fb; --surface:#ffffff; --surface-2:#f2f2f8; --ink:#2a2c3f; --ink-2:#626780; --ink-3:#9296ab;
+  --line:#e7e7f0; --accent:#7c6fd6; --accent-soft:#ece9fb; --on-accent:#ffffff;
+  --late:#c8414a; --late-soft:#fde7e8; --due:#a8700c; --due-soft:#fdf2d9; --ok:#2e8a57; --ok-soft:#e1f4e8;
+  --k-anki:#e3f4ee; --k-p1:#e8eefc; --k-p2:#e0ecfb; --k-p3:#ece6fa; --k-bloc:#fdebdc; --k-diff:#fde4ea; --k-shs:#efefef; --k-tut:#fdf3d6; --k-libre:#e4f5e6; --k-org:#f3f1e6;
+  --radius:14px; --font-d:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif; --font-b:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif; --font-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
-  --bg:#0f1513; --surface:#161e1b; --surface-2:#1e2824; --ink:#e6eeea; --ink-2:#aebbb6; --ink-3:#83918c;
-  --line:#2a3632; --accent:#3cb5a1; --accent-soft:#173a33; --on-accent:#08201b;
-  --late:#ef7f70; --late-soft:#3d1f1b; --due:#e0b04a; --due-soft:#3a2f14; --ok:#6cc58e; --ok-soft:#173222;
-  --k-anki:#173a33; --k-p1:#1e2540; --k-p2:#1a2b3f; --k-p3:#2a2140; --k-bloc:#3a2a1a; --k-diff:#3d1f1b; --k-shs:#262a29; --k-tut:#3a2f14; --k-libre:#173222; --k-org:#2c2c20;}}
-:root[data-theme="dark"]{color-scheme:dark;
-  --bg:#0f1513; --surface:#161e1b; --surface-2:#1e2824; --ink:#e6eeea; --ink-2:#aebbb6; --ink-3:#83918c;
-  --line:#2a3632; --accent:#3cb5a1; --accent-soft:#173a33; --on-accent:#08201b;
-  --late:#ef7f70; --late-soft:#3d1f1b; --due:#e0b04a; --due-soft:#3a2f14; --ok:#6cc58e; --ok-soft:#173222;
-  --k-anki:#173a33; --k-p1:#1e2540; --k-p2:#1a2b3f; --k-p3:#2a2140; --k-bloc:#3a2a1a; --k-diff:#3d1f1b; --k-shs:#262a29; --k-tut:#3a2f14; --k-libre:#173222; --k-org:#2c2c20;}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
-.wrap{max-width:1080px;margin:0 auto}
+.wrap{max-width:1180px;margin:0 auto}
 h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0;line-height:1.15}
-h2{font-size:1.35rem;font-weight:700}
-h3{font-size:1.05rem;font-weight:700}
+h2{font-size:1.3rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
 .muted{color:var(--ink-2)} .small{font-size:.85rem}
 .num{font-family:var(--font-m);font-variant-numeric:tabular-nums}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:20px 12px}
-.brand h1{font-size:1.7rem;font-weight:700;letter-spacing:-.01em}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 12px}
+.brand h1{font-size:1.75rem;font-weight:700;letter-spacing:-.01em}
 .brand p{margin:2px 0 0;color:var(--ink-2)}
-.countdown{display:flex;align-items:baseline;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:8px 14px}
+.countdown{display:flex;align-items:baseline;gap:8px;background:var(--accent-soft);border-radius:var(--radius);padding:8px 16px}
 .countdown b{font-family:var(--font-d);font-size:2rem;color:var(--accent);line-height:1}
 nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;padding-block:8px;border-bottom:1px solid var(--line);scrollbar-width:none}
-nav.tabs button{flex:0 0 auto;border:0;background:transparent;color:var(--ink-2);font:600 .95rem var(--font-b);padding:8px 14px;border-radius:999px;cursor:pointer}
-nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
-nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav.tabs button{flex:0 0 auto;border:0;background:transparent;color:var(--ink-2);font:700 .95rem var(--font-b);padding:8px 15px;border-radius:999px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 section.view{padding-top:20px;display:grid;gap:20px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:grid;gap:12px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:grid;gap:12px;min-width:0;box-shadow:0 1px 2px rgb(42 44 63 / .04)}
 .panel > header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:700}
 .notice{background:var(--due-soft);color:var(--ink);border-radius:var(--radius);padding:10px 14px}
 ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--surface-2)}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--mbg,var(--surface-2))}
 .task .what{min-width:0}
 .task .what b{display:block;overflow-wrap:anywhere}
+.acts{display:flex;gap:4px}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:.75rem;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
 .pill.late{background:var(--late-soft);color:var(--late)} .pill.due{background:var(--due-soft);color:var(--due)} .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.info{background:var(--accent-soft);color:var(--accent)}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .88rem var(--font-b);border-radius:8px;padding:7px 12px;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:700 .86rem var(--font-b);border-radius:10px;padding:7px 12px;cursor:pointer}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.sm{padding:4px 9px;font-size:.8rem}
 .btn.danger{color:var(--late)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
-.stat{background:var(--surface-2);border-radius:8px;padding:10px 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 .stat b{display:block;font-family:var(--font-d);font-size:1.6rem;line-height:1.1}
-.stat.late b{color:var(--late)}
+.stat.late{background:var(--late-soft);border-color:transparent} .stat.late b{color:var(--late)}
+/* matières */
+.mdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mfg,var(--ink-3));flex:none}
+.mtag{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:700;border-radius:999px;padding:1px 8px;background:var(--mbg,var(--surface-2));color:var(--mfg,var(--ink-2));white-space:nowrap}
 /* calendar strip */
-.weeks{display:grid;grid-template-columns:repeat(12,minmax(64px,1fr));gap:4px;overflow-x:auto;padding-bottom:4px}
-.wk{background:var(--surface-2);border-radius:6px;padding:6px;min-height:84px;display:grid;align-content:start;gap:3px;font-size:.72rem}
+.weeks{display:grid;grid-template-columns:repeat(12,minmax(78px,1fr));gap:6px;overflow-x:auto;padding-bottom:4px}
+.wk{background:var(--surface-2);border-radius:10px;padding:6px;min-height:90px;display:grid;align-content:start;gap:3px;font-size:.72rem}
 .wk.now{outline:2px solid var(--accent)}
 .wk .d{font-family:var(--font-m);color:var(--ink-3)}
-.wk .ev{border-radius:4px;padding:1px 4px;background:var(--surface);overflow-wrap:anywhere}
-.wk .ev.end{color:var(--ink-2)} .wk .ev.big{background:var(--ink);color:var(--bg);font-weight:700} .wk .ev.shs{background:var(--k-shs)} .wk .ev.kh{background:var(--k-tut)} .wk .ev.ed{background:var(--k-p2)} .wk .ev.eb{background:var(--late-soft);color:var(--late);font-weight:700} .wk .ev.off{background:var(--k-libre)}
+.wk .ev{border-radius:6px;padding:1px 5px;background:var(--mbg,var(--surface));color:var(--ink);overflow-wrap:anywhere}
+.wk .ev.big{background:var(--accent);color:#fff;font-weight:700} .wk .ev.eb{background:var(--late-soft);color:var(--late);font-weight:700} .wk .ev.off{background:var(--k-libre)} .wk .ev.shs{background:var(--k-shs)} .wk .ev.ed{background:#fff;border:1px dashed var(--line)} .wk .ev.end{background:transparent;color:var(--ink-2)}
 /* cours */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:5px 11px;font:600 .82rem var(--font-b);cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.mat{display:grid;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:5px 11px;font:700 .82rem var(--font-b);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"]{background:var(--mbg,var(--accent-soft));color:var(--mfg,var(--accent));border-color:var(--mfg,var(--accent))}
+.mat{display:grid;gap:10px;border-top:5px solid var(--mfg,var(--line))}
 .mat-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.mat-head h3{color:var(--mfg,var(--ink))}
 .bar{height:8px;border-radius:4px;background:var(--surface-2);display:flex;overflow:hidden;gap:2px}
 .bar i{display:block;height:100%}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2)}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
 .rows{display:grid;gap:4px}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;background:var(--surface-2)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:var(--mbg,var(--surface-2))}
 .row .t{min-width:0;display:flex;gap:6px;align-items:center}
 .row .t span{overflow-wrap:anywhere}
 .passes{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-.pass{border:1px solid var(--line);background:var(--surface);color:var(--ink-3);border-radius:6px;min-width:44px;padding:4px 6px;font:600 .75rem var(--font-m);cursor:pointer;text-align:center}
-.pass.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.pass{border:1px solid var(--line);background:var(--surface);color:var(--ink-3);border-radius:8px;min-width:44px;padding:4px 6px;font:500 .75rem var(--font-m);cursor:pointer;text-align:center}
+.pass.on{background:var(--mfg,var(--accent));border-color:var(--mfg,var(--accent));color:#fff}
 .pass.late{border-color:var(--late);color:var(--late);background:var(--late-soft)}
 .pass.due{border-color:var(--due);color:var(--due);background:var(--due-soft)}
 .star{border:0;background:transparent;cursor:pointer;font-size:1rem;color:var(--ink-3);padding:0 2px}
 .star.on{color:var(--late)}
-/* semaine */
+/* planning */
+.plan-nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.plan-nav .lbl{font-family:var(--font-d);font-weight:700;font-size:1.1rem;min-width:13ch}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--ink-2);font-weight:700}
+.toggle input{width:auto}
+.pweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:start}
+.pday{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px;display:grid;gap:6px;min-width:0}
+.pday.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.pday h3{font-size:.95rem;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.pday h3 .num{font-size:.75rem;color:var(--ink-3);font-weight:400}
+.pitem{border-radius:8px;padding:5px 7px;font-size:.8rem;line-height:1.3;background:var(--c,var(--surface-2));display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:start}
+.pitem .h{font-family:var(--font-m);font-size:.68rem;color:var(--ink-2);display:block}
+.pitem.tpl{grid-template-columns:1fr;opacity:.85}
+.pitem.task{background:var(--mbg,#fff);border:1px solid var(--mfg,var(--line))}
+.pitem.task.done .tx{text-decoration:line-through;color:var(--ink-3)}
+.pitem.ev{grid-template-columns:1fr;background:var(--mbg,var(--k-tut));font-weight:700}
+.pitem input[type="checkbox"]{width:auto;margin:2px 0 0}
+.pitem .x{border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:.8rem;padding:0 2px}
+.addf{display:grid;gap:4px}
+.addf .r{display:grid;grid-template-columns:1fr auto;gap:4px}
+.addf input,.addf select{padding:5px 7px;font-size:.8rem}
+@media (max-width:980px){.pweek{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.pweek{grid-template-columns:1fr}}
+/* semaine type */
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .day{display:grid;gap:4px;align-content:start}
 .day h3{font-size:.95rem;padding:4px 2px}
 .day.today h3{color:var(--accent)}
-.blk{border-radius:6px;padding:5px 7px;font-size:.78rem;line-height:1.3;background:var(--c,var(--surface-2))}
+.blk{border-radius:8px;padding:5px 7px;font-size:.78rem;line-height:1.3;background:var(--c,var(--surface-2))}
 .blk .h{font-family:var(--font-m);font-size:.7rem;color:var(--ink-2);display:block}
 @media (max-width:860px){.week{grid-template-columns:1fr}.day{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px}}
 /* tables */
@@ -102,24 +123,24 @@ td.n,th.n{text-align:right;font-family:var(--font-m);font-variant-numeric:tabula
 /* forms */
 form.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;align-items:end}
 label{display:grid;gap:4px;font-size:.8rem;color:var(--ink-2);font-weight:700}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 9px;width:100%}
 textarea{min-height:70px;resize:vertical}
 .full{grid-column:1/-1}
 /* chart */
 .chart{position:relative}
 .chart svg{display:block;width:100%;height:auto}
-.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.78rem;padding:6px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-110%)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:.78rem;padding:6px 8px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-115%)}
 /* method */
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
-.step{background:var(--surface-2);border-radius:8px;padding:12px;display:grid;gap:4px;align-content:start}
+.step{background:var(--surface-2);border-radius:12px;padding:12px;display:grid;gap:4px;align-content:start}
 .step .k{font-family:var(--font-m);font-size:.75rem;color:var(--accent);font-weight:500}
 .prose{max-width:68ch}
 .prose p,.prose li{margin:0 0 6px}
-pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;padding:12px;font:.82rem/1.5 var(--font-m);margin:0}
+pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;padding:12px;font:.82rem/1.5 var(--font-m);margin:0}
 /* modal */
-.modal{position:fixed;inset:0;background:rgb(0 0 0 / .45);display:grid;place-items:center;padding:16px;z-index:20}
-.modal .card{background:var(--surface);border-radius:12px;padding:18px;width:min(460px,100%);display:grid;gap:12px;max-height:90vh;overflow:auto}
-.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:.88rem;z-index:30}
+.modal{position:fixed;inset:0;background:rgb(42 44 63 / .35);display:grid;place-items:center;padding:16px;z-index:20}
+.modal .card{background:var(--surface);border-radius:16px;padding:18px;width:min(460px,100%);display:grid;gap:12px;max-height:90vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:10px;font-size:.88rem;z-index:30}
 @media (prefers-reduced-motion:no-preference){.pass,.chip,.btn{transition:background .12s,color .12s}}
 </style>
 
@@ -133,6 +154,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
   </header>
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" data-tab="auj" aria-selected="true">Aujourd'hui</button>
+    <button role="tab" data-tab="planning" aria-selected="false">Planning</button>
     <button role="tab" data-tab="cours" aria-selected="false">Cours</button>
     <button role="tab" data-tab="kholles" aria-selected="false">Kholles</button>
     <button role="tab" data-tab="semaine" aria-selected="false">Semaine type</button>
@@ -146,27 +168,45 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
     <div class="stats" id="stats"></div>
     <div class="grid2">
       <div class="panel">
-        <header><h2>À faire aujourd'hui</h2><span class="muted small" id="todayLabel"></span></header>
+        <header><h2>Cours à reprendre</h2><span class="muted small" id="todayLabel"></span></header>
+        <p class="muted small" style="margin:0">« Fait » coche le passage. « + » l'ajoute à ton planning d'aujourd'hui.</p>
         <ul class="clean" id="todo"></ul>
       </div>
       <div class="panel">
-        <header><h2>Plan du jour</h2><span class="eyebrow">semaine type</span></header>
-        <div class="rows" id="todayPlan"></div>
+        <header><h2>Ma journée</h2><button class="btn sm" type="button" data-goto="planning">Ouvrir le planning</button></header>
+        <div id="todayDay"></div>
       </div>
     </div>
     <div class="panel">
-      <header><h2>Jusqu'au concours</h2><span class="muted small">fins de cours, échéances et kholles, semaine par semaine</span></header>
+      <header><h2>Jusqu'au concours</h2><span class="muted small">fins de cours, ED, kholles et échéances, semaine par semaine</span></header>
       <div class="weeks" id="weeks"></div>
     </div>
+  </section>
+
+  <!-- PLANNING -->
+  <section class="view" id="v-planning" hidden>
+    <div class="panel">
+      <header>
+        <div class="plan-nav">
+          <button class="btn sm" type="button" id="pPrev" aria-label="Semaine précédente">◀</button>
+          <span class="lbl" id="pLbl"></span>
+          <button class="btn sm" type="button" id="pNext" aria-label="Semaine suivante">▶</button>
+          <button class="btn sm ghost" type="button" id="pNow">Cette semaine</button>
+        </div>
+        <label class="toggle"><input type="checkbox" id="pTpl" checked> Afficher la semaine type</label>
+      </header>
+      <p class="muted small" style="margin:0">Ajoute tes tâches dans chaque jour, avec une heure et une matière si tu veux. Coche-les une fois faites. Les kholles, les ED et les blocs de la semaine type s'affichent tout seuls (bloc de révision, cahier d'exos du tutorat, Anki…).</p>
+    </div>
+    <div class="pweek" id="pweek"></div>
   </section>
 
   <!-- COURS -->
   <section class="view" id="v-cours" hidden>
     <div class="panel">
       <header><h2>Avancement des cours</h2>
-        <div class="legend"><span style="--c:var(--accent)">3 passages</span><span style="--c:#5b8fd6">2 passages</span><span style="--c:#9fb8dc">1 passage</span><span style="--c:var(--surface-2)">pas commencé</span></div>
+        <div class="legend"><span style="--c:#7c6fd6">3 passages</span><span style="--c:#a9a0e6">2 passages</span><span style="--c:#d6d1f5">1 passage</span><span style="--c:var(--surface-2)">pas commencé</span></div>
       </header>
-      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre. Touche encore pour annuler. ★ = cours difficile, il ira dans le créneau du samedi matin. Le bouton ✎ sert à renommer, changer les dates, noter le nombre de cartes ou ajouter une note. « Anki » veut dire que les cartes du cours sont réactivées et que tu les révises.</p>
+      <p class="muted small" style="margin:0">Touche P1, P2 ou P3 quand tu as fini un passage : la date du jour s'enregistre. Touche encore pour annuler. ★ = cours difficile, il ira dans le créneau du samedi matin. « Anki » = les cartes du cours sont activées. ✎ pour renommer, changer les dates ou ajouter une note.</p>
       <div class="chips" id="matChips"></div>
     </div>
     <div id="coursList" style="display:grid;gap:20px"></div>
@@ -192,7 +232,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
       </form>
     </div>
     <div class="panel">
-      <header><h2>Toutes les kholles</h2></header>
+      <header><h2>Toutes les kholles</h2><span class="muted small">✎ pour ajouter ton rang quand tu as le résultat</span></header>
       <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Matière</th><th>Orga</th><th class="n">Rang</th><th class="n">Top %</th><th class="n">Note</th><th>Retour</th><th></th></tr></thead><tbody id="khRows"></tbody></table></div>
     </div>
   </section>
@@ -202,6 +242,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
     <div class="panel">
       <header><h2>Ta semaine type</h2><span class="muted small">Lever 6 h 30 · écrans coupés 22 h 45 · coucher 23 h 30</span></header>
       <p class="muted small prose" style="margin:0">Les nouveaux cours sortent du mardi midi au vendredi, donc la semaine sert aux 1ers et 2es passages. Du vendredi soir au mardi midi : ancrage, blocs de révision et rattrapage. Les blocs durent 50 min avec 10 min de pause, et tu changes de manière de travailler à chaque bloc (lecture → ardoise → QCM).</p>
+      <p class="small prose" style="margin:0"><b>Bloc de révision kholle</b> : lundi 8 h–10 h et dimanche 8 h 30–12 h. <b>Cahier d'exos du tutorat</b> : lundi 17 h 30–19 h et samedi 10 h 45–12 h 30.</p>
       <div class="legend">
         <span style="--c:var(--k-anki)">Anki</span><span style="--c:var(--k-p1)">1er passage</span><span style="--c:var(--k-p2)">2e passage</span><span style="--c:var(--k-p3)">3e passage</span><span style="--c:var(--k-bloc)">Bloc kholle</span><span style="--c:var(--k-diff)">Cours difficiles</span><span style="--c:var(--k-tut)">Tutorat / kholle</span><span style="--c:var(--k-shs)">SHS mineure</span><span style="--c:var(--k-libre)">Libre</span>
       </div>
@@ -214,8 +255,8 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
     <div class="panel">
       <header><h2>Le cycle d'un cours</h2><span class="eyebrow">J = jour de sortie</span></header>
       <div class="steps">
-        <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découverte</h3><span class="small">Tu lis pour comprendre, sans chercher à retenir. Tu regardes les QCM du cours pour voir ce qu'on attend de toi (en chimie et en anat, tu les fais tout de suite). Et tu lances la création des cartes Anki.</span></div>
-        <div class="step"><span class="k">P2 · J+1 à J+3</span><h3>Appropriation</h3><span class="small">À l'ardoise : schémas, moyens mnémotechniques, tu réexpliques à voix haute. Puis QCM du cours. Tu tries les cartes et tu les ajoutes dans Anki le jour même.</span></div>
+        <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découverte</h3><span class="small">Tu lis pour comprendre, sur tablette. Tu surlignes <b>dans une seule couleur</b> ce qui mérite une carte (chiffres, listes, exceptions, pièges). Tu regardes les QCM du cours pour voir ce qu'on attend de toi. Puis tu envoies le PDF surligné à l'IA pour tes cartes.</span></div>
+        <div class="step"><span class="k">P2 · J+1 à J+3</span><h3>Appropriation</h3><span class="small">À l'ardoise : schémas, moyens mnémotechniques, tu réexpliques à voix haute. Puis QCM du cours. Tu vois les nouvelles cartes pour la première fois et tu suspends tout de suite celles qui sont évidentes pour toi.</span></div>
         <div class="step"><span class="k">P3 · week-end</span><h3>Ancrage</h3><span class="small">Sans relire : page blanche ou ardoise, tu restitues de mémoire le plan, les schémas et les chiffres. Tu compares, puis QCM. Tu ne relis que les trous.</span></div>
         <div class="step"><span class="k">Ensuite · tous les jours</span><h3>Entretien</h3><span class="small">Anki chaque matin, un bloc de révision avant chaque kholle, et des QCM mélangés en fin de journée.</span></div>
       </div>
@@ -224,18 +265,18 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
       <div class="panel prose">
         <header><h2>Anki</h2></header>
         <ul>
-          <li><b>Chaque jour, tu vides les cartes « à revoir » du paquet parent</b> « PASS S1 ». Anki ne te montre que les cartes arrivées à échéance.</li>
+          <li><b>Chaque jour, tu vides les cartes « à revoir » du paquet parent.</b> Anki ne te montre que les cartes arrivées à échéance.</li>
           <li><b>Réglages</b> : FSRS activé, rétention visée 0,90, intervalle maximal 21 jours, révisions max 9999.</li>
-          <li><b>Budget</b> : environ 15 notes (≈ 25 à 35 cartes) par heure de cours pour les matières à mémoire (SHS, anat, histo, embryo, physio, molécules de biochimie). Moins de 10 pour la chimie, la biophysique et les exercices de biomol : là, ce sont les QCM qui te font apprendre.</li>
-          <li><b>Charge visée</b> : 45 à 60 min par jour. Au-delà, tu as trop de cartes et il faut réduire à la source, pas sauter des jours.</li>
-          <li>Les cartes d'un cours sont ajoutées le <b>jour de son 2e passage</b>, jamais avant.</li>
-          <li>Tu ne crées plus de cartes toi-même.</li>
+          <li><b>Tes cartes</b> : l'IA les fait à partir de ce que tu as surligné, en en faisant le moins possible sans perdre d'info. Tu suspends les évidentes à la première vue.</li>
+          <li><b>Le vrai indicateur</b> : le temps passé par jour (Statistiques d'Anki). Vise 45 à 60 min. Si tu dépasses 1 h 15 plusieurs jours de suite, surligne moins et suspends plus. Ne saute jamais un jour.</li>
+          <li>Les cartes d'un cours sont activées le <b>jour de son 2e passage</b>.</li>
         </ul>
       </div>
       <div class="panel prose">
         <header><h2>Règles pour tenir jusqu'en décembre</h2></header>
         <ul>
-          <li><b>Organisation : 10 min par jour à 19 h</b>, plus 20 min le dimanche pour le bilan. En dehors, tu ne touches pas au planning.</li>
+          <li><b>Organisation : 10 min par jour à 19 h</b>, plus 20 min le dimanche pour le bilan et le planning de la semaine. En dehors, tu ne touches pas au planning.</li>
+          <li><b>Un seul outil de suivi</b> : cette page. Plus de tableau à côté.</li>
           <li><b>Un retard ne se rattrape pas « comme il faut »</b> : un seul passage actif (ardoise de mémoire puis QCM), dans le créneau de rattrapage du dimanche.</li>
           <li><b>Le cours le plus difficile va dans un créneau réservé</b> (samedi matin, vendredi en fin de journée), pas au milieu d'une journée chargée.</li>
           <li><b>Barème −1 par item faux</b> en chimie, histo et embryo : en QCM, entraîne-toi à laisser un item vide quand tu doutes.</li>
@@ -245,29 +286,27 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
       </div>
     </div>
     <div class="panel prose" style="max-width:none">
-      <header><h2>Ne rien louper sans 3000 cartes</h2><span class="eyebrow">chaque info a sa place</span></header>
+      <header><h2>Ne rien louper</h2><span class="eyebrow">chaque info a sa place</span></header>
       <div class="steps">
         <div class="step"><span class="k">La fiche</span><h3>Contient tout</h3><span class="small">Ta fiche annotée reste la référence complète. À chaque 3e passage et à chaque bloc kholle, tu restitues <b>tout le cours</b> de mémoire, pas seulement tes cartes.</span></div>
         <div class="step"><span class="k">Les QCM</span><h3>Repèrent les trous</h3><span class="small">Chaque item raté ou deviné te montre une info qui manque. Tu en fais une carte « erreur », et ce sont les cartes les plus rentables.</span></div>
-        <div class="step"><span class="k">Anki</span><h3>Garde ce qui s'oublie</h3><span class="small">Chiffres, listes, exceptions, noms, rapports anatomiques. Ce que tu comprends n'a pas besoin de carte.</span></div>
-        <div class="step"><span class="k">Le filet de sécurité</span><h3>Vérifier la couverture</h3><span class="small">Après chaque paquet de cartes, l'IA liste les infos du cours qui ne sont dans aucune carte. Tu lis cette liste en 2 min et tu ajoutes seulement ce qui peut tomber.</span></div>
+        <div class="step"><span class="k">Ton surlignage</span><h3>Choisit les cartes</h3><span class="small">C'est toi qui décides ce qui va dans Anki, au moment où tu découvres le cours. L'IA ne fait que le mettre en forme.</span></div>
+        <div class="step"><span class="k">Le filet de sécurité</span><h3>Vérifier la couverture</h3><span class="small">L'IA liste les infos importantes que tu n'as pas surlignées. Tu lis cette liste en 2 min et tu ajoutes seulement ce qui peut tomber.</span></div>
       </div>
-      <p class="small muted" style="margin:0">Moins de cartes, ce n'est pas moins d'infos. Une carte à trous peut couvrir une liste entière (c1, c2, c3… dans la même note), et une carte image peut couvrir un schéma complet. Le vrai risque de perte, c'est d'avoir 10 000 cartes en décembre et de devoir sauter des jours.</p>
     </div>
     <div class="panel">
-      <header><h2>Tes matières</h2><span class="muted small">d'après les guides de la prépa · coefs à confirmer au besoin</span></header>
+      <header><h2>Tes matières</h2><span class="muted small">d'après les guides de la prépa</span></header>
       <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin des cours</th><th>Priorité de méthode</th></tr></thead><tbody id="matRows"></tbody></table></div>
     </div>
     <div class="panel">
       <header><h2>Demande de cartes Anki à l'IA</h2><button class="btn" id="copyPrompt" type="button">Copier</button></header>
-      <pre class="prompt" id="promptTxt">Fais-moi des cartes Anki pour ce cours de [MATIÈRE] – [TITRE DU COURS], [DURÉE] h de cours.
+      <pre class="prompt" id="promptTxt">Voici mon cours de [MATIÈRE] – [TITRE DU COURS], en PDF. J'ai surligné les passages à mettre en cartes.
 Règles :
-- Une note = une notion. Regroupe les listes et les tableaux dans une seule note à trous multiples ({{c1::…}}, {{c2::…}}…) au lieu de faire une carte par ligne.
-- Ne fais des cartes que pour ce qui s'oublie : chiffres, listes, exceptions, définitions, rapports anatomiques, chronologie, structures de molécules. Pas de carte sur ce qui se comprend en raisonnant.
+- Fais des cartes UNIQUEMENT pour les passages surlignés, en gardant toutes leurs infos.
+- Fais-en le moins possible : une note = une notion. Regroupe les listes et les tableaux dans une seule note à trous multiples ({{c1::…}}, {{c2::…}}…).
 - Formule les trous sur les pièges des items de QCM (valeurs proches, « sauf », inversions).
-- Maximum [15 × DURÉE] notes. Commence par les infos les plus probables au concours.
 - Donne le résultat en TSV : Texte[TAB]Extra[TAB]Tags, avec le tag PASS::[Matière]::[Cours].
-Ensuite, sous le TSV : liste en une ligne chacune TOUTES les infos du cours qui ne sont dans aucune carte, pour que je vérifie que rien d'important ne manque.</pre>
+Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'ai PAS surlignées et qui pourraient tomber en QCM, pour que je vérifie.</pre>
     </div>
   </section>
 
@@ -295,10 +334,10 @@ Ensuite, sous le TSV : liste en une ligne chacune TOUTES les infos du cours qui 
 <div class="modal" id="modal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="m-title">
   <h3 id="m-title">Modifier le cours</h3>
   <label>Titre<input type="text" id="m-titre"></label>
-  <div class="f" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
     <label>P1<input type="date" id="m-p1"></label><label>P2<input type="date" id="m-p2"></label><label>P3<input type="date" id="m-p3"></label>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end"><label>Nombre de cartes<input type="number" id="m-cartes" min="0" inputmode="numeric"></label><label><span><input type="checkbox" id="m-anki" style="width:auto"> Cartes activées dans Anki</span></label></div>
+  <label><span><input type="checkbox" id="m-anki" style="width:auto"> Cartes activées dans Anki</span></label>
   <label>Note<textarea id="m-note"></textarea></label>
   <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
     <button class="btn danger" id="m-del" type="button">Supprimer</button>
@@ -306,23 +345,40 @@ Ensuite, sous le TSV : liste en une ligne chacune TOUTES les infos du cours qui 
   </div>
   <p class="small" id="m-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
 </div></div>
+<div class="modal" id="kmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="k-title">
+  <h3 id="k-title">Résultat de kholle</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <label>Date<input type="date" id="k-date"></label><label>Note /20<input type="number" id="k-note" step="0.01" min="0" max="20" inputmode="decimal"></label>
+    <label>Rang<input type="number" id="k-rang" min="1" inputmode="numeric"></label><label>Sur<input type="number" id="k-total" min="1" inputmode="numeric"></label>
+  </div>
+  <label>Ce que je retiens<input type="text" id="k-com"></label>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="k-cancel" type="button">Annuler</button><button class="btn primary" id="k-save" type="button">Enregistrer</button></div>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
 (function(){
 const CONCOURS = "2026-12-17";
+/* Couleurs pastel par matière : fond (bg) et couleur forte (fg). */
+const MCOL = {
+  chimie:["#dcecff","#3a78c2"], biochimie:["#d9f3ec","#2a8a74"], biocell:["#e8e3fb","#6a5bc8"], histo:["#ffe3ec","#c24f7a"],
+  embryo:["#ffeadb","#c0662a"], anatos:["#fff3c9","#9a7607"], biophysique:["#e6f5da","#4a8a28"], anattc:["#fbe6cf","#a8671a"],
+  physio:["#dcf2fa","#23839f"], biomol:["#f6e0f8","#9e46ad"], shs:["#efe8e2","#85664e"]
+};
+const mvars=id=>{const c=MCOL[id];return c?`--mbg:${c[0]};--mfg:${c[1]}`:""};
 const WEEK = [
- {d:"Lundi",b:[["6:30","","Lever","libre"],["7:00","7:45","Anki : révisions du jour","anki"],["8:00","10:00","Bloc révision : matière de la kholle de jeudi (QCM de la banque + ardoise)","bloc"],["10:15","12:00","3es passages restants","p3"],["13:00","17:00","SHS mineure (fac)","shs"],["17:30","19:00","Cahier d'exos du tutorat","tut"],["19:00","19:10","Organisation (10 min)","org"],["20:30","21:30","Rattrapage léger ou libre","libre"]]},
+ {d:"Lundi",b:[["7:00","7:45","Anki : révisions du jour","anki"],["8:00","10:00","Bloc révision : matières des kholles de la semaine (QCM de la banque + ardoise)","bloc"],["10:15","12:00","3es passages restants","p3"],["13:00","17:00","SHS mineure (fac)","shs"],["17:30","19:00","Cahier d'exos du tutorat","tut"],["19:00","19:10","Organisation (10 min)","org"],["20:30","21:30","Rattrapage léger ou libre","libre"]]},
  {d:"Mardi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages restants de la semaine d'avant","p2"],["10:15","12:00","Cours difficile n°1 (★)","diff"],["13:30","15:30","1ers passages : nouveaux cours sortis","p1"],["15:45","17:45","2es passages","p2"],["18:00","19:00","QCM mélangés (chimie + matière du jour)","p3"],["19:00","19:10","Organisation","org"],["20:30","21:30","Libre ou lecture légère","libre"]]},
- {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","Kholle prépa si tu en as une (tu choisis ce créneau), sinon QCM mélangés","tut"],["19:00","19:10","Organisation","org"]]},
+ {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","Kholle prépa si tu en as une, sinon QCM mélangés","tut"],["19:00","19:10","Organisation","org"]]},
  {d:"Jeudi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","17:00","2es passages + QCM du cours","p2"],["17:30","18:30","Kholle du tutorat","tut"],["18:45","18:55","Organisation","org"],["19:30","","Soirée famille / amis (une semaine sur deux)","libre"]]},
  {d:"Vendredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:00","Polycopiés + déjeuner","libre"],["13:00","15:00","2es passages : finir ceux de la semaine","p2"],["15:00","17:00","SHS mineure (13 h–17 h une semaine sur 4)","shs"],["17:30","19:00","Cours difficile n°2 (★) ou QCM","diff"],["19:00","","Soirée libre","libre"]]},
  {d:"Samedi",b:[["7:00","7:45","Anki","anki"],["8:00","10:30","Créneau réservé aux cours difficiles (★)","diff"],["10:45","12:30","Cahier d'exos du tutorat","tut"],["14:00","17:30","3es passages : ardoise de mémoire puis QCM","p3"],["17:30","","Soirée libre","libre"]]},
- {d:"Dimanche",b:[["7:30","8:15","Anki","anki"],["8:30","12:00","Bloc révision : matière de la kholle de jeudi","bloc"],["14:00","16:00","3es passages restants","p3"],["16:00","18:00","Rattrapage, ou libre si tu es à jour","diff"],["18:30","18:50","Bilan de la semaine + plan (onglet Bilan)","org"],["19:00","","Soirée libre","libre"]]}
+ {d:"Dimanche",b:[["7:30","8:15","Anki","anki"],["8:30","12:00","Bloc révision : matières des kholles de la semaine","bloc"],["14:00","16:00","3es passages restants","p3"],["16:00","18:00","Rattrapage, ou libre si tu es à jour","diff"],["18:30","18:50","Bilan + planning de la semaine","org"],["19:00","","Soirée libre","libre"]]}
 ];
 const KCOL = {anki:"--k-anki",p1:"--k-p1",p2:"--k-p2",p3:"--k-p3",bloc:"--k-bloc",diff:"--k-diff",shs:"--k-shs",tut:"--k-tut",libre:"--k-libre",org:"--k-org"};
+const JOURS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
-let db=null, M=[], C=[], K=[], E=[], B=[], filt="all";
+let db=null, M=[], C=[], K=[], E=[], B=[], T=[], filt="all", weekOff=0, showTpl=true;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const iso=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
@@ -330,15 +386,20 @@ const today=()=>iso(new Date());
 const dayN=s=>{const [y,m,d]=s.split("-").map(Number);return Math.round(Date.UTC(y,m-1,d)/864e5)};
 const since=s=>s?dayN(today())-dayN(s):null;
 const fmt=s=>{if(!s)return"";const [y,m,d]=s.split("-");return d+"/"+m};
-const matById=id=>M.find(m=>m.id===id)||{nom:id,coef:0};
+const matById=id=>M.find(m=>m.id===id)||{id,nom:id||"",coef:0};
+const mondayOf=d=>{const x=new Date(d);x.setHours(12,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const toMin=h=>{if(!h)return -1;const [a,b]=h.split(":").map(Number);return a*60+(b||0)};
 function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
 function isoWeek(d=new Date()){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return t.getUTCFullYear()+"-S"+String(Math.ceil(((t-y)/864e5+1)/7)).padStart(2,"0")}
 
 /* tabs */
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+document.addEventListener("click",e=>{const g=e.target.closest("[data-goto]");if(g)showTab(g.dataset.goto)});
 function showTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));document.querySelectorAll("section.view").forEach(s=>s.hidden=s.id!=="v-"+t);try{localStorage.setItem("tab",t)}catch(e){}}
 try{const t=localStorage.getItem("tab");if(t&&$("#v-"+t))showTab(t)}catch(e){}
-const h=(location.hash||"").slice(1);if(h&&$("#v-"+h))showTab(h);
+try{showTpl=localStorage.getItem("tpl")!=="0";$("#pTpl").checked=showTpl}catch(e){}
+const hsh=(location.hash||"").slice(1);if(hsh&&$("#v-"+hsh))showTab(hsh);
 
 /* countdown */
 const jm=dayN(CONCOURS)-dayN(today());$("#jminus").textContent=jm>0?"J-"+jm:"J";
@@ -356,49 +417,100 @@ function todoItems(){
   for(const c of C){const st=status(c),m=matById(c.matiere);
     if(st.p2)out.push({lvl:st.p2,kind:"P2",c,m,why:st.p2==="late"?"P1 il y a "+since(c.p1)+" j":"prêt pour le 2e passage"});
     if(st.p3)out.push({lvl:st.p3,kind:"P3",c,m,why:st.p3==="late"?"P2 il y a "+since(c.p2)+" j":"ancrage de mémoire"});
-    if(c.p2&&!c.anki&&m.mode!=="qcm")out.push({lvl:"info",kind:"Anki",c,m,why:"cartes à ajouter"});
+    if(c.p2&&!c.anki&&m.mode!=="qcm")out.push({lvl:"info",kind:"Anki",c,m,why:"cartes à activer"});
   }
   const rank={late:0,due:1,info:2};
   return out.sort((a,b)=>rank[a.lvl]-rank[b.lvl]||(b.m.coef||0)-(a.m.coef||0)||(a.c.ordre||0)-(b.c.ordre||0));
 }
+function kholleSoon(fromIso,days){
+  const lim=iso(addDays(new Date(fromIso+"T12:00:00"),days));
+  return [...new Set(K.filter(k=>k.date>=fromIso&&k.date<=lim&&!k.rang).map(k=>matById(k.matiere).nom))];
+}
 
+/* AUJOURD'HUI */
 function renderAuj(){
   const items=todoItems(), late=items.filter(i=>i.lvl==="late").length;
   const done3=C.filter(c=>c.p3).length, started=C.filter(c=>c.p1).length;
-  const upcoming=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1);const next=upcoming[0];
-  const lim=iso(new Date(Date.now()+7*864e5));const soon=[...new Set(upcoming.filter(k=>k.date<=lim).map(k=>matById(k.matiere).nom))];
+  const next=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
+  const tDay=T.filter(t=>t.date===today()), tDone=tDay.filter(t=>t.fait).length;
   $("#stats").innerHTML=
    `<div class="stat ${late?"late":""}"><span class="eyebrow">En retard</span><b class="num">${late}</b><span class="small muted">passages</span></div>`+
+   `<div class="stat"><span class="eyebrow">Tâches du jour</span><b class="num">${tDone}<span class="small muted"> / ${tDay.length}</span></b><span class="small muted">faites</span></div>`+
    `<div class="stat"><span class="eyebrow">Cours vus</span><b class="num">${started}<span class="small muted"> / ${C.length}</span></b><span class="small muted">au moins 1 passage</span></div>`+
    `<div class="stat"><span class="eyebrow">Ancrés</span><b class="num">${done3}</b><span class="small muted">3 passages faits</span></div>`+
-   `<div class="stat"><span class="eyebrow">Cartes Anki</span><b class="num">${C.reduce((a,c)=>a+(c.cartes||0),0)}</b><span class="small muted">≈ ${Math.round(C.reduce((a,c)=>a+(c.cartes||0),0)/Math.max(1,C.filter(c=>c.cartes).length))} par cours</span></div>`+
-   `<div class="stat"><span class="eyebrow">Prochaine kholle</span><b style="font-size:1.1rem">${next?esc(matById(next.matiere).nom):"–"}</b><span class="small muted">${next?fmt(next.date)+" · "+esc(next.orga||""):"ajoute-la dans Kholles"}</span></div>`;
+   `<div class="stat" style="${next?mvars(next.matiere)+";background:var(--mbg)":""}"><span class="eyebrow">Prochaine kholle</span><b style="font-size:1.1rem">${next?esc(matById(next.matiere).nom):"–"}</b><span class="small muted">${next?fmt(next.date)+" · "+esc(next.orga||""):"ajoute-la dans Kholles"}</span></div>`;
   const wd=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"][new Date().getDay()];
   $("#todayLabel").textContent=wd+" "+fmt(today());
   const ul=$("#todo");
   if(!items.length){ul.innerHTML=`<li class="muted">Aucun passage en attente. Fais les 1ers passages des cours qui sortent aujourd'hui, et coche P1 dans l'onglet Cours.</li>`}
-  else ul.innerHTML=items.slice(0,14).map(i=>`<li class="task"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom)} · ${esc(i.why)}</span></span><button class="btn" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></li>`).join("")+(items.length>14?`<li class="small muted">+ ${items.length-14} autres dans l'onglet Cours</li>`:"");
+  else ul.innerHTML=items.slice(0,14).map(i=>`<li class="task" style="${mvars(i.c.matiere)}"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom)} · ${esc(i.why)}</span></span><span class="acts"><button class="btn sm" data-plan="${esc(i.c.id)}" data-k="${i.kind}" aria-label="Ajouter à mon planning d'aujourd'hui">+</button><button class="btn sm" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></span></li>`).join("")+(items.length>14?`<li class="small muted">+ ${items.length-14} autres dans l'onglet Cours</li>`:"");
   ul.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const k=b.dataset.k;setField(b.dataset.done,k==="Anki"?{anki:true}:{[k.toLowerCase()]:today()})});
-  const plan=WEEK[(new Date().getDay()+6)%7];
-  $("#todayPlan").innerHTML=plan.b.map(x=>`<div class="blk" style="--c:var(${KCOL[x[3]]})"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</div>`).join("");
+  ul.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.plan);addTask({date:today(),heure:"",texte:(b.dataset.k==="Anki"?"Activer les cartes · ":b.dataset.k+" · ")+c.titre,matiere:c.matiere})});
+  $("#todayDay").innerHTML=dayHtml(today(),true);
+  wireDay($("#todayDay"));
   renderWeeks();
 }
 function renderWeeks(){
-  const start=new Date();start.setDate(start.getDate()-((start.getDay()+6)%7));
+  const start=mondayOf(new Date());
   const evs=[...E.map(e=>({date:e.date,t:e.titre,cls:e.type==="concours"?"big":e.type||""})),
     ...M.filter(m=>m.fin).map(m=>({date:m.fin,t:"Fin "+m.nom,cls:"end"})),
-    ...K.filter(k=>k.date>=today()).map(k=>({date:k.date,t:"Kholle "+(k.orga==="Prépa"?"prépa ":"")+matById(k.matiere).nom,cls:"kh"}))];
+    ...K.filter(k=>k.date>=today()).map(k=>({date:k.date,t:"Kholle "+(k.orga==="Prépa"?"prépa ":"")+matById(k.matiere).nom,cls:"kh",m:k.matiere}))];
   let html="";
-  for(let w=0;w<12;w++){const a=new Date(start);a.setDate(a.getDate()+7*w);const z=new Date(a);z.setDate(z.getDate()+6);const A=iso(a),Z=iso(z);
+  for(let w=0;w<12;w++){const A=iso(addDays(start,7*w)),Z=iso(addDays(start,7*w+6));
     const inW=evs.filter(e=>e.date>=A&&e.date<=Z).sort((x,y)=>x.date<y.date?-1:1);
-    html+=`<div class="wk ${w===0?"now":""}"><span class="d">${fmt(A)}</span>${inW.map(e=>`<span class="ev ${e.cls}">${fmt(e.date)} ${esc(e.t)}</span>`).join("")}</div>`}
+    html+=`<div class="wk ${w===0?"now":""}"><span class="d">${fmt(A)}</span>${inW.map(e=>`<span class="ev ${e.cls}" style="${e.m?mvars(e.m):""}">${fmt(e.date)} ${esc(e.t)}</span>`).join("")}</div>`}
   $("#weeks").innerHTML=html;
 }
+
+/* PLANNING */
+function dayItems(dIso){
+  const d=new Date(dIso+"T12:00:00"), idx=(d.getDay()+6)%7;
+  const items=[];
+  E.filter(e=>e.date===dIso).forEach(e=>items.push({type:"ev",min:-2,html:`<div class="pitem ev" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":"var(--k-tut)"}">${esc(e.titre)}</div>`}));
+  K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(k.orga==="Prépa"?"18:00":"17:30"),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${k.orga==="Prépa"?"18:00 · colle prépa":"17:30 · kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
+  if(showTpl){const soon=kholleSoon(dIso,7);
+    WEEK[idx].b.forEach(x=>items.push({type:"tpl",min:toMin(x[0]),html:`<div class="pitem tpl" style="--c:var(${KCOL[x[3]]})"><span><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</span></div>`}))}
+  T.filter(t=>t.date===dIso).forEach(t=>items.push({type:"task",min:toMin(t.heure),crt:t.crt||0,html:`<div class="pitem task ${t.fait?"done":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tdone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${t.heure?`<span class="h">${esc(t.heure)}</span>`:""}${esc(t.texte)}${t.matiere?` <span class="mtag">${esc(matById(t.matiere).nom)}</span>`:""}</span><button class="x" data-tdel="${esc(t.id)}" aria-label="Supprimer la tâche">✕</button></div>`}));
+  return items.sort((a,b)=>a.min-b.min||(a.type==="task"?1:0)-(b.type==="task"?1:0)||(a.crt||0)-(b.crt||0));
+}
+function matOptions(){return `<option value="">Matière…</option>`+[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>`<option value="${esc(m.id)}">${esc(m.nom)}</option>`).join("")}
+function dayHtml(dIso,compact){
+  const its=dayItems(dIso);
+  return `${its.map(i=>i.html).join("")||`<p class="muted small" style="margin:0">Rien de prévu.</p>`}
+   <form class="addf" data-date="${dIso}" style="margin-top:6px"><div class="r"><input type="text" name="texte" placeholder="Ajouter une tâche" aria-label="Nouvelle tâche" required><button class="btn sm primary" type="submit">+</button></div><div class="r" style="grid-template-columns:1fr 1fr"><input type="time" name="heure" aria-label="Heure"><select name="matiere" aria-label="Matière">${matOptions()}</select></div></form>`;
+}
+function wireDay(root){
+  root.querySelectorAll("[data-tdone]").forEach(b=>b.onchange=()=>updTask(b.dataset.tdone,{fait:b.checked}));
+  root.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){delTask(b.dataset.tdel)}else{b.dataset.arm=1;b.textContent="Suppr. ?";setTimeout(()=>{delete b.dataset.arm;b.textContent="✕"},3000)}});
+  root.querySelectorAll("form.addf").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(f);const tx=String(fd.get("texte")||"").trim();if(!tx)return;addTask({date:f.dataset.date,texte:tx,heure:String(fd.get("heure")||""),matiere:String(fd.get("matiere")||"")});f.reset()}));
+}
+function renderPlanning(){
+  const mon=addDays(mondayOf(new Date()),7*weekOff);
+  $("#pLbl").textContent="Semaine du "+fmt(iso(mon));
+  let html="";
+  for(let i=0;i<7;i++){const dIso=iso(addDays(mon,i));
+    html+=`<div class="pday ${dIso===today()?"today":""}"><h3>${JOURS[i]} <span class="num">${fmt(dIso)}</span></h3>${dayHtml(dIso)}</div>`}
+  const el=$("#pweek");
+  const focus=document.activeElement&&el.contains(document.activeElement)?document.activeElement.closest("form")?.dataset.date:null;
+  el.innerHTML=html;wireDay(el);
+  if(focus){const inp=el.querySelector(`form[data-date="${focus}"] input[name="texte"]`);inp&&inp.focus()}
+}
+$("#pPrev").onclick=()=>{weekOff--;renderPlanning()};
+$("#pNext").onclick=()=>{weekOff++;renderPlanning()};
+$("#pNow").onclick=()=>{weekOff=0;renderPlanning()};
+$("#pTpl").onchange=e=>{showTpl=e.target.checked;try{localStorage.setItem("tpl",showTpl?"1":"0")}catch(_){}renderPlanning();renderAuj()};
+async function addTask(t){
+  if(!db){toast("Données indisponibles ici");return}
+  const doc={date:t.date,heure:t.heure||"",texte:t.texte,matiere:t.matiere||"",fait:false,crt:Date.now()};
+  try{await db.collection("taches").add(doc);toast("Ajouté au planning")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
+}
+async function updTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign(t,patch);renderAll();try{await db.doc("taches/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+async function delTask(id){try{await db.doc("taches/"+id).delete()}catch(e){toast("Suppression impossible")}}
 
 /* COURS */
 function renderCours(){
   const mats=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0));
-  $("#matChips").innerHTML=`<button class="chip" data-f="all" aria-pressed="${filt==="all"}">Toutes</button><button class="chip" data-f="late" aria-pressed="${filt==="late"}">En retard</button><button class="chip" data-f="star" aria-pressed="${filt==="star"}">★ Difficiles</button>`+mats.map(m=>`<button class="chip" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}">${esc(m.nom)}</button>`).join("");
+  $("#matChips").innerHTML=`<button class="chip" data-f="all" aria-pressed="${filt==="all"}">Toutes</button><button class="chip" data-f="late" aria-pressed="${filt==="late"}">En retard</button><button class="chip" data-f="star" aria-pressed="${filt==="star"}">★ Difficiles</button>`+mats.map(m=>`<button class="chip" style="${mvars(m.id)}" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}"><span class="mdot"></span>${esc(m.nom)}</button>`).join("");
   $("#matChips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderCours()});
   const list=$("#coursList");let html="";
   for(const m of mats){
@@ -408,10 +520,11 @@ function renderCours(){
     if(filt==="late")cs=cs.filter(c=>{const s=status(c);return s.p2==="late"||s.p3==="late"});
     if(filt==="star")cs=cs.filter(c=>c.difficile);
     if((filt==="late"||filt==="star")&&!cs.length)continue;
+    const mc=MCOL[m.id]||["#eee","#7c6fd6"];
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
-    html+=`<div class="panel mat"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} ancrés · ${n2} en P2 · ${n1} en P1 · ${all} cours</span></div>
-     <div class="bar" role="img" aria-label="${n3} cours à 3 passages, ${n2} à 2, ${n1} à 1, sur ${all}">${n3?`<i style="width:${n3/tot*100}%;background:var(--accent)"></i>`:""}${n2?`<i style="width:${n2/tot*100}%;background:#5b8fd6"></i>`:""}${n1?`<i style="width:${n1/tot*100}%;background:#9fb8dc"></i>`:""}</div>
-     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.cartes!=null?` <span class="pill ${c.cartes===0?"due":c.cartes>100?"late":c.cartes>70?"due":"info"}" title="cartes Anki">${c.cartes} cartes</span>`:""}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}</span></div>
+    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} ancrés · ${n2} en P2 · ${n1} en P1 · ${all} cours</span></div>
+     <div class="bar" role="img" aria-label="${n3} cours à 3 passages, ${n2} à 2, ${n1} à 1, sur ${all}">${n3?`<i style="width:${n3/tot*100}%;background:${mc[1]}"></i>`:""}${n2?`<i style="width:${n2/tot*100}%;background:${mc[1]};opacity:.55"></i>`:""}${n1?`<i style="width:${n1/tot*100}%;background:${mc[1]};opacity:.25"></i>`:""}</div>
+     <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}</span></div>
        <div class="passes">${["p1","p2","p3"].map(p=>`<button class="pass ${c[p]?"on":s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p]):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}</button>`).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt===m.id||filt==="all"?`<div><button class="btn ghost" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
   }
@@ -433,49 +546,55 @@ async function addCours(mid){
 }
 let editing=null;
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;
-  $("#m-titre").value=c.titre||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-cartes").value=c.cartes??"";$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
+  $("#m-titre").value=c.titre||"";$("#m-p1").value=c.p1||"";$("#m-p2").value=c.p2||"";$("#m-p3").value=c.p3||"";$("#m-anki").checked=!!c.anki;$("#m-note").value=c.note||"";$("#m-confirm").hidden=true;$("#modal").hidden=false;$("#m-titre").focus()}
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
-$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,cartes:$("#m-cartes").value===""?null:Number($("#m-cartes").value),note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
+$("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#modal").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true}});
 
 /* KHOLLES */
+function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
 function renderKholles(){
-  const cfg=window.__cfg||{};const ref=cfg.placesMed&&cfg.promo?cfg.placesMed/cfg.promo*100:null;
-  $("#refTxt").textContent=ref?`repère provisoire : ${cfg.placesMed} places en médecine / ${cfg.promo} en PASS ≈ top ${ref.toFixed(1)} %`:"";
+  const {lo,hi,c}=refs();
+  $("#refTxt").textContent=hi?`zone d'admission estimée : top ${lo.toFixed(1)} % à ${hi.toFixed(1)} % (${c.placesMed} places, ≈ ${c.candidats} candidats en médecine, ${c.promo} en PASS)`:"";
   $("#kh-mat").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>`<option value="${esc(m.id)}">${esc(m.nom)}</option>`).join("");
   const rows=[...K].sort((a,b)=>a.date<b.date?1:-1);
-  $("#khRows").innerHTML=rows.map(k=>{const p=k.rang&&k.total?k.rang/k.total*100:null;const cls=p==null?"":ref&&p<=ref?"ok":"due";
-    return `<tr><td class="num">${fmt(k.date)}</td><td>${esc(matById(k.matiere).nom)}</td><td>${esc(k.orga||"")}</td><td class="n">${k.rang?k.rang+" / "+k.total:"à venir"}</td><td class="n">${p!=null?`<span class="pill ${cls}">${p.toFixed(1)} %</span>`:"–"}</td><td class="n">${k.note!=null&&k.note!==""?esc(k.note):"–"}</td><td class="small">${esc(k.com||"")}</td><td><button class="btn ghost small" data-kdel="${esc(k.id)}" aria-label="Supprimer">✕</button></td></tr>`}).join("")||`<tr><td colspan="8" class="muted">Aucune kholle enregistrée.</td></tr>`;
+  $("#khRows").innerHTML=rows.map(k=>{const p=k.rang&&k.total?k.rang/k.total*100:null;const cls=p==null?"":lo!=null&&p<=lo?"ok":hi!=null&&p<=hi?"info":"due";
+    return `<tr><td class="num">${fmt(k.date)}</td><td><span class="mtag" style="${mvars(k.matiere)}">${esc(matById(k.matiere).nom)}</span></td><td>${esc(k.orga||"")}</td><td class="n">${k.rang?k.rang+" / "+k.total:"à venir"}</td><td class="n">${p!=null?`<span class="pill ${cls}">${p.toFixed(1)} %</span>`:"–"}</td><td class="n">${k.note!=null&&k.note!==""?esc(k.note):"–"}</td><td class="small">${esc(k.com||"")}</td><td style="white-space:nowrap"><button class="btn ghost sm" data-kedit="${esc(k.id)}" aria-label="Modifier">✎</button><button class="btn ghost sm" data-kdel="${esc(k.id)}" aria-label="Supprimer">✕</button></td></tr>`}).join("")||`<tr><td colspan="8" class="muted">Aucune kholle enregistrée.</td></tr>`;
   $("#khRows").querySelectorAll("[data-kdel]").forEach(b=>b.onclick=async()=>{if(b.dataset.arm){try{await db.doc("kholles/"+b.dataset.kdel).delete()}catch(e){toast("Suppression impossible")}}else{b.dataset.arm=1;b.textContent="Confirmer";setTimeout(()=>{delete b.dataset.arm;b.textContent="✕"},3000)}});
-  drawChart(ref);
+  $("#khRows").querySelectorAll("[data-kedit]").forEach(b=>b.onclick=()=>openK(b.dataset.kedit));
+  drawChart(lo,hi);
 }
-function drawChart(ref){
+let kediting=null;
+function openK(id){const k=K.find(x=>x.id===id);if(!k)return;kediting=id;$("#k-title").textContent="Kholle "+matById(k.matiere).nom+" · "+(k.orga||"");$("#k-date").value=k.date||"";$("#k-note").value=k.note??"";$("#k-rang").value=k.rang??"";$("#k-total").value=k.total??"";$("#k-com").value=k.com||"";$("#kmodal").hidden=false;$("#k-rang").focus()}
+$("#k-cancel").onclick=()=>{$("#kmodal").hidden=true};
+$("#k-save").onclick=async()=>{const n=v=>v===""?null:Number(v);const patch={date:$("#k-date").value,note:n($("#k-note").value),rang:n($("#k-rang").value),total:n($("#k-total").value),com:$("#k-com").value.trim()};$("#kmodal").hidden=true;try{await db.doc("kholles/"+kediting).update(patch);toast("Kholle mise à jour")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+function drawChart(lo,hi){
   const pts=K.filter(k=>k.rang&&k.total).map(k=>({...k,p:k.rang/k.total*100})).sort((a,b)=>a.date<b.date?-1:1);
   const el=$("#chart");
   if(!pts.length){el.innerHTML=`<p class="muted small">Tes classements s'afficheront ici.</p>`;return}
-  const W=640,H=240,L=46,R=16,T=16,Bm=40;const maxP=Math.max(30,Math.ceil(Math.max(...pts.map(p=>p.p),ref||0)/10)*10);
-  const x=i=>pts.length===1?L+(W-L-R)/2:L+i*(W-L-R)/(pts.length-1);const y=p=>T+p/maxP*(H-T-Bm);
+  const W=640,H=250,L=46,R=16,T0=22,Bm=40;const maxP=Math.max(30,Math.ceil(Math.max(...pts.map(p=>p.p),hi||0)/10)*10);
+  const x=i=>pts.length===1?L+(W-L-R)/2:L+i*(W-L-R)/(pts.length-1);const y=p=>T0+p/maxP*(H-T0-Bm);
   let g="";for(let v=0;v<=maxP;v+=10)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${v}%</text>`;
-  let refL=ref?`<line x1="${L}" x2="${W-R}" y1="${y(ref)}" y2="${y(ref)}" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${W-R}" y="${y(ref)-6}" text-anchor="end" font-size="11" fill="var(--ink-2)">repère ${ref.toFixed(1)} %</text>`:"";
+  const band=lo!=null&&hi!=null?`<rect x="${L}" y="${y(lo)}" width="${W-L-R}" height="${y(hi)-y(lo)}" fill="#e1f4e8"/><line x1="${L}" x2="${W-R}" y1="${y(hi)}" y2="${y(hi)}" stroke="#2e8a57" stroke-width="1.2" stroke-dasharray="5 4"/><text x="${W-R}" y="${y(hi)+13}" text-anchor="end" font-size="11" fill="#2e8a57">zone d'admission estimée</text>`:"";
   const path=pts.map((p,i)=>(i?"L":"M")+x(i)+" "+y(p.p)).join(" ");
-  const dots=pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.p)}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/><circle cx="${x(i)}" cy="${y(p.p)}" r="16" fill="transparent" data-i="${i}" style="cursor:pointer"/><text x="${x(i)}" y="${H-Bm+18}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">${esc(matById(p.matiere).nom.slice(0,10))}</text><text x="${x(i)}" y="${H-Bm+31}" text-anchor="middle" font-size="10" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${fmt(p.date)}</text>`).join("");
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Classement en pourcentage de la promo, par kholle. Plus bas = mieux."><text x="${L}" y="11" font-size="11" fill="var(--ink-3)">top % de la promo (en haut = meilleur)</text>${g}${refL}<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>${dots}</svg><div class="tip" hidden></div>`;
+  const dots=pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.p)}" r="6" fill="${(MCOL[p.matiere]||["","#7c6fd6"])[1]}" stroke="#fff" stroke-width="2"/><circle cx="${x(i)}" cy="${y(p.p)}" r="16" fill="transparent" data-i="${i}" style="cursor:pointer"/><text x="${x(i)}" y="${H-Bm+18}" text-anchor="middle" font-size="10.5" fill="var(--ink-2)">${esc(matById(p.matiere).nom.replace(/ \(.*\)/,"").slice(0,12))}</text><text x="${x(i)}" y="${H-Bm+31}" text-anchor="middle" font-size="10" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${fmt(p.date)}</text>`).join("");
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Classement en pourcentage de la promo, par kholle. En haut = meilleur."><text x="${L}" y="12" font-size="11" fill="var(--ink-3)">top % de la promo (en haut = meilleur)</text>${band}${g}<path d="${path}" fill="none" stroke="#b9b3e8" stroke-width="2"/>${dots}</svg><div class="tip" hidden></div>`;
   const tip=el.querySelector(".tip");
-  el.querySelectorAll("[data-i]").forEach(c=>{const show=()=>{const p=pts[+c.dataset.i];const r=el.getBoundingClientRect(),s=el.querySelector("svg").getBoundingClientRect();tip.innerHTML=`${esc(matById(p.matiere).nom)} · ${esc(p.orga||"")}<br>${p.rang} / ${p.total} · top ${p.p.toFixed(1)} %`;tip.style.left=(x(+c.dataset.i)/W*s.width)+"px";tip.style.top=(y(p.p)/H*s.height)+"px";tip.hidden=false};c.addEventListener("mouseenter",show);c.addEventListener("click",show);c.addEventListener("mouseleave",()=>tip.hidden=true)});
+  el.querySelectorAll("[data-i]").forEach(c=>{const show=()=>{const p=pts[+c.dataset.i];const s=el.querySelector("svg").getBoundingClientRect();tip.innerHTML=`${esc(matById(p.matiere).nom)} · ${esc(p.orga||"")}<br>${p.rang} / ${p.total} · top ${p.p.toFixed(1)} %`;tip.style.left=(x(+c.dataset.i)/W*s.width)+"px";tip.style.top=(y(p.p)/H*s.height)+"px";tip.hidden=false};c.addEventListener("mouseenter",show);c.addEventListener("click",show);c.addEventListener("mouseleave",()=>tip.hidden=true)});
 }
 $("#khForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   const n=v=>v===""?null:Number(v);
   const doc={date:$("#kh-date").value,matiere:$("#kh-mat").value,orga:$("#kh-org").value,rang:n($("#kh-rang").value),total:n($("#kh-total").value),note:n($("#kh-note").value),com:$("#kh-com").value.trim()};
   try{await db.collection("kholles").add(doc);e.target.reset();toast("Kholle enregistrée")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
-/* SEMAINE */
+/* SEMAINE TYPE */
 function renderSemaine(){const t=(new Date().getDay()+6)%7;
   $("#week").innerHTML=WEEK.map((d,i)=>`<div class="day ${i===t?"today":""}"><h3>${d.d}</h3>${d.b.map(x=>`<div class="blk" style="--c:var(${KCOL[x[3]]})"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}</div>`).join("")}</div>`).join("")}
 
-/* METHODE matières */
+/* METHODE */
 function renderMat(){
-  $("#matRows").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>`<tr><td><b>${esc(m.nom)}</b></td><td class="n">${esc(m.coef??"?")}</td><td class="small">${esc(m.epreuve||"")}</td><td class="num small">${m.fin?fmt(m.fin):esc(m.finTxt||"–")}</td><td class="small">${esc(m.conseil||"")}</td></tr>`).join("");
+  $("#matRows").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>`<tr><td><span class="mtag" style="${mvars(m.id)}"><span class="mdot"></span>${esc(m.nom)}</span></td><td class="n">${esc(m.coef??"?")}</td><td class="small">${esc(m.epreuve||"")}</td><td class="num small">${m.fin?fmt(m.fin):esc(m.finTxt||"–")}</td><td class="small">${esc(m.conseil||"")}</td></tr>`).join("");
 }
 $("#copyPrompt").onclick=async()=>{const t=$("#promptTxt").textContent;try{await navigator.clipboard.writeText(t);toast("Copié")}catch(e){const r=document.createRange();r.selectNodeContents($("#promptTxt"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Texte sélectionné : copie-le")}};
 
@@ -489,16 +608,17 @@ function renderBilan(){
 $("#bilanForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   try{await db.doc("bilans/"+WK).set({ok:$("#b-ok").value.trim(),ko:$("#b-ko").value.trim(),change:$("#b-change").value.trim(),energie:$("#b-energie").value,stress:$("#b-stress").value,date:today()});toast("Bilan enregistré")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
-function renderAll(){renderAuj();renderCours();renderKholles();renderMat();renderBilan()}
+function renderAll(){renderAuj();renderPlanning();renderCours();renderKholles();renderMat();renderBilan()}
 renderSemaine();renderAll();
 
 /* DATA */
 (async()=>{
   db=await (window.claude?.use?window.claude.use("db"):Promise.resolve(null));
   if(!db){$("#dbnote").hidden=false;return}
-  const sub=(col,fn)=>db.collection(col).onSnapshot(s=>{fn(s.docs.map(d=>({id:d.id,...d.data()})));renderAll()},e=>toast("Synchro interrompue : "+e.code));
-  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);
-  db.doc("config/general").onSnapshot(s=>{window.__cfg=s.exists?s.data():{};renderAll()});
+  let pend=0;const later=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;renderAll()})};
+  const sub=(col,fn)=>db.collection(col).onSnapshot(s=>{fn(s.docs.map(d=>({id:d.id,...d.data()})));later()},e=>toast("Synchro interrompue : "+e.code));
+  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);
+  db.doc("config/general").onSnapshot(s=>{window.__cfg=s.exists?s.data():{};later()});
 })();
 })();
 </script>
