@@ -13,6 +13,7 @@
   --radius:14px; --font-d:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif; --font-b:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif; --font-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
 .wrap{max-width:1180px;margin:0 auto}
 h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0;line-height:1.15}
@@ -104,11 +105,6 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .plan-nav .lbl{font-family:var(--font-d);font-weight:700;font-size:1.1rem;min-width:13ch}
 .toggle{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--ink-2);font-weight:700}
 .toggle input{width:auto}
-.pweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:start}
-.pday{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px;display:grid;gap:6px;min-width:0}
-.pday.today{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
-.pday h3{font-size:.95rem;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
-.pday h3 .num{font-size:.75rem;color:var(--ink-3);font-weight:400}
 .pitem{border-radius:8px;padding:5px 7px;font-size:.8rem;line-height:1.3;background:var(--c,var(--surface-2));display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:start}
 .pitem .h{font-family:var(--font-m);font-size:.68rem;color:var(--ink-2);display:block}
 .pitem.tpl{grid-template-columns:1fr;opacity:.85}
@@ -120,8 +116,31 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .addf{display:grid;gap:4px}
 .addf .r{display:grid;grid-template-columns:1fr auto;gap:4px}
 .addf input,.addf select{padding:5px 7px;font-size:.8rem}
-@media (max-width:980px){.pweek{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:560px){.pweek{grid-template-columns:1fr}}
+/* calendrier semaine */
+.cal{--hh:48px;overflow:auto;max-height:80vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+.cal-grid{display:grid;grid-template-columns:44px repeat(7,minmax(118px,1fr));min-width:880px}
+.cal-head{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:6px 4px;display:grid;gap:3px;align-content:start;min-width:0}
+.cal-head.corner{border-left:0}
+.cal-head .dn{display:flex;justify-content:center;align-items:baseline;gap:6px;font-weight:700;font-size:.85rem;color:var(--ink-2)}
+.cal-head .dn b{font-family:var(--font-d);font-size:1.15rem;color:var(--ink);padding:0 7px;border-radius:999px}
+.cal-head.today .dn b{background:#e5484d;color:#fff}
+.cal-head .ad{font-size:.7rem;border-radius:6px;padding:1px 5px;background:var(--mbg,var(--k-tut));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:default}
+.cal-head .ad.task{background:var(--mbg,var(--accent-soft));border-left:3px solid var(--mfg,var(--accent));cursor:pointer}
+.cal-head .ad.done{text-decoration:line-through;opacity:.6}
+.cal-head .plus{border:0;background:transparent;color:var(--accent);font:700 .75rem var(--font-b);cursor:pointer;padding:0}
+.cal-hours{position:relative;height:calc(var(--hh) * 18)}
+.cal-hours span{position:absolute;right:6px;transform:translateY(-50%);font:500 .66rem var(--font-m);color:var(--ink-3)}
+.cal-col{position:relative;height:calc(var(--hh) * 18);border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hh) - 1px),var(--line) calc(var(--hh) - 1px),var(--line) var(--hh));cursor:copy}
+.cal-col.today{background-color:#fbfaff}
+.cb{position:absolute;border-radius:7px;padding:2px 5px;font-size:.7rem;line-height:1.2;overflow:hidden}
+.cb .h{font:500 .62rem var(--font-m);color:var(--ink-2);display:block}
+.cb.tpl{left:2px;right:2px;background:var(--c);color:var(--ink-2);cursor:copy;pointer-events:none}
+.cb.task,.cb.kh{background:var(--mbg,var(--accent-soft));border-left:4px solid var(--mfg,var(--accent));color:var(--ink);box-shadow:0 1px 3px rgb(42 44 63 / .12);z-index:2}
+.cb.task{cursor:pointer}
+.cb.kh{font-weight:700;cursor:default}
+.cb.done{opacity:.55}.cb.done .tx{text-decoration:line-through}
+.nowline{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:4;pointer-events:none}
+.nowline::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e5484d}
 /* semaine type */
 .week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 .day{display:grid;gap:4px;align-content:start}
@@ -216,9 +235,9 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:12px;p
         </div>
         <label class="toggle"><input type="checkbox" id="pTpl" checked> Afficher la semaine type</label>
       </header>
-      <p class="muted small" style="margin:0">Ajoute tes tâches dans chaque jour, avec une heure et une matière si tu veux. Coche-les une fois faites. Les kholles, les ED et les blocs de la semaine type s'affichent tout seuls (bloc de révision, cahier d'exos du tutorat, Anki…).</p>
+      <p class="muted small" style="margin:0">Touche un créneau vide pour ajouter une tâche à cette heure-là, ou « + tâche » sous le jour pour une tâche sans heure. Touche une tâche pour la modifier ou la cocher. Les kholles, les ED et ta semaine type (en fond pâle) s'affichent tout seuls.</p>
     </div>
-    <div class="pweek" id="pweek"></div>
+    <div class="cal" id="cal"></div>
   </section>
 
   <!-- COURS -->
@@ -395,6 +414,20 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   </div>
   <p class="small" id="pm-confirm" hidden style="margin:0;color:var(--late)">Touche encore pour effacer la date, le QCM et le ressenti de ce passage.</p>
 </div></div>
+<div class="modal" id="tmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="tm-title">
+  <h3 id="tm-title">Nouvelle tâche</h3>
+  <label>Quoi<input type="text" id="tm-texte" placeholder="Ex. P2 Neuro 2 + QCM"></label>
+  <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px">
+    <label>Jour<input type="date" id="tm-date"></label><label>Début<input type="time" id="tm-heure"></label><label>Fin<input type="time" id="tm-fin"></label>
+  </div>
+  <label>Matière<select id="tm-mat"></select></label>
+  <label><span><input type="checkbox" id="tm-fait" style="width:auto"> Fait</span></label>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn danger" id="tm-del" type="button">Supprimer</button>
+    <div style="display:flex;gap:8px"><button class="btn ghost" id="tm-cancel" type="button">Annuler</button><button class="btn primary" id="tm-save" type="button">Enregistrer</button></div>
+  </div>
+  <p class="small" id="tm-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -525,24 +558,61 @@ function wireDay(root){
   root.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){delTask(b.dataset.tdel)}else{b.dataset.arm=1;b.textContent="Suppr. ?";setTimeout(()=>{delete b.dataset.arm;b.textContent="✕"},3000)}});
   root.querySelectorAll("form.addf").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(f);const tx=String(fd.get("texte")||"").trim();if(!tx)return;addTask({date:f.dataset.date,texte:tx,heure:String(fd.get("heure")||""),matiere:String(fd.get("matiere")||"")});f.reset()}));
 }
+const CAL0=6,CAL1=24;
+const hm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+function lanes(items){items.sort((a,b)=>a.s-b.s||b.e-a.e);let cl=[],end=-1;const out=[];
+  const flush=()=>{const L=[];cl.forEach(it=>{let i=L.findIndex(e=>e<=it.s);if(i<0){i=L.length;L.push(0)}L[i]=it.e;it.lane=i});cl.forEach(it=>it.n=L.length);out.push(...cl);cl=[]};
+  items.forEach(it=>{if(cl.length&&it.s>=end){flush();end=-1}cl.push(it);end=Math.max(end,it.e)});if(cl.length)flush();return out}
 function renderPlanning(){
   const mon=addDays(mondayOf(new Date()),7*weekOff);
   $("#pLbl").textContent="Semaine du "+fmt(iso(mon));
-  let html="";
-  for(let i=0;i<7;i++){const dIso=iso(addDays(mon,i));
-    html+=`<div class="pday ${dIso===today()?"today":""}"><h3>${JOURS[i]} <span class="num">${fmt(dIso)}</span></h3>${dayHtml(dIso)}</div>`}
-  const el=$("#pweek");
-  const focus=document.activeElement&&el.contains(document.activeElement)?document.activeElement.closest("form")?.dataset.date:null;
-  el.innerHTML=html;wireDay(el);
-  if(focus){const inp=el.querySelector(`form[data-date="${focus}"] input[name="texte"]`);inp&&inp.focus()}
+  const el=$("#cal"),keep=el.firstChild?el.scrollTop:null;
+  const HH=48,top=m=>(m-CAL0*60)/60*HH;
+  let head=`<div class="cal-head corner"></div>`,body=`<div class="cal-hours">${Array.from({length:CAL1-CAL0},(_,i)=>i?`<span style="top:${i*HH}px">${CAL0+i}h</span>`:"").join("")}</div>`;
+  for(let i=0;i<7;i++){const dIso=iso(addDays(mon,i)),idx=i,isT=dIso===today();
+    const ad=[...E.filter(e=>e.date===dIso).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}">${esc(e.titre)}</span>`),
+      ...T.filter(t=>t.date===dIso&&!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${esc(t.texte)}</span>`)].join("");
+    head+=`<div class="cal-head ${isT?"today":""}"><span class="dn">${JOURS[i].slice(0,3)}. <b>${+dIso.slice(8)}</b></span>${ad}<button class="plus" type="button" data-tnew="${dIso}">+ tâche</button></div>`;
+    let blocks="";
+    if(showTpl){const soon=kholleSoon(dIso,7);WEEK[idx].b.forEach(x=>{const s0=toMin(x[0]);const e0=x[1]?toMin(x[1]):Math.min(s0+120,CAL1*60);if(e0<=CAL0*60)return;
+      blocks+=`<div class="cb tpl" style="--c:var(${KCOL[x[3]]});top:${top(s0)}px;height:${Math.max(top(e0)-top(s0)-2,14)}px"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</div>`})}
+    const its=[...T.filter(t=>t.date===dIso&&t.heure).map(t=>{const s0=toMin(t.heure);let e0=t.fin?toMin(t.fin):s0+60;if(e0<=s0)e0=s0+30;return{s:s0,e:e0,t}}),
+      ...K.filter(k=>k.date===dIso).map(k=>{const s0=toMin(k.orga==="Prépa"?"18:00":"17:30");return{s:s0,e:s0+60,k}})];
+    const L=showTpl?16:2;
+    lanes(its).forEach(it=>{const w=`calc((100% - ${L+2}px) / ${it.n})`,left=`calc(${L}px + (100% - ${L+2}px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)}px;height:${Math.max(top(it.e)-top(it.s)-2,18)}px;left:${left};width:${w}`;
+      if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-topen="${esc(t.id)}"><span class="h">${esc(t.heure)}${t.fin?"–"+esc(t.fin):""}${t.fait?" ✓":""}</span><span class="tx">${esc(t.texte)}</span></div>`}
+      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="h">${k.orga==="Prépa"?"18:00 · colle prépa":"17:30 · kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</div>`}});
+    if(isT){const n=new Date(),nm=n.getHours()*60+n.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
+    body+=`<div class="cal-col ${isT?"today":""}" data-date="${dIso}">${blocks}</div>`;
+  }
+  el.innerHTML=`<div class="cal-grid">${head}${body}</div>`;
+  el.scrollTop=keep!=null?keep:(7-CAL0)*HH;
+  el.querySelectorAll(".cal-col").forEach(c=>c.addEventListener("click",e=>{if(e.target!==c)return;const m=CAL0*60+Math.floor(e.offsetY/HH*2)*30;openTask(null,{date:c.dataset.date,heure:hm(m),fin:hm(Math.min(m+60,CAL1*60-1))})}));
+  el.querySelectorAll("[data-topen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openTask(b.dataset.topen)});
+  el.querySelectorAll("[data-tnew]").forEach(b=>b.onclick=()=>openTask(null,{date:b.dataset.tnew,heure:"",fin:""}));
 }
+let tEdit=null;
+function openTask(id,init){
+  const t=id?T.find(x=>x.id===id):null;if(id&&!t)return;tEdit=id;
+  $("#tm-title").textContent=t?"Modifier la tâche":"Nouvelle tâche";
+  $("#tm-mat").innerHTML=matOptions().replace("Matière…","Aucune matière");
+  const v=t||init||{};$("#tm-texte").value=v.texte||"";$("#tm-date").value=v.date||today();$("#tm-heure").value=v.heure||"";$("#tm-fin").value=v.fin||"";$("#tm-mat").value=v.matiere||"";$("#tm-fait").checked=!!v.fait;
+  $("#tm-del").hidden=!t;$("#tm-confirm").hidden=true;$("#tmodal").hidden=false;$("#tm-texte").focus();
+}
+$("#tm-cancel").onclick=()=>{$("#tmodal").hidden=true};
+$("#tm-save").onclick=async()=>{const texte=$("#tm-texte").value.trim();if(!texte){$("#tm-texte").focus();return}
+  const doc={texte,date:$("#tm-date").value||today(),heure:$("#tm-heure").value,fin:$("#tm-heure").value?$("#tm-fin").value:"",matiere:$("#tm-mat").value,fait:$("#tm-fait").checked};
+  $("#tmodal").hidden=true;
+  if(tEdit)await updTask(tEdit,doc);else await addTask(doc)};
+$("#tm-del").onclick=async()=>{if($("#tm-confirm").hidden){$("#tm-confirm").hidden=false;return}$("#tmodal").hidden=true;await delTask(tEdit)};
+setInterval(()=>{if(!$("#v-planning").hidden&&weekOff===0)renderPlanning()},60000);
 $("#pPrev").onclick=()=>{weekOff--;renderPlanning()};
 $("#pNext").onclick=()=>{weekOff++;renderPlanning()};
 $("#pNow").onclick=()=>{weekOff=0;renderPlanning()};
 $("#pTpl").onchange=e=>{showTpl=e.target.checked;try{localStorage.setItem("tpl",showTpl?"1":"0")}catch(_){}renderPlanning();renderAuj()};
 async function addTask(t){
   if(!db){toast("Données indisponibles ici");return}
-  const doc={date:t.date,heure:t.heure||"",texte:t.texte,matiere:t.matiere||"",fait:false,crt:Date.now()};
+  const doc={date:t.date,heure:t.heure||"",fin:t.fin||"",texte:t.texte,matiere:t.matiere||"",fait:!!t.fait,crt:Date.now()};
   try{await db.collection("taches").add(doc);toast("Ajouté au planning")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
 }
 async function updTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign(t,patch);renderAll();try{await db.doc("taches/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
@@ -636,7 +706,7 @@ function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)ret
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
 $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
