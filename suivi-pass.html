@@ -63,7 +63,7 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .wk.now{outline:2px solid var(--accent)}
 .wk .d{font-family:var(--font-m);color:var(--ink-3)}
 .wk .ev{border-radius:4px;padding:1px 4px;background:var(--surface);overflow-wrap:anywhere}
-.wk .ev.end{color:var(--ink-2)} .wk .ev.big{background:var(--ink);color:var(--bg);font-weight:700} .wk .ev.shs{background:var(--k-shs)} .wk .ev.kh{background:var(--k-tut)}
+.wk .ev.end{color:var(--ink-2)} .wk .ev.big{background:var(--ink);color:var(--bg);font-weight:700} .wk .ev.shs{background:var(--k-shs)} .wk .ev.kh{background:var(--k-tut)} .wk .ev.ed{background:var(--k-p2)} .wk .ev.eb{background:var(--late-soft);color:var(--late);font-weight:700} .wk .ev.off{background:var(--k-libre)}
 /* cours */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:5px 11px;font:600 .82rem var(--font-b);cursor:pointer}
@@ -226,7 +226,7 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
         <ul>
           <li><b>Chaque jour, tu vides les cartes « à revoir » du paquet parent</b> « PASS S1 ». Anki ne te montre que les cartes arrivées à échéance.</li>
           <li><b>Réglages</b> : FSRS activé, rétention visée 0,90, intervalle maximal 21 jours, révisions max 9999.</li>
-          <li><b>Budget cartes</b> : environ 25 par heure de cours pour les matières à mémoire (SHS, anat, histo, embryo, physio, molécules de biochimie). Moins de 10 pour la chimie, la biophysique et les exercices de biomol : là, ce sont les QCM qui te font apprendre.</li>
+          <li><b>Budget</b> : environ 15 notes (≈ 25 à 35 cartes) par heure de cours pour les matières à mémoire (SHS, anat, histo, embryo, physio, molécules de biochimie). Moins de 10 pour la chimie, la biophysique et les exercices de biomol : là, ce sont les QCM qui te font apprendre.</li>
           <li><b>Charge visée</b> : 45 à 60 min par jour. Au-delà, tu as trop de cartes et il faut réduire à la source, pas sauter des jours.</li>
           <li>Les cartes d'un cours sont ajoutées le <b>jour de son 2e passage</b>, jamais avant.</li>
           <li>Tu ne crées plus de cartes toi-même.</li>
@@ -244,6 +244,16 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
         </ul>
       </div>
     </div>
+    <div class="panel prose" style="max-width:none">
+      <header><h2>Ne rien louper sans 3000 cartes</h2><span class="eyebrow">chaque info a sa place</span></header>
+      <div class="steps">
+        <div class="step"><span class="k">La fiche</span><h3>Contient tout</h3><span class="small">Ta fiche annotée reste la référence complète. À chaque 3e passage et à chaque bloc kholle, tu restitues <b>tout le cours</b> de mémoire, pas seulement tes cartes.</span></div>
+        <div class="step"><span class="k">Les QCM</span><h3>Repèrent les trous</h3><span class="small">Chaque item raté ou deviné te montre une info qui manque. Tu en fais une carte « erreur », et ce sont les cartes les plus rentables.</span></div>
+        <div class="step"><span class="k">Anki</span><h3>Garde ce qui s'oublie</h3><span class="small">Chiffres, listes, exceptions, noms, rapports anatomiques. Ce que tu comprends n'a pas besoin de carte.</span></div>
+        <div class="step"><span class="k">Le filet de sécurité</span><h3>Vérifier la couverture</h3><span class="small">Après chaque paquet de cartes, l'IA liste les infos du cours qui ne sont dans aucune carte. Tu lis cette liste en 2 min et tu ajoutes seulement ce qui peut tomber.</span></div>
+      </div>
+      <p class="small muted" style="margin:0">Moins de cartes, ce n'est pas moins d'infos. Une carte à trous peut couvrir une liste entière (c1, c2, c3… dans la même note), et une carte image peut couvrir un schéma complet. Le vrai risque de perte, c'est d'avoir 10 000 cartes en décembre et de devoir sauter des jours.</p>
+    </div>
     <div class="panel">
       <header><h2>Tes matières</h2><span class="muted small">d'après les guides de la prépa · coefs à confirmer au besoin</span></header>
       <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin des cours</th><th>Priorité de méthode</th></tr></thead><tbody id="matRows"></tbody></table></div>
@@ -252,12 +262,12 @@ pre.prompt{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;pa
       <header><h2>Demande de cartes Anki à l'IA</h2><button class="btn" id="copyPrompt" type="button">Copier</button></header>
       <pre class="prompt" id="promptTxt">Fais-moi des cartes Anki pour ce cours de [MATIÈRE] – [TITRE DU COURS], [DURÉE] h de cours.
 Règles :
-- 1 carte = 1 information qui peut tomber en QCM (chiffres, exceptions, définitions, rapports anatomiques, chronologie, structures de molécules).
-- Maximum [25 × DURÉE] cartes. Commence par les 10 informations les plus probables au concours.
-- Pas de carte sur ce qui se comprend en raisonnant (je le travaille en QCM).
-- Formule les cartes comme les pièges des items de QCM (vrai/faux, « sauf », valeurs proches).
-- Privilégie le texte à trous : {{c1::...}}.
-- Donne le résultat en TSV : Texte[TAB]Extra[TAB]Tags, avec le tag PASS::[Matière]::[Cours].</pre>
+- Une note = une notion. Regroupe les listes et les tableaux dans une seule note à trous multiples ({{c1::…}}, {{c2::…}}…) au lieu de faire une carte par ligne.
+- Ne fais des cartes que pour ce qui s'oublie : chiffres, listes, exceptions, définitions, rapports anatomiques, chronologie, structures de molécules. Pas de carte sur ce qui se comprend en raisonnant.
+- Formule les trous sur les pièges des items de QCM (valeurs proches, « sauf », inversions).
+- Maximum [15 × DURÉE] notes. Commence par les infos les plus probables au concours.
+- Donne le résultat en TSV : Texte[TAB]Extra[TAB]Tags, avec le tag PASS::[Matière]::[Cours].
+Ensuite, sous le TSV : liste en une ligne chacune TOUTES les infos du cours qui ne sont dans aucune carte, pour que je vérifie que rien d'important ne manque.</pre>
     </div>
   </section>
 
@@ -355,7 +365,8 @@ function todoItems(){
 function renderAuj(){
   const items=todoItems(), late=items.filter(i=>i.lvl==="late").length;
   const done3=C.filter(c=>c.p3).length, started=C.filter(c=>c.p1).length;
-  const next=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
+  const upcoming=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1);const next=upcoming[0];
+  const lim=iso(new Date(Date.now()+7*864e5));const soon=[...new Set(upcoming.filter(k=>k.date<=lim).map(k=>matById(k.matiere).nom))];
   $("#stats").innerHTML=
    `<div class="stat ${late?"late":""}"><span class="eyebrow">En retard</span><b class="num">${late}</b><span class="small muted">passages</span></div>`+
    `<div class="stat"><span class="eyebrow">Cours vus</span><b class="num">${started}<span class="small muted"> / ${C.length}</span></b><span class="small muted">au moins 1 passage</span></div>`+
@@ -368,14 +379,14 @@ function renderAuj(){
   else ul.innerHTML=items.slice(0,14).map(i=>`<li class="task"><span class="pill ${i.lvl==="late"?"late":i.lvl==="due"?"due":"info"}">${i.kind}</span><span class="what"><b>${esc(i.c.titre)}</b><span class="small muted">${esc(i.m.nom)} · ${esc(i.why)}</span></span><button class="btn" data-done="${esc(i.c.id)}" data-k="${i.kind}">Fait</button></li>`).join("")+(items.length>14?`<li class="small muted">+ ${items.length-14} autres dans l'onglet Cours</li>`:"");
   ul.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const k=b.dataset.k;setField(b.dataset.done,k==="Anki"?{anki:true}:{[k.toLowerCase()]:today()})});
   const plan=WEEK[(new Date().getDay()+6)%7];
-  $("#todayPlan").innerHTML=plan.b.map(x=>`<div class="blk" style="--c:var(${KCOL[x[3]]})"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&next?` <b>→ ${esc(matById(next.matiere).nom)}</b>`:""}</div>`).join("");
+  $("#todayPlan").innerHTML=plan.b.map(x=>`<div class="blk" style="--c:var(${KCOL[x[3]]})"><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</div>`).join("");
   renderWeeks();
 }
 function renderWeeks(){
   const start=new Date();start.setDate(start.getDate()-((start.getDay()+6)%7));
-  const evs=[...E.map(e=>({date:e.date,t:e.titre,cls:e.type==="concours"?"big":e.type==="shs"?"shs":""})),
+  const evs=[...E.map(e=>({date:e.date,t:e.titre,cls:e.type==="concours"?"big":e.type||""})),
     ...M.filter(m=>m.fin).map(m=>({date:m.fin,t:"Fin "+m.nom,cls:"end"})),
-    ...K.filter(k=>k.date>=today()).map(k=>({date:k.date,t:"Kholle "+matById(k.matiere).nom,cls:"kh"}))];
+    ...K.filter(k=>k.date>=today()).map(k=>({date:k.date,t:"Kholle "+(k.orga==="Prépa"?"prépa ":"")+matById(k.matiere).nom,cls:"kh"}))];
   let html="";
   for(let w=0;w<12;w++){const a=new Date(start);a.setDate(a.getDate()+7*w);const z=new Date(a);z.setDate(z.getDate()+6);const A=iso(a),Z=iso(z);
     const inW=evs.filter(e=>e.date>=A&&e.date<=Z).sort((x,y)=>x.date<y.date?-1:1);
