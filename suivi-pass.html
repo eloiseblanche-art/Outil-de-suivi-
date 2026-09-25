@@ -125,8 +125,8 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .cal-head .dn b{font-family:var(--font-d);font-size:1.15rem;color:var(--ink);padding:0 7px;border-radius:999px}
 .cal-head.today .dn b{background:#e5484d;color:#fff}
 .cal-head .ad{font-size:.7rem;border-radius:6px;padding:1px 5px;background:var(--mbg,var(--k-tut));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:default}
-.cal-head .ad.task{background:var(--mbg,var(--accent-soft));border-left:3px solid var(--mfg,var(--accent));cursor:pointer}
-.cal-head .ad.done{text-decoration:line-through;opacity:.6}
+.cal-head .ad.task{background:rgb(229 72 77 / .14);border-left:3px solid rgb(229 72 77 / .7);cursor:pointer}
+.cal-head .ad.task.done{background:rgb(46 138 87 / .16);border-left-color:#2e8a57}
 .cal-head .plus{border:0;background:transparent;color:var(--accent);font:700 .75rem var(--font-b);cursor:pointer;padding:0}
 .cal-hours{position:relative;height:calc(var(--hh) * 18)}
 .cal-hours span{position:absolute;right:6px;transform:translateY(-50%);font:500 .66rem var(--font-m);color:var(--ink-3)}
@@ -136,9 +136,13 @@ ul.clean{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .cb .h{font:500 .62rem var(--font-m);color:var(--ink-2);display:block}
 .cb.tpl{left:2px;right:2px;background:var(--c);color:var(--ink-2);cursor:copy;pointer-events:none}
 .cb.task,.cb.kh{background:var(--mbg,var(--accent-soft));border-left:4px solid var(--mfg,var(--accent));color:var(--ink);box-shadow:0 1px 3px rgb(42 44 63 / .12);z-index:2}
-.cb.task{cursor:pointer}
+.cb.task{cursor:grab;background:rgb(229 72 77 / .14);border-left-color:rgb(229 72 77 / .75);touch-action:none;user-select:none;-webkit-user-select:none;padding-bottom:8px}
+.cb.task.done{background:rgb(46 138 87 / .16);border-left-color:#2e8a57}
+.cb.task .rz{position:absolute;left:0;right:0;bottom:0;height:9px;cursor:ns-resize}
+.cb.task .rz::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:2px;background:rgb(42 44 63 / .25)}
+.cb.task.dragging{cursor:grabbing;z-index:6;box-shadow:0 6px 18px rgb(42 44 63 / .25);opacity:.92}
 .cb.kh{font-weight:700;cursor:default}
-.cb.done{opacity:.55}.cb.done .tx{text-decoration:line-through}
+
 .nowline{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:4;pointer-events:none}
 .nowline::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e5484d}
 /* semaine type */
@@ -229,7 +233,9 @@ details.fold>*:not(summary){margin:0 20px 18px}
 .prose{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink-2)}
 .cal{border:0;box-shadow:0 1px 2px rgb(42 44 63 / .04),0 8px 28px rgb(42 44 63 / .05);border-radius:18px}
 .cb.tpl{opacity:.8}
-#todayDay .pitem.task{border:0;border-left:3px solid var(--mfg,var(--accent));border-radius:0 8px 8px 0;background:var(--mbg,var(--accent-soft))}
+#todayDay .pitem.task{border:0;border-left:3px solid rgb(229 72 77 / .75);border-radius:0 8px 8px 0;background:rgb(229 72 77 / .12)}
+#todayDay .pitem.task.done{border-left-color:#2e8a57;background:rgb(46 138 87 / .15)}
+#todayDay .pitem.task.done .tx{text-decoration:none;color:var(--ink)}
 #todayDay .mtag{background:transparent;padding:0}
 th{font-weight:700}
 td,th{border-bottom-color:#f0f0f5}
@@ -284,7 +290,7 @@ td,th{border-bottom-color:#f0f0f5}
       </div>
     </div>
     <div class="cal" id="cal"></div>
-    <p class="hint">Touche un créneau vide pour ajouter une tâche.</p>
+    <p class="hint">Touche un créneau vide pour ajouter une tâche · fais glisser un bloc pour le déplacer · tire sa poignée du bas pour changer sa durée.</p>
     <details class="panel fold">
       <summary><h2>Bilan de la semaine</h2><span class="muted small num" id="wkId"></span></summary>
       <form class="f" id="bilanForm">
@@ -578,6 +584,7 @@ function lanes(items){items.sort((a,b)=>a.s-b.s||b.e-a.e);let cl=[],end=-1;const
   const flush=()=>{const L=[];cl.forEach(it=>{let i=L.findIndex(e=>e<=it.s);if(i<0){i=L.length;L.push(0)}L[i]=it.e;it.lane=i});cl.forEach(it=>it.n=L.length);out.push(...cl);cl=[]};
   items.forEach(it=>{if(cl.length&&it.s>=end){flush();end=-1}cl.push(it);end=Math.max(end,it.e)});if(cl.length)flush();return out}
 function renderPlanning(){
+  if(dragging)return;
   const mon=addDays(mondayOf(new Date()),7*weekOff);
   $("#pLbl").textContent="Semaine du "+fmt(iso(mon));
   const el=$("#cal"),keep=el.firstChild?el.scrollTop:null;
@@ -585,7 +592,7 @@ function renderPlanning(){
   let head=`<div class="cal-head corner"></div>`,body=`<div class="cal-hours">${Array.from({length:CAL1-CAL0},(_,i)=>i?`<span style="top:${i*HH}px">${CAL0+i}h</span>`:"").join("")}</div>`;
   for(let i=0;i<7;i++){const dIso=iso(addDays(mon,i)),idx=i,isT=dIso===today();
     const ad=[...E.filter(e=>e.date===dIso).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}">${esc(e.titre)}</span>`),
-      ...T.filter(t=>t.date===dIso&&!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${esc(t.texte)}</span>`)].join("");
+      ...T.filter(t=>t.date===dIso&&!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${esc(t.texte)}</span>`)].join("");
     head+=`<div class="cal-head ${isT?"today":""}"><span class="dn">${JOURS[i].slice(0,3)}. <b>${+dIso.slice(8)}</b></span>${ad}<button class="plus" type="button" data-tnew="${dIso}">+ tâche</button></div>`;
     let blocks="";
     if(showTpl){const soon=kholleSoon(dIso,7);WEEK[idx].b.forEach(x=>{const s0=toMin(x[0]);const e0=x[1]?toMin(x[1]):Math.min(s0+120,CAL1*60);if(e0<=CAL0*60)return;
@@ -594,7 +601,7 @@ function renderPlanning(){
       ...K.filter(k=>k.date===dIso).map(k=>{const s0=toMin(k.orga==="Prépa"?"18:00":"17:30");return{s:s0,e:s0+60,k}})];
     const L=showTpl?16:2;
     lanes(its).forEach(it=>{const w=`calc((100% - ${L+2}px) / ${it.n})`,left=`calc(${L}px + (100% - ${L+2}px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)}px;height:${Math.max(top(it.e)-top(it.s)-2,18)}px;left:${left};width:${w}`;
-      if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-topen="${esc(t.id)}"><span class="h">${esc(t.heure)}${t.fin?"–"+esc(t.fin):""}${t.fait?" ✓":""}</span><span class="tx">${esc(t.texte)}</span></div>`}
+      if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${pos}" data-tid="${esc(t.id)}"><span class="h">${esc(t.heure)}${t.fin?"–"+esc(t.fin):""}${t.fait?" ✓":""}</span><span class="tx">${esc(t.texte)}</span><span class="rz" aria-hidden="true"></span></div>`}
       else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="h">${k.orga==="Prépa"?"18:00 · colle prépa":"17:30 · kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</div>`}});
     if(isT){const n=new Date(),nm=n.getHours()*60+n.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${isT?"today":""}" data-date="${dIso}">${blocks}</div>`;
@@ -603,7 +610,32 @@ function renderPlanning(){
   el.scrollTop=keep!=null?keep:(7-CAL0)*HH;
   el.querySelectorAll(".cal-col").forEach(c=>c.addEventListener("click",e=>{if(e.target!==c)return;const m=CAL0*60+Math.floor(e.offsetY/HH*2)*30;openTask(null,{date:c.dataset.date,heure:hm(m),fin:hm(Math.min(m+60,CAL1*60-1))})}));
   el.querySelectorAll("[data-topen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openTask(b.dataset.topen)});
+  el.querySelectorAll(".cb.task").forEach(b=>wireDrag(b,el,HH));
   el.querySelectorAll("[data-tnew]").forEach(b=>b.onclick=()=>openTask(null,{date:b.dataset.tnew,heure:"",fin:""}));
+}
+let dragging=null;
+function wireDrag(b,el,HH){
+  const snap=HH/4;
+  b.addEventListener("pointerdown",e=>{if(e.button>0)return;const t=T.find(x=>x.id===b.dataset.tid);if(!t)return;
+    const s0=toMin(t.heure),e0=t.fin?Math.max(toMin(t.fin),s0+15):s0+60;
+    dragging={b,t,rz:e.target.classList.contains("rz"),x0:e.clientX,y0:e.clientY,moved:false,top0:parseFloat(b.style.top),h0:parseFloat(b.style.height),dur:e0-s0};
+    b.setPointerCapture(e.pointerId);e.preventDefault();e.stopPropagation()});
+  b.addEventListener("pointermove",e=>{const d=dragging;if(!d||d.b!==b)return;const dx=e.clientX-d.x0,dy=e.clientY-d.y0;
+    if(!d.moved&&Math.hypot(dx,dy)<6)return;d.moved=true;b.classList.add("dragging");
+    const lab=b.querySelector(".h");
+    if(d.rz){const h=Math.max(snap-2,Math.round((d.h0+2+dy)/snap)*snap-2);b.style.height=h+"px";const st=toMin(d.t.heure);lab.textContent=hm(st)+"–"+hm(st+Math.round((h+2)/HH*60))}
+    else{const maxTop=(CAL1-CAL0)*HH-snap;const top=Math.min(maxTop,Math.max(0,Math.round((d.top0+dy)/snap)*snap));b.style.top=top+"px";
+      const st=CAL0*60+Math.round(top/HH*60);lab.textContent=hm(st)+"–"+hm(Math.min(st+d.dur,CAL1*60-1));
+      const col=[...el.querySelectorAll(".cal-col")].find(c=>{const r=c.getBoundingClientRect();return e.clientX>=r.left&&e.clientX<r.right});
+      if(col&&col!==b.parentElement){b.style.left="16px";b.style.width="calc(100% - 18px)";col.appendChild(b)}}});
+  const end=async e=>{const d=dragging;if(!d||d.b!==b)return;dragging=null;b.classList.remove("dragging");
+    if(!d.moved){openTask(d.t.id);return}
+    let patch;
+    if(d.rz){const st=toMin(d.t.heure);const dur=Math.max(15,Math.round((parseFloat(b.style.height)+2)/HH*60/15)*15);patch={fin:hm(Math.min(st+dur,CAL1*60-1))}}
+    else{const st=CAL0*60+Math.round(parseFloat(b.style.top)/HH*60/15)*15;patch={date:b.parentElement.dataset.date,heure:hm(st),fin:hm(Math.min(st+d.dur,CAL1*60-1))}}
+    await updTask(d.t.id,patch)};
+  b.addEventListener("pointerup",end);
+  b.addEventListener("pointercancel",()=>{if(dragging&&dragging.b===b){dragging=null;renderPlanning()}});
 }
 let tEdit=null;
 function openTask(id,init){
