@@ -218,6 +218,8 @@ button.pie[aria-pressed="true"]{border-color:var(--mfg)}
 .row{background:transparent;border-bottom:1px solid var(--line);border-radius:0;padding:7px 2px}
 .rows .row:last-child{border-bottom:0}
 .pass{border-color:var(--line);background:#fff}
+.addc{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:2px}
+.addc input{border-color:transparent;background:var(--surface-2);font-size:.88rem}
 details.fold{padding:0}
 details.fold>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 details.fold>summary::-webkit-details-marker{display:none}
@@ -682,6 +684,7 @@ function renderCours(){
   $("#matChips").innerHTML=`<button class="chip" data-f="all" aria-pressed="${filt==="all"}">Tous les cours</button><button class="chip" data-f="late" aria-pressed="${filt==="late"}">En retard</button><button class="chip" data-f="star" aria-pressed="${filt==="star"}">★ Difficiles</button>`;
   $("#matChips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderCours();renderPies()});
   const list=$("#coursList");let html="";
+  const ae=document.activeElement,keepM=ae&&ae.closest&&ae.closest("form.addc")?ae.closest("form.addc").dataset.add:null,keepV=keepM?ae.value:"";
   for(const m of mats){
     let cs=C.filter(c=>c.matiere===m.id).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
     if(filt!=="all"&&filt!=="late"&&filt!=="star"&&filt!==m.id)continue;
@@ -694,23 +697,24 @@ function renderCours(){
     html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${n3} / ${all} ancrés</span></div>
      <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
        <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
-     ${filt===m.id?`<div><button class="link" data-add="${esc(m.id)}">+ Ajouter un cours</button></div>`:""}</div>`;
+     ${filt==="all"||filt===m.id?`<form class="addc" data-add="${esc(m.id)}"><input type="text" name="t" placeholder="+ Ajouter un cours en ${esc(m.nom.replace(/ \(.*\)/,""))}" aria-label="Nouveau cours en ${esc(m.nom)}" autocomplete="off"><button class="btn sm primary" type="submit">Ajouter</button></form>`:""}</div>`;
   }
   list.innerHTML=html||`<p class="muted">Rien à afficher avec ce filtre.</p>`;
   list.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.id);const p=b.dataset.p;if(p==="anki"){setField(c.id,{anki:!c.anki});return}openPass(c.id,p)});
   list.querySelectorAll("[data-star]").forEach(b=>b.onclick=()=>{const c=C.find(x=>x.id===b.dataset.star);setField(c.id,{difficile:!c.difficile})});
   list.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openModal(b.dataset.edit));
-  list.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addCours(b.dataset.add));
+  list.querySelectorAll("form.addc").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();const t=f.elements.t.value.trim();if(!t){f.elements.t.focus();return}addCours(f.dataset.add,t);f.elements.t.value=""}));
+  if(keepM){const i=list.querySelector(`form.addc[data-add="${keepM}"] input`);if(i){i.value=keepV;i.focus()}}
 }
 async function setField(id,patch){
   const c=C.find(x=>x.id===id);if(!c||!db)return;const{r,...rest}=patch;Object.assign(c,rest);if(r){c.r={...(c.r||{})};for(const k in r)c.r[k]={...(c.r[k]||{}),...r[k]}}renderAll();
   try{await db.doc("cours/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
 }
-async function addCours(mid){
-  if(!db)return;const cs=C.filter(c=>c.matiere===mid);const ordre=cs.reduce((a,c)=>Math.max(a,c.ordre||0),0)+1;
+async function addCours(mid,titre){
+  if(!db){toast("Données indisponibles ici");return}const cs=C.filter(c=>c.matiere===mid);const ordre=cs.reduce((a,c)=>Math.max(a,c.ordre||0),0)+1;
   const id=mid+"-"+String(ordre).padStart(2,"0")+"-"+Math.random().toString(36).slice(2,6);
-  const doc={matiere:mid,ordre,titre:"Nouveau cours",p1:"",p2:"",p3:"",anki:false,difficile:false,note:""};
-  try{await db.doc("cours/"+id).set(doc);openModal(id,{id,...doc})}catch(e){toast("Ajout impossible : "+(e.code||"erreur"))}
+  const doc={matiere:mid,ordre,titre:titre||"Nouveau cours",p1:"",p2:"",p3:"",anki:false,difficile:false,note:""};
+  try{await db.doc("cours/"+id).set(doc);toast("Cours ajouté : "+doc.titre)}catch(e){toast("Ajout impossible : "+(e.code||"erreur"))}
 }
 let editing=null;
 function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)return;editing=c.id;
