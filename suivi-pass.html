@@ -384,7 +384,7 @@ td,th{border-bottom-color:#f0f0f5}
   <section class="view" id="v-planning" hidden>
     <div class="plan" id="plan">
       <aside class="recap" id="recap" aria-label="Récap par matière">
-        <div class="recap-hd"><h2>Matières</h2><p>Glisse un objectif dans ta semaine. Remets une tâche ici pour la déplanifier.</p></div>
+        <div class="recap-hd"><h2>Matières</h2><p>Glisse une tâche dans ta semaine.</p></div>
         <div id="recapList"></div>
       </aside>
       <div class="plan-main">
@@ -848,15 +848,10 @@ function renderRecap(){
     const open=rcOpen.has(m.id||"_")?" open":"";
     const nOpen=objs.filter(t=>!t.fait).length;
     if(m.gen&&!objs.length&&!planned.length&&!open)return `<details class="rc" data-rc="_"><summary><span class="vis" style="--mfg:#8e8e93" aria-hidden="true">✓</span><span class="nm">Général</span><span></span><span class="chev"></span></summary>${objBody(m,objs,planned)}</details>`;
-    const stats=m.gen?"":`<div class="rc-stats">
-      <span><b>${cs.length}</b> cours · P1 <b>${n1+n2+n3}</b> · P2 <b>${n2+n3}</b> · P3 <b>${n3}</b>${av!=null?` · QCM <b>${av} %</b>`:""}</span>
-      ${kn?`<span>Kholle <b>${JABR[(new Date(kn.date+"T12:00:00").getDay()+6)%7]} ${fmt(kn.date)}</b>${kn.orga?" · "+esc(kn.orga):""}</span>`:""}
-      ${late?`<span class="late">${late} passage${late>1?"s":""} en retard</span>`:""}
-      ${m.fin?`<span>Fin des cours le <b>${fmt(m.fin)}</b></span>`:m.finTxt?`<span>Fin des cours : ${esc(m.finTxt)}</span>`:""}
-    </div>`;
+    const stats="";
     return `<details class="rc" data-rc="${esc(m.id||"_")}" style="${mvars(m.id)}"${open}>
-      <summary><button type="button" class="vis" data-vis="${esc(m.id||"_")}" aria-pressed="${shown(m.id)}" aria-label="${shown(m.id)?"Masquer":"Afficher"} ${esc(shortNom(m))} dans le calendrier">✓</button><span class="nm">${esc(shortNom(m))}</span><span>${nOpen?`<span class="badge">${nOpen}</span>`:""}</span><span class="chev"></span>
-      ${m.gen?"":`<span class="bar" aria-hidden="true"><i style="width:${n3/tot*100}%;background:${fg}"></i><i style="width:${n2/tot*100}%;background:${fg}99"></i><i style="width:${n1/tot*100}%;background:${fg}4d"></i></span>`}</summary>
+      <summary><button type="button" class="vis" data-vis="${esc(m.id||"_")}" aria-pressed="${shown(m.id)}" aria-label="${shown(m.id)?"Masquer":"Afficher"} ${esc(shortNom(m))} dans le calendrier">✓</button><span class="nm">${esc(shortNom(m))}</span><span></span><span class="chev"></span>
+      </summary>
       <div class="rc-body">${stats}${objBody(m,objs,planned)}</div></details>`}).join("");
   box.querySelectorAll("details.rc").forEach(d=>d.addEventListener("toggle",()=>{const k=d.dataset.rc;d.open?rcOpen.add(k):rcOpen.delete(k);try{localStorage.setItem("rcOpen",JSON.stringify([...rcOpen]))}catch(e){}}));
   box.querySelectorAll("[data-vis]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const k=b.dataset.vis;hid.has(k)?hid.delete(k):hid.add(k);try{localStorage.setItem("hidMat",JSON.stringify([...hid]))}catch(e){}renderRecap();renderPlanning()});
@@ -868,9 +863,8 @@ function renderRecap(){
 }
 function objBody(m,objs,planned){
   const nm=esc(shortNom(m));
-  return `${objs.length?`<span class="rc-sub">Objectifs</span><ul class="olist">${objs.map(t=>`<li class="obj ${t.fait?"done":""}" data-obj="${esc(t.id)}" data-txt="${esc(t.texte)}" data-mat="${esc(t.matiere||"")}"><span class="grip" aria-hidden="true">⠿</span><input type="checkbox" data-odone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${esc(t.texte)}</span><button type="button" class="x" data-odel="${esc(t.id)}" aria-label="Supprimer l'objectif">✕</button></li>`).join("")}</ul>`:""}
-    ${planned.length?`<span class="rc-stats"><span>Déjà planifié : <b>${planned.length}</b> à venir</span></span>`:""}
-    <form class="oadd" data-mat="${esc(m.id)}"><input type="text" name="t" placeholder="Nouvel objectif${m.gen?"":" en "+nm}…" aria-label="Nouvel objectif ${nm}" autocomplete="off"><button type="submit" aria-label="Ajouter l'objectif">+</button></form>`}
+  return `${objs.length?`<ul class="olist">${objs.map(t=>`<li class="obj ${t.fait?"done":""}" data-obj="${esc(t.id)}" data-txt="${esc(t.texte)}" data-mat="${esc(t.matiere||"")}"><span class="grip" aria-hidden="true">⠿</span><input type="checkbox" data-odone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${esc(t.texte)}</span><button type="button" class="x" data-odel="${esc(t.id)}" aria-label="Supprimer l'objectif">✕</button></li>`).join("")}</ul>`:""}
+    <form class="oadd" data-mat="${esc(m.id)}"><input type="text" name="t" placeholder="Ajouter une tâche…" aria-label="Nouvel objectif ${nm}" autocomplete="off"><button type="submit" aria-label="Ajouter l'objectif">+</button></form>`}
 
 /* Glisser un objectif du récap vers le calendrier.
    Souris ou poignée ⠿ : tout de suite. Doigt ailleurs sur la carte : appui long, pour laisser défiler la liste. */
