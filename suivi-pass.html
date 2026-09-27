@@ -340,7 +340,7 @@ td,th{border-bottom-color:#f0f0f5}
 .oadd{display:grid;grid-template-columns:1fr auto;gap:6px}
 .oadd input{border:0;background:#f2f2f7;border-radius:8px;padding:7px 9px;font:inherit;font-size:.84rem}
 .oadd button{border:0;background:var(--mfg,#8e8e93);color:#fff;border-radius:8px;width:34px;font-size:1.1rem;cursor:pointer}
-.ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;max-width:220px;padding:6px 9px;border-radius:8px;font:600 .82rem var(--sys);background:color-mix(in srgb,var(--mfg,#8e8e93) 20%,#fff);border-left:3px solid var(--mfg,#8e8e93);color:#1c1c1e;box-shadow:0 10px 28px rgb(0 0 0 / .2)}
+.dragghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;max-width:220px;padding:6px 9px;border-radius:8px;font:600 .82rem var(--sys);background:color-mix(in srgb,var(--mfg,#8e8e93) 20%,#fff);border-left:3px solid var(--mfg,#8e8e93);color:#1c1c1e;box-shadow:0 10px 28px rgb(0 0 0 / .2)}
 .wrap:has(#v-planning:not([hidden])){max-width:1500px}
 @media (max-width:900px){.plan{grid-template-columns:1fr}.recap{position:static;max-height:42vh}.month{font-size:1.5rem}}
 </style>
@@ -896,7 +896,7 @@ document.addEventListener("pointermove",e=>{const d=odrag;if(!d||e.pointerId!==d
   const dist=Math.hypot(e.clientX-d.x0,e.clientY-d.y0);
   if(!d.ready){if(dist>8){clearTimeout(d.timer);odrag=null}return}
   if(!d.active){if(dist<5)return;d.active=true;d.li.classList.remove("lift");d.li.classList.add("src");
-    const g=d.ghost=document.createElement("div");g.className="ghost";g.setAttribute("style",mvars(d.data.mat));g.textContent=d.data.txt;document.body.appendChild(g)}
+    const g=d.ghost=document.createElement("div");g.className="dragghost";g.setAttribute("style",mvars(d.data.mat));g.textContent=d.data.txt;document.body.appendChild(g)}
   d.ghost.style.transform=`translate(${e.clientX-20}px,${e.clientY-18}px)`;
   autoScroll(e.clientX);
   const h=calHit(e.clientX,e.clientY);
@@ -1171,6 +1171,8 @@ function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)ret
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
 $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim(),lien:$("#m-lien").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
+/* Toucher à côté d'une fenêtre la ferme. */
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.hidden=true}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
 /* KHOLLES */
