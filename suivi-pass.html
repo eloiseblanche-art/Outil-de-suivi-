@@ -328,8 +328,6 @@ td,th{border-bottom-color:#f0f0f5}
 .obj{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:7px;align-items:center;background:color-mix(in srgb,var(--mfg,#8e8e93) 13%,#fff);border-left:3px solid var(--mfg,#8e8e93);border-radius:7px;padding:6px 6px 6px 4px;font-size:.84rem;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .12s,box-shadow .12s,opacity .12s}
 .obj .grip{touch-action:none;color:color-mix(in srgb,var(--mfg,#8e8e93) 70%,#fff);font-size:.95rem;line-height:1;padding:2px 1px;cursor:grab}
 .obj .tx{overflow-wrap:anywhere;color:#1c1c1e}
-.obj.sug{background:transparent;border:1px dashed color-mix(in srgb,var(--mfg,#8e8e93) 55%,#fff);border-left:3px solid var(--mfg,#8e8e93)}
-.obj.sug .tx{color:#3a3a3c}
 .obj.done .tx{text-decoration:line-through;color:#8e8e93}
 .obj.lift{transform:scale(1.03);box-shadow:0 6px 16px rgb(0 0 0 / .14)}
 .obj.src{opacity:.35}
@@ -844,13 +842,12 @@ function renderRecap(){
     const cs=C.filter(c=>c.matiere===m.id),[n3,n2,n1,n0]=counts(cs),tot=cs.length||1,fg=(MCOL[m.id]||[,"#8e8e93"])[1];
     const objs=T.filter(t=>!t.date&&(t.matiere||"")===m.id).sort((a,b)=>(a.fait?1:0)-(b.fait?1:0)||(a.crt||0)-(b.crt||0));
     const planned=T.filter(t=>t.date&&t.date>=td&&(t.matiere||"")===m.id&&!t.fait);
-    const sugs=m.gen?[]:todo.filter(i=>i.c.matiere===m.id&&i.kind!=="Anki").map(i=>({...i,txt:i.kind+" · "+i.c.titre})).filter(i=>!T.some(t=>t.texte===i.txt&&(!t.date||t.date>=td))).slice(0,4);
     const late=todo.filter(i=>i.c.matiere===m.id&&i.lvl==="late").length;
     const kn=m.gen?null:K.filter(k=>k.matiere===m.id&&k.date>=td&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
     const av=m.gen?null:avgPct(cs);
     const open=rcOpen.has(m.id||"_")?" open":"";
     const nOpen=objs.filter(t=>!t.fait).length;
-    if(m.gen&&!objs.length&&!planned.length&&!open)return `<details class="rc" data-rc="_"><summary><span class="vis" style="--mfg:#8e8e93" aria-hidden="true">✓</span><span class="nm">Général</span><span></span><span class="chev"></span></summary>${objBody(m,objs,[],planned)}</details>`;
+    if(m.gen&&!objs.length&&!planned.length&&!open)return `<details class="rc" data-rc="_"><summary><span class="vis" style="--mfg:#8e8e93" aria-hidden="true">✓</span><span class="nm">Général</span><span></span><span class="chev"></span></summary>${objBody(m,objs,planned)}</details>`;
     const stats=m.gen?"":`<div class="rc-stats">
       <span><b>${cs.length}</b> cours · P1 <b>${n1+n2+n3}</b> · P2 <b>${n2+n3}</b> · P3 <b>${n3}</b>${av!=null?` · QCM <b>${av} %</b>`:""}</span>
       ${kn?`<span>Kholle <b>${JABR[(new Date(kn.date+"T12:00:00").getDay()+6)%7]} ${fmt(kn.date)}</b>${kn.orga?" · "+esc(kn.orga):""}</span>`:""}
@@ -860,7 +857,7 @@ function renderRecap(){
     return `<details class="rc" data-rc="${esc(m.id||"_")}" style="${mvars(m.id)}"${open}>
       <summary><button type="button" class="vis" data-vis="${esc(m.id||"_")}" aria-pressed="${shown(m.id)}" aria-label="${shown(m.id)?"Masquer":"Afficher"} ${esc(shortNom(m))} dans le calendrier">✓</button><span class="nm">${esc(shortNom(m))}</span><span>${nOpen?`<span class="badge">${nOpen}</span>`:""}</span><span class="chev"></span>
       ${m.gen?"":`<span class="bar" aria-hidden="true"><i style="width:${n3/tot*100}%;background:${fg}"></i><i style="width:${n2/tot*100}%;background:${fg}99"></i><i style="width:${n1/tot*100}%;background:${fg}4d"></i></span>`}</summary>
-      <div class="rc-body">${stats}${objBody(m,objs,sugs,planned)}</div></details>`}).join("");
+      <div class="rc-body">${stats}${objBody(m,objs,planned)}</div></details>`}).join("");
   box.querySelectorAll("details.rc").forEach(d=>d.addEventListener("toggle",()=>{const k=d.dataset.rc;d.open?rcOpen.add(k):rcOpen.delete(k);try{localStorage.setItem("rcOpen",JSON.stringify([...rcOpen]))}catch(e){}}));
   box.querySelectorAll("[data-vis]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const k=b.dataset.vis;hid.has(k)?hid.delete(k):hid.add(k);try{localStorage.setItem("hidMat",JSON.stringify([...hid]))}catch(e){}renderRecap();renderPlanning()});
   box.querySelectorAll("[data-odone]").forEach(b=>b.onchange=()=>updTask(b.dataset.odone,{fait:b.checked}));
@@ -869,14 +866,13 @@ function renderRecap(){
   box.querySelectorAll(".obj").forEach(wireObj);
   if(keep){const i=box.querySelector(`form.oadd[data-mat="${CSS.escape(keep.m)}"] input`);if(i){i.value=keep.v;i.focus();try{i.setSelectionRange(keep.s,keep.s)}catch(e){}}}
 }
-function objBody(m,objs,sugs,planned){
+function objBody(m,objs,planned){
   const nm=esc(shortNom(m));
   return `${objs.length?`<span class="rc-sub">Objectifs</span><ul class="olist">${objs.map(t=>`<li class="obj ${t.fait?"done":""}" data-obj="${esc(t.id)}" data-txt="${esc(t.texte)}" data-mat="${esc(t.matiere||"")}"><span class="grip" aria-hidden="true">⠿</span><input type="checkbox" data-odone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${esc(t.texte)}</span><button type="button" class="x" data-odel="${esc(t.id)}" aria-label="Supprimer l'objectif">✕</button></li>`).join("")}</ul>`:""}
-    ${sugs.length?`<span class="rc-sub">À reprendre</span><ul class="olist">${sugs.map(i=>`<li class="obj sug" data-sug="1" data-txt="${esc(i.txt)}" data-mat="${esc(m.id)}" title="${esc(i.why)}"><span class="grip" aria-hidden="true">⠿</span><span></span><span class="tx">${esc(i.txt)}</span><span class="pl">${i.lvl==="late"?"retard":"prêt"}</span></li>`).join("")}</ul>`:""}
     ${planned.length?`<span class="rc-stats"><span>Déjà planifié : <b>${planned.length}</b> à venir</span></span>`:""}
     <form class="oadd" data-mat="${esc(m.id)}"><input type="text" name="t" placeholder="Nouvel objectif${m.gen?"":" en "+nm}…" aria-label="Nouvel objectif ${nm}" autocomplete="off"><button type="submit" aria-label="Ajouter l'objectif">+</button></form>`}
 
-/* Glisser un objectif (ou un cours à reprendre) du récap vers le calendrier.
+/* Glisser un objectif du récap vers le calendrier.
    Souris ou poignée ⠿ : tout de suite. Doigt ailleurs sur la carte : appui long, pour laisser défiler la liste. */
 let odrag=null;
 function wireObj(li){
@@ -889,7 +885,7 @@ function wireObj(li){
 function odEnd(drop){const d=odrag;if(!d)return;clearTimeout(d.timer);odrag=null;d.li.classList.remove("lift","src");
   if(d.ghost)d.ghost.remove();if(d.prev)d.prev.remove();endAS();
   if(drop&&d.active){const h=calHit(d.x,d.y);if(h){const heure=h.allday?"":hm(h.min),fin=h.allday?"":hm(Math.min(h.min+60,CAL1*60-1));
-      if(d.data.obj)updTask(d.data.obj,{date:h.date,heure,fin});else addTask({date:h.date,heure,fin,texte:d.data.txt,matiere:d.data.mat})}}
+      if(d.data.obj)updTask(d.data.obj,{date:h.date,heure,fin})}}
   else if(drop&&!d.active&&d.data.obj)openTask(d.data.obj);
   if(pendingPlan)renderPlanning();if(pendingRecap)renderRecap()}
 document.addEventListener("pointermove",e=>{const d=odrag;if(!d||e.pointerId!==d.pid)return;d.x=e.clientX;d.y=e.clientY;
