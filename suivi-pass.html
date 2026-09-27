@@ -271,7 +271,7 @@ td,th{border-bottom-color:#f0f0f5}
 .seg{display:inline-flex;align-items:center;background:#fff;border-radius:999px;padding:3px;box-shadow:0 1px 3px rgb(0 0 0 / .08)}
 .seg button{border:0;background:transparent;font:500 .95rem var(--sys);color:#1c1c1e;padding:7px 12px;border-radius:999px;cursor:pointer}
 .seg #pNow{color:var(--red);font-weight:600}
-.cal{--hh:56px;height:calc(100vh - 170px);height:calc(100dvh - 170px);min-height:440px;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgb(0 0 0 / .04),0 8px 28px rgb(0 0 0 / .05);scroll-snap-type:x mandatory;scroll-padding-left:52px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.cal{--hh:40px;height:calc(100vh - 150px);height:calc(100dvh - 150px);min-height:420px;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgb(0 0 0 / .04),0 8px 28px rgb(0 0 0 / .05);scroll-snap-type:x mandatory;scroll-padding-left:52px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .cal.nosnap{scroll-snap-type:none}
 .cal-grid{display:grid;width:max-content}
 .cal-head{position:sticky;top:0;z-index:5;background:rgb(255 255 255 / .97);border-bottom:1px solid #d1d1d6;padding:10px 3px 6px;display:grid;gap:3px;align-content:start;min-width:0;scroll-snap-align:start;cursor:copy}
@@ -287,11 +287,11 @@ td,th{border-bottom-color:#f0f0f5}
 .cal-hours span{position:absolute;right:8px;transform:translateY(-50%);font:400 .72rem var(--sys);font-variant-numeric:tabular-nums;color:#8e8e93}
 .cal-col{position:relative;height:calc(var(--hh) * 18);border-left:1px solid var(--hair);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hh) - 1px),#ececf0 calc(var(--hh) - 1px),#ececf0 var(--hh));cursor:copy}
 .cal-col.we{background-color:#fcfcfd}
-.cb{position:absolute;border-radius:6px;padding:3px 6px 3px 7px;font-size:.76rem;line-height:1.25;overflow:hidden}
+.cb{position:absolute;border-radius:6px;padding:2px 5px 2px 6px;font-size:.74rem;line-height:1.2;overflow:hidden}
 .cb .tx{display:block;font-weight:600;color:color-mix(in srgb,var(--mfg,#8e7cf0) 72%,#000);overflow-wrap:anywhere}
 .cb .h{display:block;font:500 .68rem var(--sys);font-variant-numeric:tabular-nums;color:var(--mfg,#8e7cf0);margin-top:1px}
 .cb.task,.cb.kh,.cb.preview{background:color-mix(in srgb,var(--mfg,#8e7cf0) 15%,#fff);border-left:3px solid var(--mfg,#8e7cf0);z-index:2}
-.cb.task{display:block;border-bottom:0;border-radius:6px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding-bottom:8px}
+.cb.task{display:block;border-bottom:0;border-radius:6px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding-bottom:6px}
 .cb.task.done{opacity:.5}
 .cb.task.done .tx{text-decoration:line-through}
 .cb.task .rz{position:absolute;left:0;right:0;bottom:0;height:10px;cursor:ns-resize}
@@ -328,6 +328,9 @@ td,th{border-bottom-color:#f0f0f5}
 .obj{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:7px;align-items:center;background:color-mix(in srgb,var(--mfg,#8e8e93) 13%,#fff);border-left:3px solid var(--mfg,#8e8e93);border-radius:7px;padding:6px 6px 6px 4px;font-size:.84rem;line-height:1.3;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .12s,box-shadow .12s,opacity .12s}
 .obj .grip{touch-action:none;color:color-mix(in srgb,var(--mfg,#8e8e93) 70%,#fff);font-size:.95rem;line-height:1;padding:2px 1px;cursor:grab}
 .obj .tx{overflow-wrap:anywhere;color:#1c1c1e}
+.obj .when{display:block;font-size:.72rem;font-weight:600;color:var(--mfg,#8e8e93)}
+.obj.planned{background:#fff;border:1px solid color-mix(in srgb,var(--mfg,#8e8e93) 30%,#fff);border-left:3px solid var(--mfg,#8e8e93)}
+.cb .mn{display:block;font:700 .62rem var(--sys);text-transform:uppercase;letter-spacing:.03em;color:var(--mfg,#8e7cf0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .obj.done .tx{text-decoration:line-through;color:#8e8e93}
 .obj.lift{transform:scale(1.03);box-shadow:0 6px 16px rgb(0 0 0 / .14)}
 .obj.src{opacity:.35}
@@ -384,7 +387,7 @@ td,th{border-bottom-color:#f0f0f5}
   <section class="view" id="v-planning" hidden>
     <div class="plan" id="plan">
       <aside class="recap" id="recap" aria-label="Récap par matière">
-        <div class="recap-hd"><h2>Matières</h2><p>Glisse une tâche dans ta semaine.</p></div>
+        <div class="recap-hd"><h2>Matières</h2><p>Glisse une tâche dans ta semaine. Elle reste listée ici avec son jour.</p></div>
         <div id="recapList"></div>
       </aside>
       <div class="plan-main">
@@ -719,7 +722,9 @@ function wireDay(root){
   root.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){delTask(b.dataset.tdel)}else{b.dataset.arm=1;b.textContent="Suppr. ?";setTimeout(()=>{delete b.dataset.arm;b.textContent="✕"},3000)}});
   root.querySelectorAll("form.addf").forEach(f=>f.addEventListener("submit",e=>{e.preventDefault();const fd=new FormData(f);const tx=String(fd.get("texte")||"").trim();if(!tx)return;addTask({date:f.dataset.date,texte:tx,heure:String(fd.get("heure")||""),matiere:String(fd.get("matiere")||"")});f.reset()}));
 }
-const CAL0=6,CAL1=24,HH=56,HW=52;
+const CAL0=6,CAL1=24,HW=52;
+/* Hauteur d'une heure : calculée pour que toute la journée (6 h – minuit) tienne sans défiler. */
+let HH=40;
 const JABR=["lun.","mar.","mer.","jeu.","ven.","sam.","dim."];
 const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const hm=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
@@ -740,6 +745,8 @@ function renderPlanning(){
   const last=new Date(Math.max(+addDays(t0,7*18),+addDays(new Date(CONCOURS+"T12:00:00"),21)));
   const base=dayN(iso(start)),n=dayN(iso(mondayOf(last)))-base+7;
   const W=el.clientWidth||1000,vis=W>=680?7:W>=500?5:3,dw=Math.max(56,(W-HW)/vis);
+  if(el.clientWidth){const y0=el.getBoundingClientRect().top+window.scrollY;el.style.height=Math.max(380,window.innerHeight-y0-14)+"px"}
+  if(el.clientHeight)HH=Math.max(22,Math.floor((el.clientHeight-(cal.headH||52)-2)/(CAL1-CAL0)));
   const keepTop=el.firstChild&&cal.seen?el.scrollTop:null;
   if(cal.pos==null)cal.pos=vis>=7?dayN(iso(t0)):dayN(today());
   const top=m=>(m-CAL0*60)/60*HH;
@@ -749,23 +756,24 @@ function renderPlanning(){
   for(let i=0;i<n;i++){const d=addDays(start,i),dIso=iso(d),wd=i%7,isT=dIso===today(),we=wd>=5?"we":"";
     const ts=Td[dIso]||[];
     const ad=[...(Ed[dIso]||[]).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}">${esc(e.titre)}</span>`),
-      ...ts.filter(t=>!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${esc(t.texte)}</span>`)].join("");
+      ...ts.filter(t=>!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${t.matiere?`<b>${esc(shortNom(matById(t.matiere)))}</b> · `:""}${esc(t.texte)}</span>`)].join("");
     const dd=d.getDate();
     head+=`<div class="cal-head ${isT?"today":""} ${we}" data-date="${dIso}"><span class="dn">${JABR[wd]} <b>${dd}</b>${dd===1?` <span>${MOIS[d.getMonth()].slice(0,4)}.</span>`:""}</span>${ad}</div>`;
     let blocks="";
     const its=[...ts.filter(t=>t.heure).map(t=>{const s0=toMin(t.heure);let e0=t.fin?toMin(t.fin):s0+60;if(e0<=s0)e0=s0+30;return{s:s0,e:e0,t}}),
       ...(Kd[dIso]||[]).map(k=>{const s0=toMin(k.orga==="Prépa"?"18:00":"17:30");return{s:s0,e:s0+60,k}})];
     lanes(its).forEach(it=>{const w=`calc((100% - 4px) / ${it.n} - 1px)`,left=`calc(2px + (100% - 4px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)+1}px;height:${Math.max(top(it.e)-top(it.s)-2,20)}px;left:${left};width:${w}`;
-      if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}"><span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
+      if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}">${t.matiere?`<span class="mn">${esc(shortNom(matById(t.matiere)))}</span>`:""}<span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
       else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="tx">${k.orga==="Prépa"?"Colle prépa":"Kholle"} · ${esc(shortNom(matById(k.matiere)))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${k.orga==="Prépa"?"18:00":"17:30"}</span></div>`}});
     if(isT){const nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${we}" data-date="${dIso}">${blocks}</div>`;
   }
   el.style.setProperty("--dw",dw+"px");el.style.setProperty("--hh",HH+"px");
   el.innerHTML=`<div class="cal-grid" style="grid-template-columns:${HW}px repeat(${n},${dw}px)">${head}${body}</div>`;
-  cal.start=start;cal.base=base;cal.n=n;cal.dw=dw;cal.vis=vis;cal.w=W;cal.seen=!!el.clientWidth;
+  cal.start=start;cal.base=base;cal.n=n;cal.dw=dw;cal.vis=vis;cal.w=W;cal.seen=!!el.clientWidth;cal.h=el.clientHeight;
   el.scrollLeft=Math.round((cal.pos-base)*dw);
-  el.scrollTop=keepTop!=null?keepTop:(7-CAL0)*HH-14;
+  el.scrollTop=keepTop!=null?keepTop:0;
+  const hh=el.querySelector(".cal-head.corner").offsetHeight;if(el.clientHeight&&Math.abs(hh-(cal.headH||52))>1&&!renderPlanning.again){cal.headH=hh;renderPlanning.again=true;renderPlanning();renderPlanning.again=false;return}
   paintMonth();
   el.querySelectorAll(".cal-col").forEach(c=>c.addEventListener("click",e=>{if(e.target!==c)return;const m=CAL0*60+Math.floor(e.offsetY/HH*2)*30;openTask(null,{date:c.dataset.date,heure:hm(m),fin:hm(Math.min(m+60,CAL1*60-1))})}));
   el.querySelectorAll(".cal-head[data-date]").forEach(h=>h.addEventListener("click",e=>{if(e.target===h)openTask(null,{date:h.dataset.date,heure:"",fin:""})}));
@@ -776,7 +784,8 @@ function paintMonth(){if(!cal.dw)return;const d=addDays(cal.start,Math.round(cal
   $("#pLbl").innerHTML=`<b>${MOIS[d.getMonth()]}</b> ${d.getFullYear()}`}
 {const el=$("#cal");let raf=0;
   el.addEventListener("scroll",()=>{if(!cal.dw||!el.clientWidth)return;const p=el.scrollLeft/cal.dw,r=Math.round(p);cal.pos=cal.base+(Math.abs(p-r)<.03?r:p);if(!raf)raf=requestAnimationFrame(()=>{raf=0;paintMonth()})},{passive:true});
-  if(window.ResizeObserver)new ResizeObserver(()=>{if(el.clientWidth&&Math.abs(el.clientWidth-cal.w)>1)renderPlanning()}).observe(el);}
+  if(window.ResizeObserver)new ResizeObserver(()=>{if(el.clientWidth&&(Math.abs(el.clientWidth-cal.w)>1||Math.abs(el.clientHeight-(cal.h||0))>1))renderPlanning()}).observe(el);}
+window.addEventListener("resize",()=>{if(!$("#v-planning").hidden)renderPlanning()});
 const jump=k=>{const el=$("#cal");el.scrollBy({left:k*cal.vis*cal.dw,behavior:"smooth"})};
 $("#pPrev").onclick=()=>jump(-1);
 $("#pNext").onclick=()=>jump(1);
@@ -840,7 +849,8 @@ function renderRecap(){
   const mats=[...[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)),{id:"",nom:"Général",gen:true}];
   box.innerHTML=mats.map(m=>{
     const cs=C.filter(c=>c.matiere===m.id),[n3,n2,n1,n0]=counts(cs),tot=cs.length||1,fg=(MCOL[m.id]||[,"#8e8e93"])[1];
-    const objs=T.filter(t=>!t.date&&(t.matiere||"")===m.id).sort((a,b)=>(a.fait?1:0)-(b.fait?1:0)||(a.crt||0)-(b.crt||0));
+    const wk0=iso(mondayOf(new Date()));
+    const objs=T.filter(t=>(t.matiere||"")===m.id&&(!t.date||t.date>=wk0)).sort((a,b)=>(a.date?1:0)-(b.date?1:0)||(a.date||"").localeCompare(b.date||"")||(a.heure||"").localeCompare(b.heure||"")||(a.crt||0)-(b.crt||0));
     const planned=T.filter(t=>t.date&&t.date>=td&&(t.matiere||"")===m.id&&!t.fait);
     const late=todo.filter(i=>i.c.matiere===m.id&&i.lvl==="late").length;
     const kn=m.gen?null:K.filter(k=>k.matiere===m.id&&k.date>=td&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
@@ -863,7 +873,7 @@ function renderRecap(){
 }
 function objBody(m,objs,planned){
   const nm=esc(shortNom(m));
-  return `${objs.length?`<ul class="olist">${objs.map(t=>`<li class="obj ${t.fait?"done":""}" data-obj="${esc(t.id)}" data-txt="${esc(t.texte)}" data-mat="${esc(t.matiere||"")}"><span class="grip" aria-hidden="true">⠿</span><input type="checkbox" data-odone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${esc(t.texte)}</span><button type="button" class="x" data-odel="${esc(t.id)}" aria-label="Supprimer l'objectif">✕</button></li>`).join("")}</ul>`:""}
+  return `${objs.length?`<ul class="olist">${objs.map(t=>`<li class="obj ${t.fait?"done":""} ${t.date?"planned":""}" data-obj="${esc(t.id)}" data-txt="${esc(t.texte)}" data-mat="${esc(t.matiere||"")}"><span class="grip" aria-hidden="true">⠿</span><input type="checkbox" data-odone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${esc(t.texte)}${t.date?`<span class="when">${JABR[(new Date(t.date+"T12:00:00").getDay()+6)%7]} ${+t.date.slice(8)}${t.heure?" · "+esc(t.heure):""}</span>`:""}</span><button type="button" class="x" data-odel="${esc(t.id)}" aria-label="Supprimer l'objectif">✕</button></li>`).join("")}</ul>`:""}
     <form class="oadd" data-mat="${esc(m.id)}"><input type="text" name="t" placeholder="Ajouter une tâche…" aria-label="Nouvel objectif ${nm}" autocomplete="off"><button type="submit" aria-label="Ajouter l'objectif">+</button></form>`}
 
 /* Glisser un objectif du récap vers le calendrier.
