@@ -609,9 +609,9 @@ const mvars=id=>{const c=MCOL[id];return c?`--mbg:${c[0]};--mfg:${c[1]}`:""};
 const WEEK = [
  {d:"Lundi",b:[["7:00","7:45","Anki : révisions du jour","anki"],["8:00","10:00","Bloc révision : matières des kholles de la semaine (QCM de la banque + ardoise)","bloc"],["10:15","12:00","3es passages restants","p3"],["13:00","17:00","SHS mineure (fac)","shs"],["17:30","19:00","Cahier d'exos du tutorat","tut"],["19:00","19:10","Organisation (10 min)","org"],["20:30","21:30","Rattrapage léger ou libre","libre"]]},
  {d:"Mardi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages restants de la semaine d'avant","p2"],["10:15","12:00","Cours difficile n°1 (★)","diff"],["13:30","15:30","1ers passages : nouveaux cours sortis","p1"],["15:45","17:45","2es passages","p2"],["18:00","19:00","QCM mélangés (chimie + matière du jour)","p3"],["19:00","19:10","Organisation","org"],["20:30","21:30","Libre ou lecture légère","libre"]]},
- {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","Kholle prépa si tu en as une, sinon QCM mélangés","tut"],["19:00","19:10","Organisation","org"]]},
+ {d:"Mercredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages (cours de mardi)","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","14:30","MOOC bio cell de la semaine","p1"],["14:45","17:45","1ers et 2es passages","p2"],["18:00","19:00","Cours difficile n°2 (★) ou QCM mélangés","diff"],["19:00","19:10","Organisation","org"]]},
  {d:"Jeudi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:30","Polycopiés + déjeuner","libre"],["13:30","17:00","2es passages + QCM du cours","p2"],["17:30","18:30","Kholle du tutorat","tut"],["18:45","18:55","Organisation","org"],["19:30","","Soirée famille / amis (une semaine sur deux)","libre"]]},
- {d:"Vendredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:00","Polycopiés + déjeuner","libre"],["13:00","15:00","2es passages : finir ceux de la semaine","p2"],["15:00","17:00","SHS mineure (13 h–17 h une semaine sur 4)","shs"],["17:30","19:00","Cours difficile n°2 (★) ou QCM","diff"],["19:00","","Soirée libre","libre"]]},
+ {d:"Vendredi",b:[["7:00","7:45","Anki","anki"],["8:00","10:00","2es passages","p2"],["10:15","12:00","1ers passages","p1"],["12:00","13:00","Polycopiés + déjeuner","libre"],["13:00","15:00","2es passages : finir ceux de la semaine","p2"],["15:00","17:00","SHS mineure (13 h–17 h une semaine sur 4)","shs"],["17:30","19:30","Kholles prépa : les deux de la semaine (17 h 30 puis 18 h 30)","tut"],["19:30","","Soirée libre","libre"]]},
  {d:"Samedi",b:[["7:00","7:45","Anki","anki"],["8:00","10:30","Créneau réservé aux cours difficiles (★)","diff"],["10:45","12:30","Cahier d'exos du tutorat","tut"],["14:00","17:30","3es passages : ardoise de mémoire puis QCM","p3"],["17:30","","Soirée libre","libre"]]},
  {d:"Dimanche",b:[["7:30","8:15","Anki","anki"],["8:30","12:00","Bloc révision : matières des kholles de la semaine","bloc"],["14:00","16:00","3es passages restants","p3"],["16:00","18:00","Rattrapage, ou libre si tu es à jour","diff"],["18:30","18:50","Bilan + planning de la semaine","org"],["19:00","","Soirée libre","libre"]]}
 ];
@@ -664,6 +664,8 @@ function todoItems(){
   const rank={late:0,due:1,info:2};
   return out.sort((a,b)=>rank[a.lvl]-rank[b.lvl]||(b.m.coef||0)-(a.m.coef||0)||(a.c.ordre||0)-(b.c.ordre||0));
 }
+/* Heure d'une kholle : tutorat le jeudi à 17 h 30 ; prépa le vendredi, la 1re à 17 h 30 et la 2e à 18 h 30. */
+function khStart(k){if(k.orga!=="Prépa")return"17:30";const same=K.filter(x=>x.orga==="Prépa"&&x.date===k.date).sort((a,b)=>a.id<b.id?-1:1);return same.indexOf(k)>0?"18:30":"17:30"}
 function kholleSoon(fromIso,days){
   const lim=iso(addDays(new Date(fromIso+"T12:00:00"),days));
   return [...new Set(K.filter(k=>k.date>=fromIso&&k.date<=lim&&!k.rang).map(k=>matById(k.matiere).nom))];
@@ -707,7 +709,7 @@ function dayItems(dIso){
   const d=new Date(dIso+"T12:00:00"), idx=(d.getDay()+6)%7;
   const items=[];
   E.filter(e=>e.date===dIso).forEach(e=>items.push({type:"ev",min:-2,html:`<div class="pitem ev" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":"var(--k-tut)"}">${esc(e.titre)}</div>`}));
-  K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(k.orga==="Prépa"?"18:00":"17:30"),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${k.orga==="Prépa"?"18:00 · colle prépa":"17:30 · kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
+  K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(khStart(k)),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${khStart(k)} · ${k.orga==="Prépa"?"colle prépa":"kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
   if(showTpl){const soon=kholleSoon(dIso,7);
     WEEK[idx].b.forEach(x=>items.push({type:"tpl",min:toMin(x[0]),html:`<div class="pitem tpl" style="--c:var(${KCOL[x[3]]})"><span><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</span></div>`}))}
   T.filter(t=>t.date===dIso).forEach(t=>items.push({type:"task",min:toMin(t.heure),crt:t.crt||0,html:`<div class="pitem task ${t.fait?"done":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tdone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${t.heure?`<span class="h">${esc(t.heure)}</span>`:""}${esc(t.texte)}${t.matiere?` <span class="mtag">${esc(matById(t.matiere).nom)}</span>`:""}</span><button class="x" data-tdel="${esc(t.id)}" aria-label="Supprimer la tâche">✕</button></div>`}));
@@ -762,10 +764,10 @@ function renderPlanning(){
     head+=`<div class="cal-head ${isT?"today":""} ${we}" data-date="${dIso}"><span class="dn">${JABR[wd]} <b>${dd}</b>${dd===1?` <span>${MOIS[d.getMonth()].slice(0,4)}.</span>`:""}</span>${ad}</div>`;
     let blocks="";
     const its=[...ts.filter(t=>t.heure).map(t=>{const s0=toMin(t.heure);let e0=t.fin?toMin(t.fin):s0+60;if(e0<=s0)e0=s0+30;return{s:s0,e:e0,t}}),
-      ...(Kd[dIso]||[]).map(k=>{const s0=toMin(k.orga==="Prépa"?"18:00":"17:30");return{s:s0,e:s0+60,k}})];
+      ...(Kd[dIso]||[]).map(k=>{const s0=toMin(khStart(k));return{s:s0,e:s0+60,k}})];
     lanes(its).forEach(it=>{const w=`calc((100% - 4px) / ${it.n} - 1px)`,left=`calc(2px + (100% - 4px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)+1}px;height:${Math.max(top(it.e)-top(it.s)-2,20)}px;left:${left};width:${w}`;
       if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}">${t.matiere?`<span class="mn">${esc(shortNom(matById(t.matiere)))}</span>`:""}<span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
-      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="tx">${k.orga==="Prépa"?"Colle prépa":"Kholle"} · ${esc(shortNom(matById(k.matiere)))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${k.orga==="Prépa"?"18:00":"17:30"}</span></div>`}});
+      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="tx">${k.orga==="Prépa"?"Colle prépa":"Kholle"} · ${esc(shortNom(matById(k.matiere)))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)}</span></div>`}});
     if(isT){const nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${we}" data-date="${dIso}">${blocks}</div>`;
   }
