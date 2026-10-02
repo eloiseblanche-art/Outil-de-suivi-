@@ -281,6 +281,7 @@ td,th{border-bottom-color:#f0f0f5}
 .cal-head.today .dn b{background:var(--red);color:#fff;font-weight:600}
 .cal-head.we .dn{color:#8e8e93}
 .cal-head .ad{font-size:.72rem;font-weight:600;border-radius:5px;padding:2px 6px;background:var(--mbg,#f2f2f7);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:default;color:#3a3a3c}
+.cal-head .ad[data-eopen]{cursor:pointer}
 .cal-head .ad.task{background:color-mix(in srgb,var(--mfg,#8e7cf0) 16%,#fff);border-left:3px solid var(--mfg,#8e7cf0);color:color-mix(in srgb,var(--mfg,#8e7cf0) 70%,#000);cursor:pointer}
 .cal-head .ad.task.done{opacity:.5;text-decoration:line-through}
 .cal-hours{position:sticky;left:0;z-index:4;background:#fff;height:calc(var(--hh) * 18)}
@@ -291,13 +292,13 @@ td,th{border-bottom-color:#f0f0f5}
 .cb .tx{display:block;font-weight:600;color:color-mix(in srgb,var(--mfg,#8e7cf0) 72%,#000);overflow-wrap:anywhere}
 .cb .h{display:block;font:500 .68rem var(--sys);font-variant-numeric:tabular-nums;color:var(--mfg,#8e7cf0);margin-top:1px}
 .cb.task,.cb.kh,.cb.preview{background:color-mix(in srgb,var(--mfg,#8e7cf0) 15%,#fff);border-left:3px solid var(--mfg,#8e7cf0);z-index:2}
-.cb.task{display:block;border-bottom:0;border-radius:6px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding-bottom:6px}
+.cb.task,.cb.kh{display:block;border-bottom:0;border-radius:6px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding-bottom:6px}
 .cb.task.done{opacity:.5}
 .cb.task.done .tx{text-decoration:line-through}
-.cb.task .rz{position:absolute;left:0;right:0;bottom:0;height:10px;cursor:ns-resize}
-.cb.task .rz::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:2px;background:color-mix(in srgb,var(--mfg,#8e7cf0) 45%,transparent)}
-.cb.task.dragging{cursor:grabbing;z-index:6;box-shadow:0 8px 22px rgb(0 0 0 / .18);opacity:.95}
-.cb.kh{background:color-mix(in srgb,var(--mfg,#8e7cf0) 26%,#fff);cursor:default}
+.cb.task .rz,.cb.kh .rz{position:absolute;left:0;right:0;bottom:0;height:10px;cursor:ns-resize}
+.cb.task .rz::after,.cb.kh .rz::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:2px;background:color-mix(in srgb,var(--mfg,#8e7cf0) 45%,transparent)}
+.cb.task.dragging,.cb.kh.dragging{cursor:grabbing;z-index:6;box-shadow:0 8px 22px rgb(0 0 0 / .18);opacity:.95}
+.cb.kh{background:color-mix(in srgb,var(--mfg,#8e7cf0) 26%,#fff)}
 .cb.preview{left:2px;right:2px;z-index:3;pointer-events:none;border:2px dashed var(--mfg,#8e7cf0);border-left-width:3px;border-left-style:solid;opacity:.9}
 .nowline{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:3;pointer-events:none}
 .nowline::before{content:"";position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--red)}
@@ -399,7 +400,7 @@ td,th{border-bottom-color:#f0f0f5}
         <div class="cal" id="cal"></div>
       </div>
     </div>
-    <p class="hint">Glisse le calendrier vers la gauche ou la droite pour changer de jours · touche un créneau vide pour ajouter une tâche · fais glisser un bloc pour le déplacer, tire sa poignée du bas pour changer sa durée.</p>
+    <p class="hint">Glisse le calendrier vers la gauche ou la droite pour changer de jours · touche un créneau vide pour ajouter une tâche · fais glisser un bloc (tâche ou kholle) pour le déplacer, tire sa poignée du bas pour changer sa durée · touche une kholle ou un événement pour changer son nom, son jour ou ses horaires.</p>
     <details class="panel fold">
       <summary><h2>Bilan de la semaine</h2><span class="muted small num" id="wkId"></span></summary>
       <form class="f" id="bilanForm">
@@ -528,7 +529,19 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
     <label>Rang<input type="number" id="k-rang" min="1" inputmode="numeric"></label><label>Sur<input type="number" id="k-total" min="1" inputmode="numeric"></label>
   </div>
   <label>Ce que je retiens<input type="text" id="k-com"></label>
+  <label>Nom dans le planning<input type="text" id="k-titre"></label>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Début<input type="time" id="k-heure"></label><label>Fin<input type="time" id="k-fin"></label></div>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="k-cancel" type="button">Annuler</button><button class="btn primary" id="k-save" type="button">Enregistrer</button></div>
+</div></div>
+<div class="modal" id="emodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="e-h">
+  <h3 id="e-h">Modifier l'événement</h3>
+  <label>Nom<input type="text" id="e-titre"></label>
+  <label>Jour<input type="date" id="e-date"></label>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn danger" id="e-del" type="button">Supprimer</button>
+    <div style="display:flex;gap:8px"><button class="btn ghost" id="e-cancel" type="button">Annuler</button><button class="btn primary" id="e-save" type="button">Enregistrer</button></div>
+  </div>
+  <p class="small" id="e-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
 </div></div>
 <div class="modal" id="pmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="pm-title">
   <div><span class="eyebrow" id="pm-eye"></span><h3 id="pm-title"></h3></div>
@@ -664,8 +677,10 @@ function todoItems(){
   const rank={late:0,due:1,info:2};
   return out.sort((a,b)=>rank[a.lvl]-rank[b.lvl]||(b.m.coef||0)-(a.m.coef||0)||(a.c.ordre||0)-(b.c.ordre||0));
 }
-/* Heure d'une kholle : tutorat le jeudi à 17 h 30 ; prépa le vendredi, la 1re à 17 h 30 et la 2e à 18 h 30. */
-function khStart(k){if(k.orga!=="Prépa")return"17:30";const same=K.filter(x=>x.orga==="Prépa"&&x.date===k.date).sort((a,b)=>a.id<b.id?-1:1);return same.indexOf(k)>0?"18:30":"17:30"}
+/* Heure d'une kholle : celle choisie dans le planning, sinon tutorat à 17 h 30 ; prépa la 1re à 17 h 30 et la 2e à 18 h 30. */
+function khStart(k){if(k.heure)return k.heure;if(k.orga!=="Prépa")return"17:30";const same=K.filter(x=>x.orga==="Prépa"&&x.date===k.date).sort((a,b)=>a.id<b.id?-1:1);return same.indexOf(k)>0?"18:30":"17:30"}
+function khEnd(k){const s0=toMin(khStart(k));return k.fin&&toMin(k.fin)>s0?k.fin:hm(Math.min(s0+60,CAL1*60-1))}
+const khNom=k=>k.titre||(k.orga==="Prépa"?"Colle prépa":"Kholle")+" · "+shortNom(matById(k.matiere));
 function kholleSoon(fromIso,days){
   const lim=iso(addDays(new Date(fromIso+"T12:00:00"),days));
   return [...new Set(K.filter(k=>k.date>=fromIso&&k.date<=lim&&!k.rang).map(k=>matById(k.matiere).nom))];
@@ -709,7 +724,7 @@ function dayItems(dIso){
   const d=new Date(dIso+"T12:00:00"), idx=(d.getDay()+6)%7;
   const items=[];
   E.filter(e=>e.date===dIso).forEach(e=>items.push({type:"ev",min:-2,html:`<div class="pitem ev" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":"var(--k-tut)"}">${esc(e.titre)}</div>`}));
-  K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(khStart(k)),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${khStart(k)} · ${k.orga==="Prépa"?"colle prépa":"kholle tutorat"}</span>${esc(matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
+  K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(khStart(k)),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${khStart(k)} · ${k.orga==="Prépa"?"colle prépa":"kholle tutorat"}</span>${esc(k.titre||matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
   if(showTpl){const soon=kholleSoon(dIso,7);
     WEEK[idx].b.forEach(x=>items.push({type:"tpl",min:toMin(x[0]),html:`<div class="pitem tpl" style="--c:var(${KCOL[x[3]]})"><span><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</span></div>`}))}
   T.filter(t=>t.date===dIso).forEach(t=>items.push({type:"task",min:toMin(t.heure),crt:t.crt||0,html:`<div class="pitem task ${t.fait?"done":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tdone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${t.heure?`<span class="h">${esc(t.heure)}</span>`:""}${esc(t.texte)}${t.matiere?` <span class="mtag">${esc(matById(t.matiere).nom)}</span>`:""}</span><button class="x" data-tdel="${esc(t.id)}" aria-label="Supprimer la tâche">✕</button></div>`}));
@@ -758,16 +773,16 @@ function renderPlanning(){
   let head=`<div class="cal-head corner"></div>`,body=`<div class="cal-hours">${Array.from({length:CAL1-CAL0},(_,i)=>i?`<span style="top:${i*HH}px">${hm((CAL0+i)*60)}</span>`:"").join("")}</div>`;
   for(let i=0;i<n;i++){const d=addDays(start,i),dIso=iso(d),wd=i%7,isT=dIso===today(),we=wd>=5?"we":"";
     const ts=Td[dIso]||[];
-    const ad=[...(Ed[dIso]||[]).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}">${esc(e.titre)}</span>`),
+    const ad=[...(Ed[dIso]||[]).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}" data-eopen="${esc(e.id)}">${esc(e.titre)}</span>`),
       ...ts.filter(t=>!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${t.matiere?`<b>${esc(shortNom(matById(t.matiere)))}</b> · `:""}${esc(t.texte)}</span>`)].join("");
     const dd=d.getDate();
     head+=`<div class="cal-head ${isT?"today":""} ${we}" data-date="${dIso}"><span class="dn">${JABR[wd]} <b>${dd}</b>${dd===1?` <span>${MOIS[d.getMonth()].slice(0,4)}.</span>`:""}</span>${ad}</div>`;
     let blocks="";
     const its=[...ts.filter(t=>t.heure).map(t=>{const s0=toMin(t.heure);let e0=t.fin?toMin(t.fin):s0+60;if(e0<=s0)e0=s0+30;return{s:s0,e:e0,t}}),
-      ...(Kd[dIso]||[]).map(k=>{const s0=toMin(khStart(k));return{s:s0,e:s0+60,k}})];
+      ...(Kd[dIso]||[]).map(k=>{const s0=toMin(khStart(k));return{s:s0,e:toMin(khEnd(k)),k}})];
     lanes(its).forEach(it=>{const w=`calc((100% - 4px) / ${it.n} - 1px)`,left=`calc(2px + (100% - 4px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)+1}px;height:${Math.max(top(it.e)-top(it.s)-2,20)}px;left:${left};width:${w}`;
       if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}">${t.matiere?`<span class="mn">${esc(shortNom(matById(t.matiere)))}</span>`:""}<span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
-      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}"><span class="tx">${k.orga==="Prépa"?"Colle prépa":"Kholle"} · ${esc(shortNom(matById(k.matiere)))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)}</span></div>`}});
+      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}" data-kid="${esc(k.id)}"><span class="tx">${esc(khNom(k))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)} – ${khEnd(k)}</span><span class="rz" aria-hidden="true"></span></div>`}});
     if(isT){const nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${we}" data-date="${dIso}">${blocks}</div>`;
   }
@@ -781,7 +796,8 @@ function renderPlanning(){
   el.querySelectorAll(".cal-col").forEach(c=>c.addEventListener("click",e=>{if(e.target!==c)return;const m=CAL0*60+Math.floor(e.offsetY/HH*2)*30;openTask(null,{date:c.dataset.date,heure:hm(m),fin:hm(Math.min(m+60,CAL1*60-1))})}));
   el.querySelectorAll(".cal-head[data-date]").forEach(h=>h.addEventListener("click",e=>{if(e.target===h)openTask(null,{date:h.dataset.date,heure:"",fin:""})}));
   el.querySelectorAll("[data-topen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openTask(b.dataset.topen)});
-  el.querySelectorAll(".cb.task").forEach(b=>wireDrag(b,el,HH));
+  el.querySelectorAll("[data-eopen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openEv(b.dataset.eopen)});
+  el.querySelectorAll(".cb.task,.cb.kh").forEach(b=>wireDrag(b,el,HH));
 }
 function paintMonth(){if(!cal.dw)return;const d=addDays(cal.start,Math.round(cal.pos-cal.base+(cal.vis-1)/2));
   $("#pLbl").innerHTML=`<b>${MOIS[d.getMonth()]}</b> ${d.getFullYear()}`}
@@ -816,7 +832,8 @@ const endAS=()=>{$("#cal").classList.remove("nosnap")};
 let dragging=null;
 function wireDrag(b,el,HH){
   const snap=HH/4;
-  b.addEventListener("pointerdown",e=>{if(e.button>0)return;const t=T.find(x=>x.id===b.dataset.tid);if(!t)return;
+  b.addEventListener("pointerdown",e=>{if(e.button>0)return;const kid=b.dataset.kid,k=kid&&K.find(x=>x.id===kid);
+    const t=k?{id:kid,heure:khStart(k),fin:khEnd(k),kh:true}:T.find(x=>x.id===b.dataset.tid);if(!t)return;
     const s0=toMin(t.heure),e0=t.fin?Math.max(toMin(t.fin),s0+15):s0+60;
     dragging={b,t,rz:e.target.classList.contains("rz"),x0:e.clientX,y0:e.clientY,moved:false,top0:parseFloat(b.style.top),h0:parseFloat(b.style.height),dur:e0-s0,out:false};
     b.setPointerCapture(e.pointerId);e.preventDefault();e.stopPropagation()});
@@ -824,18 +841,18 @@ function wireDrag(b,el,HH){
     if(!d.moved&&Math.hypot(dx,dy)<6)return;d.moved=true;b.classList.add("dragging");
     const lab=b.querySelector(".h");
     if(d.rz){const h=Math.max(snap-2,Math.round((d.h0+2+dy)/snap)*snap-2);b.style.height=h+"px";const st=toMin(d.t.heure);lab.textContent=hm(st)+" – "+hm(st+Math.round((h+2)/HH*60))}
-    else{d.out=overRecap(e.clientX,e.clientY);$("#recap").classList.toggle("drop",d.out);autoScroll(e.clientX);
+    else{d.out=!d.t.kh&&overRecap(e.clientX,e.clientY);$("#recap").classList.toggle("drop",d.out);autoScroll(e.clientX);
       const hit=calHit(e.clientX,e.clientY);
       if(hit&&!hit.allday){const topPx=Math.min((CAL1-CAL0)*HH-snap,Math.max(0,Math.round((d.top0+dy)/snap)*snap));
         b.style.top=topPx+"px";const st=CAL0*60+Math.round(topPx/HH*60);lab.textContent=hm(st)+" – "+hm(Math.min(st+d.dur,CAL1*60-1));
         if(hit.col!==b.parentElement){b.style.left="2px";b.style.width="calc(100% - 4px)";hit.col.appendChild(b);try{b.setPointerCapture(e.pointerId)}catch(_){}}}}});
   const end=async e=>{const d=dragging;if(!d||d.b!==b)return;dragging=null;b.classList.remove("dragging");$("#recap").classList.remove("drop");endAS();
-    if(!d.moved){openTask(d.t.id);return}
+    if(!d.moved){d.t.kh?openK(d.t.id,true):openTask(d.t.id);return}
     let patch;
     if(d.rz){const st=toMin(d.t.heure);const dur=Math.max(15,Math.round((parseFloat(b.style.height)+2)/HH*60/15)*15);patch={fin:hm(Math.min(st+dur,CAL1*60-1))}}
     else if(d.out){patch={date:"",heure:"",fin:""};toast("Remis dans les objectifs")}
     else{const st=CAL0*60+Math.round(parseFloat(b.style.top)/HH*60/15)*15;patch={date:b.parentElement.dataset.date,heure:hm(st),fin:hm(Math.min(st+d.dur,CAL1*60-1))}}
-    await updTask(d.t.id,patch);if(pendingPlan)renderPlanning()};
+    if(d.t.kh){if(d.rz)patch.heure=d.t.heure;await updK(d.t.id,patch)}else await updTask(d.t.id,patch);if(pendingPlan)renderPlanning()};
   b.addEventListener("pointerup",end);
   b.addEventListener("pointercancel",()=>{if(dragging&&dragging.b===b){dragging=null;endAS();$("#recap").classList.remove("drop");renderPlanning()}});
 }
@@ -935,6 +952,15 @@ async function addTask(t){
   try{await db.collection("taches").add(doc);toast("Ajouté au planning")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
 }
 async function updTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign(t,patch);renderAll();try{await db.doc("taches/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+async function updK(id,patch){const k=K.find(x=>x.id===id);if(k)Object.assign(k,patch);renderAll();try{await db.doc("kholles/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+/* Événements (journée entière) : renommer, changer de jour, supprimer. */
+let eEdit=null;
+function openEv(id){const e=E.find(x=>x.id===id);if(!e)return;eEdit=id;$("#e-titre").value=e.titre||"";$("#e-date").value=e.date||"";$("#e-confirm").hidden=true;$("#emodal").hidden=false;$("#e-titre").focus()}
+$("#e-cancel").onclick=()=>{$("#emodal").hidden=true};
+$("#e-save").onclick=async()=>{const titre=$("#e-titre").value.trim(),date=$("#e-date").value;if(!titre){$("#e-titre").focus();return}if(!date){$("#e-date").focus();return}
+  $("#emodal").hidden=true;const e=E.find(x=>x.id===eEdit);if(e)Object.assign(e,{titre,date});renderAll();
+  try{await db.doc("evenements/"+eEdit).update({titre,date});toast("Événement modifié")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}};
+$("#e-del").onclick=async()=>{if($("#e-confirm").hidden){$("#e-confirm").hidden=false;return}$("#emodal").hidden=true;try{await db.doc("evenements/"+eEdit).delete()}catch(e){toast("Suppression impossible")}};
 async function delTask(id){try{await db.doc("taches/"+id).delete()}catch(e){toast("Suppression impossible")}}
 
 /* PASSAGES : QCM + ressenti */
@@ -1176,7 +1202,7 @@ $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"S
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
 /* Toucher à côté d'une fenêtre la ferme. */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.hidden=true}));
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#emodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
@@ -1192,9 +1218,12 @@ function renderKholles(){
   drawChart(lo,hi);
 }
 let kediting=null;
-function openK(id){const k=K.find(x=>x.id===id);if(!k)return;kediting=id;$("#k-title").textContent="Kholle "+matById(k.matiere).nom+" · "+(k.orga||"");$("#k-date").value=k.date||"";$("#k-note").value=k.note??"";$("#k-rang").value=k.rang??"";$("#k-total").value=k.total??"";$("#k-com").value=k.com||"";$("#kmodal").hidden=false;$("#k-rang").focus()}
+function openK(id,plan){const k=K.find(x=>x.id===id);if(!k)return;kediting=id;$("#k-titre").value=k.titre||"";$("#k-titre").placeholder=khNom({...k,titre:""});$("#k-heure").value=khStart(k);$("#k-fin").value=khEnd(k);$("#k-title").textContent="Kholle "+matById(k.matiere).nom+" · "+(k.orga||"");$("#k-date").value=k.date||"";$("#k-note").value=k.note??"";$("#k-rang").value=k.rang??"";$("#k-total").value=k.total??"";$("#k-com").value=k.com||"";$("#kmodal").hidden=false;$(plan?"#k-titre":"#k-rang").focus()}
 $("#k-cancel").onclick=()=>{$("#kmodal").hidden=true};
-$("#k-save").onclick=async()=>{const n=v=>v===""?null:Number(v);const patch={date:$("#k-date").value,note:n($("#k-note").value),rang:n($("#k-rang").value),total:n($("#k-total").value),com:$("#k-com").value.trim()};$("#kmodal").hidden=true;try{await db.doc("kholles/"+kediting).update(patch);toast("Kholle mise à jour")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+$("#k-save").onclick=async()=>{const n=v=>v===""?null:Number(v);const patch={date:$("#k-date").value,note:n($("#k-note").value),rang:n($("#k-rang").value),total:n($("#k-total").value),com:$("#k-com").value.trim(),titre:$("#k-titre").value.trim()};
+  const k=K.find(x=>x.id===kediting),h=$("#k-heure").value,f=$("#k-fin").value;
+  if(h&&k&&(h!==khStart(k)||f!==khEnd(k))){patch.heure=h;patch.fin=f&&toMin(f)>toMin(h)?f:""}
+  $("#kmodal").hidden=true;if(k)Object.assign(k,patch);renderAll();try{await db.doc("kholles/"+kediting).update(patch);toast("Kholle mise à jour")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
 function drawChart(lo,hi){
   const pts=K.filter(k=>k.rang&&k.total).map(k=>({...k,p:k.rang/k.total*100})).sort((a,b)=>a.date<b.date?-1:1);
   const el=$("#chart");
