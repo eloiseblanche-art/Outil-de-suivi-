@@ -283,7 +283,7 @@ td,th{border-bottom-color:#f0f0f5}
 .cal-head .ad{font-size:.72rem;font-weight:600;border-radius:5px;padding:2px 6px;background:var(--mbg,#f2f2f7);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:default;color:#3a3a3c}
 .cal-head .ad[data-eopen]{cursor:pointer}
 .cal-head .ad.task{background:color-mix(in srgb,var(--mfg,#8e7cf0) 16%,#fff);border-left:3px solid var(--mfg,#8e7cf0);color:color-mix(in srgb,var(--mfg,#8e7cf0) 70%,#000);cursor:pointer}
-.cal-head .ad.task.done{opacity:.5;text-decoration:line-through}
+.cal-head .ad.done{opacity:.5;text-decoration:line-through}
 .cal-hours{position:sticky;left:0;z-index:4;background:#fff;height:calc(var(--hh) * 18)}
 .cal-hours span{position:absolute;right:8px;transform:translateY(-50%);font:400 .72rem var(--sys);font-variant-numeric:tabular-nums;color:#8e8e93}
 .cal-col{position:relative;height:calc(var(--hh) * 18);border-left:1px solid var(--hair);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hh) - 1px),#ececf0 calc(var(--hh) - 1px),#ececf0 var(--hh));cursor:copy}
@@ -293,8 +293,8 @@ td,th{border-bottom-color:#f0f0f5}
 .cb .h{display:block;font:500 .68rem var(--sys);font-variant-numeric:tabular-nums;color:var(--mfg,#8e7cf0);margin-top:1px}
 .cb.task,.cb.kh,.cb.preview{background:color-mix(in srgb,var(--mfg,#8e7cf0) 15%,#fff);border-left:3px solid var(--mfg,#8e7cf0);z-index:2}
 .cb.task,.cb.kh{display:block;border-bottom:0;border-radius:6px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;padding-bottom:6px}
-.cb.task.done{opacity:.5}
-.cb.task.done .tx{text-decoration:line-through}
+.cb.task.done,.cb.kh.done{opacity:.5}
+.cb.task.done .tx,.cb.kh.done .tx{text-decoration:line-through}
 .cb.task .rz,.cb.kh .rz{position:absolute;left:0;right:0;bottom:0;height:10px;cursor:ns-resize}
 .cb.task .rz::after,.cb.kh .rz::after{content:"";position:absolute;left:50%;bottom:3px;width:18px;height:3px;margin-left:-9px;border-radius:2px;background:color-mix(in srgb,var(--mfg,#8e7cf0) 45%,transparent)}
 .cb.task.dragging,.cb.kh.dragging{cursor:grabbing;z-index:6;box-shadow:0 8px 22px rgb(0 0 0 / .18);opacity:.95}
@@ -531,12 +531,18 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   <label>Ce que je retiens<input type="text" id="k-com"></label>
   <label>Nom dans le planning<input type="text" id="k-titre"></label>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Début<input type="time" id="k-heure"></label><label>Fin<input type="time" id="k-fin"></label></div>
-  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="k-cancel" type="button">Annuler</button><button class="btn primary" id="k-save" type="button">Enregistrer</button></div>
+  <label><span><input type="checkbox" id="k-fait" style="width:auto"> Fait</span></label>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn danger" id="k-del" type="button">Supprimer</button>
+    <div style="display:flex;gap:8px"><button class="btn ghost" id="k-cancel" type="button">Annuler</button><button class="btn primary" id="k-save" type="button">Enregistrer</button></div>
+  </div>
+  <p class="small" id="k-confirm" hidden style="margin:0;color:var(--late)">Touche encore « Supprimer » pour confirmer.</p>
 </div></div>
 <div class="modal" id="emodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="e-h">
   <h3 id="e-h">Modifier l'événement</h3>
   <label>Nom<input type="text" id="e-titre"></label>
   <label>Jour<input type="date" id="e-date"></label>
+  <label><span><input type="checkbox" id="e-fait" style="width:auto"> Fait</span></label>
   <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
     <button class="btn danger" id="e-del" type="button">Supprimer</button>
     <div style="display:flex;gap:8px"><button class="btn ghost" id="e-cancel" type="button">Annuler</button><button class="btn primary" id="e-save" type="button">Enregistrer</button></div>
@@ -683,14 +689,14 @@ function khEnd(k){const s0=toMin(khStart(k));return k.fin&&toMin(k.fin)>s0?k.fin
 const khNom=k=>k.titre||(k.orga==="Prépa"?"Colle prépa":"Kholle")+" · "+shortNom(matById(k.matiere));
 function kholleSoon(fromIso,days){
   const lim=iso(addDays(new Date(fromIso+"T12:00:00"),days));
-  return [...new Set(K.filter(k=>k.date>=fromIso&&k.date<=lim&&!k.rang).map(k=>matById(k.matiere).nom))];
+  return [...new Set(K.filter(k=>k.date>=fromIso&&k.date<=lim&&!k.rang&&!k.fait).map(k=>matById(k.matiere).nom))];
 }
 
 /* AUJOURD'HUI */
 function renderAuj(){
   const items=todoItems(), late=items.filter(i=>i.lvl==="late").length;
   const done3=C.filter(c=>c.p3).length, started=C.filter(c=>c.p1).length;
-  const next=K.filter(k=>k.date>=today()&&!k.rang).sort((a,b)=>a.date<b.date?-1:1)[0];
+  const next=K.filter(k=>k.date>=today()&&!k.rang&&!k.fait).sort((a,b)=>a.date<b.date?-1:1)[0];
   const tDay=T.filter(t=>t.date===today()), tDone=tDay.filter(t=>t.fait).length;
   const DJ=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
   const nd=next?new Date(next.date+"T12:00:00"):null;
@@ -773,7 +779,7 @@ function renderPlanning(){
   let head=`<div class="cal-head corner"></div>`,body=`<div class="cal-hours">${Array.from({length:CAL1-CAL0},(_,i)=>i?`<span style="top:${i*HH}px">${hm((CAL0+i)*60)}</span>`:"").join("")}</div>`;
   for(let i=0;i<n;i++){const d=addDays(start,i),dIso=iso(d),wd=i%7,isT=dIso===today(),we=wd>=5?"we":"";
     const ts=Td[dIso]||[];
-    const ad=[...(Ed[dIso]||[]).map(e=>`<span class="ad" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}" data-eopen="${esc(e.id)}">${esc(e.titre)}</span>`),
+    const ad=[...(Ed[dIso]||[]).map(e=>`<span class="ad ${e.fait?"done":""}" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":e.type==="concours"?"var(--accent-soft)":"var(--k-tut)"}" title="${esc(e.titre)}" data-eopen="${esc(e.id)}">${esc(e.titre)}</span>`),
       ...ts.filter(t=>!t.heure).map(t=>`<span class="ad task ${t.fait?"done":""}" style="${mvars(t.matiere)}" data-topen="${esc(t.id)}" title="${esc(t.texte)}">${t.matiere?`<b>${esc(shortNom(matById(t.matiere)))}</b> · `:""}${esc(t.texte)}</span>`)].join("");
     const dd=d.getDate();
     head+=`<div class="cal-head ${isT?"today":""} ${we}" data-date="${dIso}"><span class="dn">${JABR[wd]} <b>${dd}</b>${dd===1?` <span>${MOIS[d.getMonth()].slice(0,4)}.</span>`:""}</span>${ad}</div>`;
@@ -782,7 +788,7 @@ function renderPlanning(){
       ...(Kd[dIso]||[]).map(k=>{const s0=toMin(khStart(k));return{s:s0,e:toMin(khEnd(k)),k}})];
     lanes(its).forEach(it=>{const w=`calc((100% - 4px) / ${it.n} - 1px)`,left=`calc(2px + (100% - 4px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)+1}px;height:${Math.max(top(it.e)-top(it.s)-2,20)}px;left:${left};width:${w}`;
       if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}">${t.matiere?`<span class="mn">${esc(shortNom(matById(t.matiere)))}</span>`:""}<span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
-      else{const k=it.k;blocks+=`<div class="cb kh" style="${mvars(k.matiere)};${pos}" data-kid="${esc(k.id)}"><span class="tx">${esc(khNom(k))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)} – ${khEnd(k)}</span><span class="rz" aria-hidden="true"></span></div>`}});
+      else{const k=it.k;blocks+=`<div class="cb kh ${k.fait?"done":""}" style="${mvars(k.matiere)};${pos}" data-kid="${esc(k.id)}"><span class="tx">${esc(khNom(k))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)} – ${khEnd(k)}${k.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}});
     if(isT){const nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${we}" data-date="${dIso}">${blocks}</div>`;
   }
@@ -955,12 +961,12 @@ async function updTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign
 async function updK(id,patch){const k=K.find(x=>x.id===id);if(k)Object.assign(k,patch);renderAll();try{await db.doc("kholles/"+id).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
 /* Événements (journée entière) : renommer, changer de jour, supprimer. */
 let eEdit=null;
-function openEv(id){const e=E.find(x=>x.id===id);if(!e)return;eEdit=id;$("#e-titre").value=e.titre||"";$("#e-date").value=e.date||"";$("#e-confirm").hidden=true;$("#emodal").hidden=false;$("#e-titre").focus()}
+function openEv(id){const e=E.find(x=>x.id===id);if(!e)return;eEdit=id;$("#e-titre").value=e.titre||"";$("#e-date").value=e.date||"";$("#e-fait").checked=!!e.fait;$("#e-confirm").hidden=true;$("#emodal").hidden=false;$("#e-titre").focus()}
 $("#e-cancel").onclick=()=>{$("#emodal").hidden=true};
-$("#e-save").onclick=async()=>{const titre=$("#e-titre").value.trim(),date=$("#e-date").value;if(!titre){$("#e-titre").focus();return}if(!date){$("#e-date").focus();return}
-  $("#emodal").hidden=true;const e=E.find(x=>x.id===eEdit);if(e)Object.assign(e,{titre,date});renderAll();
-  try{await db.doc("evenements/"+eEdit).update({titre,date});toast("Événement modifié")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}};
-$("#e-del").onclick=async()=>{if($("#e-confirm").hidden){$("#e-confirm").hidden=false;return}$("#emodal").hidden=true;try{await db.doc("evenements/"+eEdit).delete()}catch(e){toast("Suppression impossible")}};
+$("#e-save").onclick=async()=>{const titre=$("#e-titre").value.trim(),date=$("#e-date").value,fait=$("#e-fait").checked;if(!titre){$("#e-titre").focus();return}if(!date){$("#e-date").focus();return}
+  $("#emodal").hidden=true;const e=E.find(x=>x.id===eEdit);if(e)Object.assign(e,{titre,date,fait});renderAll();
+  try{await db.doc("evenements/"+eEdit).update({titre,date,fait});toast("Événement modifié")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}};
+$("#e-del").onclick=async()=>{if($("#e-confirm").hidden){$("#e-confirm").hidden=false;return}$("#emodal").hidden=true;E=E.filter(x=>x.id!==eEdit);renderAll();try{await db.doc("evenements/"+eEdit).delete();toast("Événement supprimé")}catch(e){toast("Suppression impossible")}};
 async function delTask(id){try{await db.doc("taches/"+id).delete()}catch(e){toast("Suppression impossible")}}
 
 /* PASSAGES : QCM + ressenti */
@@ -1218,9 +1224,10 @@ function renderKholles(){
   drawChart(lo,hi);
 }
 let kediting=null;
-function openK(id,plan){const k=K.find(x=>x.id===id);if(!k)return;kediting=id;$("#k-titre").value=k.titre||"";$("#k-titre").placeholder=khNom({...k,titre:""});$("#k-heure").value=khStart(k);$("#k-fin").value=khEnd(k);$("#k-title").textContent="Kholle "+matById(k.matiere).nom+" · "+(k.orga||"");$("#k-date").value=k.date||"";$("#k-note").value=k.note??"";$("#k-rang").value=k.rang??"";$("#k-total").value=k.total??"";$("#k-com").value=k.com||"";$("#kmodal").hidden=false;$(plan?"#k-titre":"#k-rang").focus()}
+function openK(id,plan){const k=K.find(x=>x.id===id);if(!k)return;kediting=id;$("#k-titre").value=k.titre||"";$("#k-titre").placeholder=khNom({...k,titre:""});$("#k-heure").value=khStart(k);$("#k-fin").value=khEnd(k);$("#k-fait").checked=!!k.fait;$("#k-confirm").hidden=true;$("#k-title").textContent="Kholle "+matById(k.matiere).nom+" · "+(k.orga||"");$("#k-date").value=k.date||"";$("#k-note").value=k.note??"";$("#k-rang").value=k.rang??"";$("#k-total").value=k.total??"";$("#k-com").value=k.com||"";$("#kmodal").hidden=false;$(plan?"#k-titre":"#k-rang").focus()}
 $("#k-cancel").onclick=()=>{$("#kmodal").hidden=true};
-$("#k-save").onclick=async()=>{const n=v=>v===""?null:Number(v);const patch={date:$("#k-date").value,note:n($("#k-note").value),rang:n($("#k-rang").value),total:n($("#k-total").value),com:$("#k-com").value.trim(),titre:$("#k-titre").value.trim()};
+$("#k-del").onclick=async()=>{if($("#k-confirm").hidden){$("#k-confirm").hidden=false;return}$("#kmodal").hidden=true;const id=kediting;K=K.filter(x=>x.id!==id);renderAll();try{await db.doc("kholles/"+id).delete();toast("Kholle supprimée")}catch(e){toast("Suppression impossible")}};
+$("#k-save").onclick=async()=>{const n=v=>v===""?null:Number(v);const patch={date:$("#k-date").value,note:n($("#k-note").value),rang:n($("#k-rang").value),total:n($("#k-total").value),com:$("#k-com").value.trim(),titre:$("#k-titre").value.trim(),fait:$("#k-fait").checked};
   const k=K.find(x=>x.id===kediting),h=$("#k-heure").value,f=$("#k-fin").value;
   if(h&&k&&(h!==khStart(k)||f!==khEnd(k))){patch.heure=h;patch.fin=f&&toMin(f)>toMin(h)?f:""}
   $("#kmodal").hidden=true;if(k)Object.assign(k,patch);renderAll();try{await db.doc("kholles/"+kediting).update(patch);toast("Kholle mise à jour")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
