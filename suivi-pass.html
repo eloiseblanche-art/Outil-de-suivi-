@@ -717,6 +717,18 @@ td,th{border-bottom-color:#f0f0f5}
       <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin</th><th>Priorité</th></tr></thead><tbody id="matRows"></tbody></table></div>
     </details>
     <details class="panel fold">
+      <summary><h2>Règles pour créer les QCM</h2></summary>
+      <ul class="prose">
+        <li><b>Un QCM par cours, qui reprend tout le cours</b>, partie par partie et dans l'ordre, annexes comprises : chaque notion tombe au moins une fois. En général 3 à 5 questions par partie (environ 45 questions pour un cours comme Embryo 01).</li>
+        <li><b>Chaque question</b> : « Parmi les propositions suivantes concernant [sujet], laquelle ou lesquelles sont vraies ou fausses ? », avec 5 propositions de A à E, chacune vraie ou fausse.</li>
+        <li><b>Le plus souvent 3 vraies et 2 fausses</b> (entre 2 et 4 vraies), jamais toutes vraies ou toutes fausses.</li>
+        <li><b>Les fausses reprennent les pièges du concours</b> : chiffre ou valeur modifiée, inversion (mitose/méiose, haploïde/diploïde, avant/après), « comme » à la place de « contrairement à », transitoire/définitif, mauvaise structure ou mauvaise étape.</li>
+        <li><b>Chaque fausse a un commentaire de correction</b> qui donne la bonne réponse et la valeur exacte. Les vraies n'en ont que si c'est utile.</li>
+        <li><b>Uniquement le contenu du cours</b>, avec ses termes et ses chiffres. Une proposition teste une seule info.</li>
+        <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
+      </ul>
+    </details>
+    <details class="panel fold">
       <summary><h2>Demande de cartes à l'IA</h2></summary>
       <div style="display:flex;justify-content:flex-end"><button class="btn" id="copyPrompt" type="button">Copier</button></div>
       <pre class="prompt" id="promptTxt">Voici mon cours de [MATIÈRE] – [TITRE DU COURS], en PDF. J'ai surligné les passages à mettre en cartes.
@@ -1790,7 +1802,7 @@ function renderQres(){
    et qu'il est su à 90 % au moins. */
 const FW=[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.031,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.587,0.2272,2.8755];
 const F_DEC=-.5,F_FAC=19/81;
-let RVC={nouv:15,max:21},SRS={};
+let RVC={nouv:15,max:21,cap:40},SRS={},LOAD={};
 const nIso=n=>new Date(n*864e5).toISOString().slice(0,10);
 const clampD=d=>Math.min(10,Math.max(1,d));
 const fR=(t,s)=>Math.pow(1+F_FAC*t/s,F_DEC);
@@ -1804,16 +1816,24 @@ function fNext(st,g,d){
 const rvGrade=e=>e===0?3:e===1?2:1;
 const GR={3:["ok","Bien"],2:["due","Difficile"],1:["late","À revoir"]};
 /* Prochaine date : intervalle = stabilité (rétention 0,90), plafonné à l'intervalle max, et jamais après le 15 décembre (J-2). */
-function rvDue(st,g){const max=+RVC.max||21,L=dayN(st.last);let due=L+(g===1?1:Math.min(max,Math.max(1,Math.round(st.s))));
-  const cap=dayN(CONCOURS)-2;if(due>cap)due=Math.max(L+1,cap);return nIso(due)}
+/* Comme Anki (« fuzz » + répartition de la charge) : à partir de 3 jours, l'intervalle peut bouger de ±15 % (±10 % dès 7 j,
+   ±5 % dès 20 j, au moins ±1 j), et on prend le jour le moins chargé de cette fourchette. Les questions vues le même jour
+   ne reviennent donc pas toutes le même jour. Une question ratée revient le lendemain, sans fourchette. */
+function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2;
+  const ivl=g===1?1:Math.min(max,Math.max(1,Math.round(st.s)));let lo=ivl,hi=ivl;
+  if(ivl>=3){const dl=Math.max(1,Math.round(ivl*(ivl<7?.15:ivl<20?.1:.05)));lo=Math.max(2,ivl-dl);hi=Math.min(max,ivl+dl)}
+  let best=null;for(let i=lo;i<=hi;i++){let d=L+i;if(d>cap)d=Math.max(L+1,cap);const sc=(load&&load[d]||0)+Math.abs(i-ivl)*.01;if(!best||sc<best.sc)best={d,sc}}
+  return nIso(best.d)}
 function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
 function buildSrs(){
-  const qb=Object.fromEntries(Q.map(q=>[q.id,Object.fromEntries((q.questions||[]).map(x=>[x.id,x]))])),out={};
+  const qb=Object.fromEntries(Q.map(q=>[q.id,Object.fromEntries((q.questions||[]).map(x=>[x.id,x]))])),out={},load={};
   [...QR].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>{const qs=qb[r.qcm];if(!qs)return;const d=r.date||iso(r.ts||Date.now());
     for(const id in (r.rep||{})){const x=qs[id];if(!x)continue;const k=r.qcm+"|"+id,st=out[k];if(st&&st.last>=d)continue;
       const e=rvErrs(x,r.rep[id]),g=rvGrade(e),nx=fNext(st,g,d);
-      nx.e=e;nx.g=g;nx.hist=[...(st?st.hist:[]),{d,e}];if(!st)nx.via=r.mode||"complet";nx.due=rvDue(nx,g);out[k]=nx}});
-  SRS=out;
+      if(st)load[dayN(st.due)]--;
+      nx.e=e;nx.g=g;nx.hist=[...(st?st.hist:[]),{d,e}];if(!st)nx.via=r.mode||"complet";nx.lastVia=r.mode||"complet";
+      nx.due=rvDue(nx,g,load);load[dayN(nx.due)]=(load[dayN(nx.due)]||0)+1;out[k]=nx}});
+  SRS=out;LOAD=load;
 }
 /* Un cours n'entre dans les révisions que quand tu le démarres (bouton sur sa carte, date gardée dans qcm.rev)
    ou quand tu as déjà fait son QCM. rev = "" : cours mis en pause, rien n'en sort (ni à revoir, ni nouvelles). */
@@ -1824,11 +1844,14 @@ async function rvSetRev(id,v){const q=qById(id);if(!q)return;q.rev=v;renderRevHo
 const rvBanks=()=>[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
 function rvQueue(){const td=today(),T=dayN(td),due=[],nw=[];
   const newToday=Object.values(SRS).filter(s=>s.first===td&&s.via==="revision").length;
+  /* plafond du jour (questions déjà faites aujourd'hui en révision comprises) : le surplus attend le lendemain, les plus urgentes d'abord */
+  const doneToday=Object.values(SRS).filter(s=>s.last===td&&s.lastVia==="revision").length,room=Math.max(0,(+RVC.cap||9999)-doneToday);
   /* nouvelles questions : d'abord celles des cours démarrés en premier */
   rvBanks().filter(rvActive).sort((a,b)=>(a.rev||"").localeCompare(b.rev||"")).forEach(q=>(q.questions||[]).forEach(x=>{const k=q.id+"|"+x.id,st=SRS[k];
     if(st){if(st.due<=td)due.push({k,u:dayN(st.due),r:fR(T-dayN(st.last),st.s)})}else nw.push(k)}));
   due.sort((a,b)=>a.u-b.u||a.r-b.r);
-  return{due:due.map(x=>x.k),nw:nw.slice(0,Math.max(0,(+RVC.nouv||0)-newToday)),nwLeft:nw.length};
+  const dk=due.map(x=>x.k).slice(0,room);
+  return{due:dk,nw:nw.slice(0,Math.max(0,Math.min((+RVC.nouv||0)-newToday,room-dk.length))),nwLeft:nw.length,dueLeft:due.length-dk.length};
 }
 function rvBank(q){const td=today(),T=dayN(td),qs=q.questions||[];let su=0,seen=0,mat=0,due=0,mem=0,next=null,nextN=0;const days={};
   qs.forEach(x=>{const st=SRS[q.id+"|"+x.id];if(!st)return;seen++;su+=5-st.e;if(st.s>=21)mat++;mem+=fR(Math.max(0,T-dayN(st.last)),st.s);
@@ -1875,7 +1898,7 @@ function renderRevHome(){
     <div class="rv-hero">
       <div class="rv-big num">${tot}<small>question${tot>1?"s":""}</small></div>
       <div style="display:grid;gap:8px">
-        <div class="rv-split"><span><b>${nDue}</b> à revoir</span><span><b>${nNew}</b> nouvelle${nNew>1?"s":""}${qq.nwLeft>nNew?` <span class="small">(encore ${qq.nwLeft-nNew} en attente)</span>`:""}</span>${tot?`<span>≈ <b>${Math.max(1,Math.round(tot*1.2))}</b> min</span>`:""}</div>
+        <div class="rv-split"><span><b>${nDue}</b> à revoir${qq.dueLeft?` <span class="small">(+ ${qq.dueLeft} reportée${qq.dueLeft>1?"s":""} à demain : limite de ${+RVC.cap} par jour)</span>`:""}</span><span><b>${nNew}</b> nouvelle${nNew>1?"s":""}${qq.nwLeft>nNew?` <span class="small">(encore ${qq.nwLeft-nNew} en attente)</span>`:""}</span>${tot?`<span>≈ <b>${Math.max(1,Math.round(tot*1.2))}</b> min</span>`:""}</div>
         ${chips?`<div class="rv-chips">${chips}</div>`:!Q.some(rvActive)?`<span class="muted">Aucun cours démarré pour l'instant : choisis plus bas ceux que tu veux réviser.</span>`:`<span class="muted">Rien à revoir aujourd'hui.${days.slice(1).find(x=>x.n)?` Prochaine révision ${dLbl(days.slice(1).find(x=>x.n).d)}.`:""}</span>`}
       </div>
     </div>
@@ -1896,11 +1919,13 @@ function renderRevHome(){
       <li><b>Tout compte</b> : les QCM complets faits dans l'onglet QCM entrent aussi dans le calendrier. Seul le premier passage de la journée compte.</li>
       <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours que tu as démarrés (bouton sur chaque cours), en commençant par le plus ancien. Un cours dont tu fais le QCM complet dans l'onglet QCM démarre tout seul. Tu peux mettre un cours en pause à tout moment.</li>
       <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
+      <li><b>Pas d'embouteillage</b> : comme dans Anki, les dates de retour sont légèrement étalées (± 15 % environ) vers les jours les moins chargés. Les questions d'un QCM complet ne reviennent donc pas toutes le même jour. En plus, au-delà de ${+RVC.cap} questions dans la journée, le reste passe au lendemain, les plus urgentes d'abord.</li>
       <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
       <li><b>Progression</b> : sous chaque cours, la courbe montre ton score à chaque séance, et l'écart compare tes réponses à celles de la fois d'avant sur les mêmes questions : <span class="up">+</span> tu progresses, <span class="down">−</span> tu régresses.</li>
     </ul>
     <form class="rv-set" id="rvSet">
       <label>Nouvelles questions par jour<input type="number" id="rv-nouv" min="0" max="200" inputmode="numeric" value="${esc(RVC.nouv)}"></label>
+      <label>Questions max par jour<input type="number" id="rv-cap" min="5" max="500" inputmode="numeric" value="${esc(RVC.cap)}"></label>
       <label>Intervalle max (jours)<input type="number" id="rv-max" min="2" max="60" inputmode="numeric" value="${esc(RVC.max)}"></label>
       <div><button class="btn" type="submit">Enregistrer</button></div>
     </form>
@@ -1912,8 +1937,8 @@ function renderRevHome(){
     if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   if($("#rvDropDr"))$("#rvDropDr").onclick=async()=>{const d=rvDraft();if(d){Object.assign(rv,{date:d.date,list:d.list||[],ans:d.ans||{},res:d.res||{}});await rvSave()}rvDropDraft();renderRevHome()};
   if($("#rvPlan"))$("#rvPlan").onclick=()=>addTask({date:today(),heure:"",texte:`Révisions espacées · ${tot} question${tot>1?"s":""}`,matiere:""});
-  $("#rvSet").addEventListener("submit",async e=>{e.preventDefault();const nv=Math.max(0,Math.round(+$("#rv-nouv").value||0)),mx=Math.min(60,Math.max(2,Math.round(+$("#rv-max").value||21)));
-    RVC={nouv:nv,max:mx};renderRevHome();if(!db)return;try{await db.doc("config/revision").set(RVC);toast("Réglages enregistrés")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
+  $("#rvSet").addEventListener("submit",async e=>{e.preventDefault();const nv=Math.max(0,Math.round(+$("#rv-nouv").value||0)),mx=Math.min(60,Math.max(2,Math.round(+$("#rv-max").value||21))),cp=Math.min(500,Math.max(5,Math.round(+$("#rv-cap").value||40)));
+    RVC={nouv:nv,max:mx,cap:cp};renderRevHome();if(!db)return;try{await db.doc("config/revision").set(RVC);toast("Réglages enregistrés")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 }
 function rvSpark(sess){const L=sess.slice(-10);if(!L.length)return"";const W=120,H=36,x=i=>L.length<2?W/2:6+i*(W-12)/(L.length-1),y=p=>H-5-p/100*(H-10);
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score par séance : ${L.map(s=>s.p+" %").join(", ")}"><line x1="0" x2="${W}" y1="${y(80)}" y2="${y(80)}" stroke="var(--line)" stroke-dasharray="3 3"/>${L.length>1?`<polyline fill="none" stroke="var(--mfg,var(--accent))" stroke-width="2" stroke-linejoin="round" points="${L.map((s,i)=>x(i)+","+y(s.p)).join(" ")}"/>`:""}${L.map((s,i)=>`<circle cx="${x(i)}" cy="${y(s.p)}" r="${i===L.length-1?3.2:2.2}" fill="var(--mfg,var(--accent))"><title>${fmt(s.d)} : ${s.p} %</title></circle>`).join("")}</svg>`}
@@ -1943,7 +1968,7 @@ function renderRevSess(){
   let verdict="";
   if(chk){const err=rvErrs(x,x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F")),g=rvGrade(err),gr=GR[g];
     if(e.again)verdict=`<span class="pill ${gr[0]}">${err?err+" erreur"+(err>1?"s":""):"Tout juste"}</span><span class="small muted">Rappel de fin de séance : ne compte pas pour le calendrier.</span>`;
-    else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g);
+    else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g,LOAD);
       verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):"5/5"}</span><span class="small">Revient ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${g===1?", et une 2e fois en fin de séance":""}.</span>`}}
   const pill=v=>v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
   $("#revRoot").innerHTML=`<div class="qz">
