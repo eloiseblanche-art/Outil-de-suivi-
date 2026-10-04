@@ -186,6 +186,10 @@ ul.clean li.task:last-child{border-bottom:0}
 .pies{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
 button.pie{border:2px solid transparent;cursor:pointer;font:inherit;color:inherit}
 button.pie[aria-pressed="true"]{border-color:var(--mfg)}
+.pcard{display:grid;gap:5px;align-content:start}
+.pcard button.pie{width:100%}
+.pnote{font-size:.76rem;line-height:1.3;padding:5px 7px;border-radius:8px;resize:vertical;min-height:2.4em;background:#fff;border:1px solid color-mix(in srgb,var(--mfg,#8e8e93) 25%,#fff)}
+.pnote::placeholder{color:#aeaeb2}
 .pie svg{max-width:88px}
 .chip{border-color:transparent;background:#fff;box-shadow:0 1px 2px rgb(42 44 63 / .06)}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -1019,9 +1023,19 @@ function renderPies(){
   $("#pieAll").innerHTML=donut([eu,tot-eu],["#7c6fd6","#ececf3"],`${eu}/${tot}`,`${eu} cours eus sur ${tot}`,20,["Déjà eus","À venir"],"cours eus");
   const av=avgPct(C);
   $("#pieLegend").innerHTML=`<span style="--c:#7c6fd6">Déjà eus <b class="num">${eu}</b></span><span style="--c:#ececf3">À venir <b class="num">${tot-eu}</b></span><span class="small muted" style="margin-top:6px">dont <b class="num">${anc}</b> déjà vus 3 fois${av!=null?` · QCM moyen <b class="num">${av} %</b>`:""}</span>`;
+  const pa=document.activeElement,keepN=pa&&pa.dataset&&pa.dataset.pnote?[pa.dataset.pnote,pa.value,pa.selectionStart,pa.selectionEnd]:null;
   $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const e=cs.filter(isEu).length,k3=cs.filter(c=>c.p3).length;const a=avgPct(cs);
-    return `<button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut([e,cs.length-e],[mc,mc+"26"],`${e}/${cs.length}`,m.nom+" : "+e+" cours eus sur "+cs.length,17,["Déjà eus","À venir"],"eus")}<span class="nm">${esc(shortNom(m))}</span><span class="sub">${k3} vus 3 fois${a!=null?" · QCM "+a+" %":""}</span></button>`}).join("");
+    return `<div class="pcard" style="${mvars(m.id)}"><button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut([e,cs.length-e],[mc,mc+"26"],`${e}/${cs.length}`,m.nom+" : "+e+" cours eus sur "+cs.length,17,["Déjà eus","À venir"],"eus")}<span class="nm">${esc(shortNom(m))}</span><span class="sub">${k3} vus 3 fois${a!=null?" · QCM "+a+" %":""}</span></button><textarea class="pnote" rows="2" data-pnote="${esc(m.id)}" placeholder="Où j'en suis…" aria-label="Où j'en suis en ${esc(m.nom)}">${esc(m.ou||"")}</textarea></div>`}).join("");
   $("#pies").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=filt===b.dataset.f?"all":b.dataset.f;renderPies();renderCours()});
+  $("#pies").querySelectorAll("[data-pnote]").forEach(t=>{t.oninput=()=>saveOu(t.dataset.pnote,t.value);t.onblur=()=>saveOu(t.dataset.pnote,t.value,true)});
+  if(keepN){const t=$("#pies").querySelector(`[data-pnote="${keepN[0]}"]`);if(t){t.value=keepN[1];t.focus();try{t.setSelectionRange(keepN[2],keepN[3])}catch(_){}}}
+}
+/* Petit mot « où j'en suis » par matière, enregistré dans la matière elle-même. */
+const ouTimers={};
+function saveOu(mid,v,now){
+  clearTimeout(ouTimers[mid]);const m=M.find(x=>x.id===mid);if(m)m.ou=v;
+  const go=async()=>{if(!db)return;try{await db.doc("matieres/"+mid).update({ou:v})}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+  if(now)go();else ouTimers[mid]=setTimeout(go,700);
 }
 
 /* COURS */
