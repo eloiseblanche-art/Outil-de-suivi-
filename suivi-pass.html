@@ -348,6 +348,39 @@ td,th{border-bottom-color:#f0f0f5}
 .dragghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;max-width:220px;padding:6px 9px;border-radius:8px;font:600 .82rem var(--sys);background:color-mix(in srgb,var(--mfg,#8e8e93) 20%,#fff);border-left:3px solid var(--mfg,#8e8e93);color:#1c1c1e;box-shadow:0 10px 28px rgb(0 0 0 / .2)}
 .wrap:has(#v-planning:not([hidden])){max-width:1500px}
 @media (max-width:900px){.plan{grid-template-columns:1fr}.recap{position:static;max-height:42vh}.month{font-size:1.5rem}}
+
+/* ---- Journée type ---- */
+.cb.tplb{left:0;right:0;background:var(--c);border-radius:0;z-index:1;cursor:pointer;padding:1px 6px;opacity:.9}
+.cb.tplb .tx{color:#55586b;font-weight:600;font-size:.68rem}
+#jmodal .card{width:min(560px,100%)}
+.jrow{display:grid;grid-template-columns:1fr 1fr 1.3fr auto;gap:5px;padding:7px;border-radius:10px;background:var(--surface-2)}
+.jrow input,.jrow select{padding:5px 7px;font-size:.85rem}
+.jrow .jt{grid-column:1/4}
+.jrow .x{border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:.9rem}
+
+/* ---- Sommeil ---- */
+:root{--sl-1:#cc4b52;--sl-2:#d9793a;--sl-3:#c9a21c;--sl-4:#7cae3c;--sl-5:#3f9e62;--sl-night:#5b5fa8;--sl-night-soft:#e8e9f7}
+.sl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.sl-grid{grid-template-columns:1fr}}
+.sl-form{display:grid;gap:14px}
+.sl-block{display:grid;gap:10px}
+.sl-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.sl-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.sl-scale button,.sl-opts button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 2px;font:700 .8rem var(--font-b);color:var(--ink-2);cursor:pointer}
+.sl-scale button[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#fff}
+.sl-opts{display:flex;flex-wrap:wrap;gap:5px}
+.sl-opts button{padding:6px 10px}
+.sl-opts button[aria-pressed="true"]{background:var(--sl-night);border-color:var(--sl-night);color:#fff}
+.sl-q{display:grid;gap:5px;font-size:.8rem;color:var(--ink-2);font-weight:700}
+.sl-sum{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;color:var(--ink-2)}
+.sl-sum b{color:var(--ink);font-family:var(--font-m);font-weight:500}
+.sl-chart svg{display:block;width:100%;height:auto}
+.sl-cmp{display:grid;gap:8px}
+.sl-cmp .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:.86rem}
+.sl-cmp .it b{font-family:var(--font-m);font-weight:500;white-space:nowrap}
+.sl-plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.sl-tonight{display:grid;gap:4px;border-left:3px solid var(--sl-night);background:var(--sl-night-soft);border-radius:0 10px 10px 0;padding:8px 12px;font-size:.88rem}
+.sl-tonight b{font-family:var(--font-m);font-weight:500}
 </style>
 
 <div class="wrap">
@@ -363,6 +396,7 @@ td,th{border-bottom-color:#f0f0f5}
     <button role="tab" data-tab="planning" aria-selected="false">Planning</button>
     <button role="tab" data-tab="cours" aria-selected="false">Cours</button>
     <button role="tab" data-tab="kholles" aria-selected="false">Kholles</button>
+    <button role="tab" data-tab="sommeil" aria-selected="false">Sommeil</button>
     <button role="tab" data-tab="methode" aria-selected="false">Méthode</button>
   </nav>
   <div id="dbnote" class="notice" hidden style="margin-top:16px">Tes données ne sont pas disponibles dans cet affichage. Ouvre la page depuis claude.ai.</div>
@@ -375,6 +409,10 @@ td,th{border-bottom-color:#f0f0f5}
         <div id="todayDay"></div>
       </div>
       <div class="side">
+        <div class="panel">
+          <header><h2>Sommeil</h2><button class="link" type="button" data-goto="sommeil">mon suivi</button></header>
+          <div id="slToday"></div>
+        </div>
         <div class="panel">
           <header><h2>À reprendre</h2><span id="lateBadge"></span></header>
           <ul class="clean" id="todo"></ul>
@@ -398,6 +436,7 @@ td,th{border-bottom-color:#f0f0f5}
       <div class="plan-main">
         <div class="plan-top">
           <button class="sbtn" type="button" id="pSide" aria-label="Afficher le récap des matières" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg></button>
+          <button class="sbtn" type="button" id="pJour" aria-label="Modifier ma journée type" title="Ma journée type"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></button>
           <h2 class="month" id="pLbl"></h2>
           <div class="seg"><button type="button" id="pPrev" aria-label="Semaine précédente">‹</button><button type="button" id="pNow">Aujourd'hui</button><button type="button" id="pNext" aria-label="Semaine suivante">›</button></div>
         </div>
@@ -450,6 +489,81 @@ td,th{border-bottom-color:#f0f0f5}
       <header><h2>Jusqu'au concours</h2></header>
       <div class="weeks" id="weeks"></div>
     </div>
+  </section>
+
+  <!-- SOMMEIL -->
+  <section class="view" id="v-sommeil" hidden>
+    <div class="sl-grid">
+      <div class="panel">
+        <header><h2>Ma nuit</h2><label style="display:flex;gap:6px;align-items:center;font-weight:700">Réveil du<input type="date" id="sl-date" style="width:auto"></label></header>
+        <form class="sl-form" id="slForm">
+          <div class="sl-block">
+            <span class="eyebrow">Au réveil · 30 secondes</span>
+            <div class="sl-row">
+              <label>Lumière éteinte hier<input type="time" id="sl-coucher"></label>
+              <label>Réveil (sonnerie)<input type="time" id="sl-reveil"></label>
+              <label>Sortie du lit<input type="time" id="sl-lever"></label>
+            </div>
+            <div class="sl-q">Temps pour m'endormir<div class="sl-opts" data-f="latence"><button type="button" data-v="5">&lt; 10 min</button><button type="button" data-v="15">10–20</button><button type="button" data-v="30">20–40</button><button type="button" data-v="50">&gt; 40</button></div></div>
+            <div class="sl-q">Écran au lit avant de dormir<div class="sl-opts" data-f="ecranSoir"><button type="button" data-v="0">Non</button><button type="button" data-v="10">&lt; 15 min</button><button type="button" data-v="40">15 min–1 h</button><button type="button" data-v="90">&gt; 1 h</button><button type="button" data-v="99">Endormie devant</button></div></div>
+            <div class="sl-q">Rendormie après le réveil ?<div class="sl-opts" data-f="rendormie"><button type="button" data-v="0">Non</button><button type="button" data-v="1">Oui</button></div></div>
+            <div class="sl-q">Téléphone au lit le matin ?<div class="sl-opts" data-f="telMatin"><button type="button" data-v="0">Non</button><button type="button" data-v="1">Oui</button></div></div>
+            <div class="sl-q">Forme au réveil<div class="sl-scale" data-f="forme"></div></div>
+            <div class="sl-q">Confiance pour la journée<div class="sl-scale" data-f="confiance"></div></div>
+          </div>
+          <div class="sl-block">
+            <span class="eyebrow">Dans la journée · à compléter le soir</span>
+            <div class="sl-row">
+              <label>Cafés (nombre)<input type="number" id="sl-cafes" min="0" max="10" inputmode="numeric"></label>
+              <label>Dernier café<input type="time" id="sl-dcafe"></label>
+              <label>Coup de barre vers<input type="time" id="sl-barre"></label>
+              <label>Sieste (min)<input type="number" id="sl-sieste" min="0" max="180" inputmode="numeric"></label>
+              <label>Fin du travail<input type="time" id="sl-fintravail"></label>
+            </div>
+            <div class="sl-q">Lumière du jour dans l'heure après le lever<div class="sl-opts" data-f="lumiere"><button type="button" data-v="0">Non</button><button type="button" data-v="1">Oui</button></div></div>
+            <div class="sl-q">Sport<div class="sl-opts" data-f="sport"><button type="button" data-v="">Non</button><button type="button" data-v="matin">Matin</button><button type="button" data-v="aprem">Après-midi</button><button type="button" data-v="soir">Soir</button></div></div>
+            <label>Note (stress, insomnie, sortie…)<input type="text" id="sl-note"></label>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap"><span class="small muted" id="sl-calc"></span><button class="btn primary" type="submit">Enregistrer</button></div>
+        </form>
+      </div>
+      <div style="display:grid;gap:18px">
+        <div class="panel">
+          <header><h2>Mes nuits</h2><span class="muted small" id="sl-n"></span></header>
+          <div class="sl-sum" id="sl-sum"></div>
+          <div class="sl-chart" id="sl-chart"></div>
+        </div>
+        <div class="panel">
+          <header><h2>Ce qui change ma forme</h2></header>
+          <div class="sl-cmp" id="sl-cmp"></div>
+        </div>
+        <div class="panel">
+          <header><h2>Mon plan</h2><span class="muted small">7 jours sur 7</span></header>
+          <form class="sl-plan" id="slPlan">
+            <label>Fin du travail<input type="time" id="sp-fin"></label>
+            <label>Lumière éteinte<input type="time" id="sp-coucher"></label>
+            <label>Lever<input type="time" id="sp-lever"></label>
+            <div style="align-self:end"><button class="btn" type="submit">Mettre à jour</button></div>
+          </form>
+          <div id="sl-planTxt"></div>
+        </div>
+      </div>
+    </div>
+    <details class="panel fold">
+      <summary><h2>Les règles du protocole</h2></summary>
+      <ul class="prose">
+        <li><b>Lever à heure fixe 7 j / 7</b>, week-end compris (30 min d'écart au plus). C'est le réglage le plus puissant de l'horloge.</li>
+        <li><b>Le téléphone dort hors de portée du lit</b>, et le réveil sonne à l'autre bout de la chambre.</li>
+        <li><b>Snap autorisé au réveil, mais debout</b> et lumière allumée, jamais en retournant dans le lit.</li>
+        <li><b>Lumière forte le matin</b> : dehors 10 à 20 min dans les 2 h (marcher = lumière + sport), ou une lampe de luminothérapie pendant Anki, l'hiver.</li>
+        <li><b>Café avant 14 h</b>, déca ensuite.</li>
+        <li><b>Après la fin du travail, du temps pour moi</b> : vidéos, curiosités, messages, mais au bureau ou sur le canapé, pas dans le lit. Note dans la journée ce que tu veux aller voir le soir.</li>
+        <li><b>Le lit sert à dormir.</b> Pas sommeil au bout de 20 min environ : se relever, lumière douce, revenir quand les yeux piquent.</li>
+        <li><b>Sieste de 20 min au plus, avant 15 h.</b></li>
+        <li><b>Sport 2 à 3 fois par semaine</b>, plutôt pas d'intense dans les 2 h avant le coucher.</li>
+        <li><b>Réveil raté ?</b> On ne se rattrape pas en veillant. Lever à l'heure le lendemain, et la journée démarre par une tâche facile (Anki).</li>
+      </ul>
+    </details>
   </section>
 
   <!-- METHODE -->
@@ -617,6 +731,13 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
     <div class="pdfmain"><div class="pdfpages" id="pdf-pages"><div class="pdfinner" id="pdf-inner"></div></div><span class="pgpill" id="pdf-pg" hidden></span></div>
   </div>
 </div>
+<div class="modal" id="jmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="j-title">
+  <h3 id="j-title">Ma journée type</h3>
+  <p class="small muted" style="margin:0">Ces créneaux s'affichent tous les jours dans le planning. Le reste du temps, c'est du travail : tu y glisses tes tâches.</p>
+  <div id="j-rows" style="display:grid;gap:6px"></div>
+  <button class="btn sm" id="j-add" type="button" style="justify-self:start">+ Ajouter un créneau</button>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="j-cancel" type="button">Annuler</button><button class="btn primary" id="j-save" type="button">Enregistrer</button></div>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -642,6 +763,7 @@ const KCOL = {anki:"--k-anki",p1:"--k-p1",p2:"--k-p2",p3:"--k-p3",bloc:"--k-bloc
 const JOURS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
 let db=null, M=[], C=[], K=[], E=[], B=[], T=[], filt="all", showTpl=true;
+let J=[{d:"06:45",f:"07:30",t:"Réveil · lumière · petit-déj",k:"matin"},{d:"09:30",f:"10:00",t:"Pause",k:"pause"},{d:"12:00",f:"13:00",t:"Pause déjeuner",k:"pause"},{d:"16:00",f:"16:30",t:"Pause",k:"pause"},{d:"19:30",f:"20:30",t:"Pause dîner",k:"pause"},{d:"22:30",f:"23:15",t:"Temps pour moi, hors du lit",k:"moi"},{d:"23:15",f:"",t:"Lumière éteinte",k:"nuit"}];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const iso=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
@@ -735,6 +857,7 @@ function dayItems(dIso){
   const items=[];
   E.filter(e=>e.date===dIso).forEach(e=>items.push({type:"ev",min:-2,html:`<div class="pitem ev" style="--mbg:${e.type==="eb"?"var(--late-soft)":e.type==="off"?"var(--k-libre)":"var(--k-tut)"}">${esc(e.titre)}</div>`}));
   K.filter(k=>k.date===dIso).forEach(k=>items.push({type:"ev",min:toMin(khStart(k)),html:`<div class="pitem ev" style="${mvars(k.matiere)}"><span><span class="h">${khStart(k)} · ${k.orga==="Prépa"?"colle prépa":"kholle tutorat"}</span>${esc(k.titre||matById(k.matiere).nom)}${k.rang?` · ${k.rang}/${k.total}`:""}</span></div>`}));
+  J.forEach(b=>items.push({type:"tpl",min:toMin(b.d),html:`<div class="pitem tpl" style="--c:${JK[b.k]||JK.pause}"><span><span class="h">${esc(b.d)}${b.f?"–"+esc(b.f):""}</span>${esc(b.t)}</span></div>`}));
   if(showTpl){const soon=kholleSoon(dIso,7);
     WEEK[idx].b.forEach(x=>items.push({type:"tpl",min:toMin(x[0]),html:`<div class="pitem tpl" style="--c:var(${KCOL[x[3]]})"><span><span class="h">${x[0]}${x[1]?"–"+x[1]:""}</span>${esc(x[2])}${x[3]==="bloc"&&soon.length?` <b>→ ${esc(soon.join(" + "))}</b>`:""}</span></div>`}))}
   T.filter(t=>t.date===dIso).forEach(t=>items.push({type:"task",min:toMin(t.heure),crt:t.crt||0,html:`<div class="pitem task ${t.fait?"done":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tdone="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="tx">${t.heure?`<span class="h">${esc(t.heure)}</span>`:""}${esc(t.texte)}${t.matiere?` <span class="mtag">${esc(matById(t.matiere).nom)}</span>`:""}</span><button class="x" data-tdel="${esc(t.id)}" aria-label="Supprimer la tâche">✕</button></div>`}));
@@ -793,6 +916,8 @@ function renderPlanning(){
     lanes(its).forEach(it=>{const w=`calc((100% - 4px) / ${it.n} - 1px)`,left=`calc(2px + (100% - 4px) / ${it.n} * ${it.lane})`,pos=`top:${top(it.s)+1}px;height:${Math.max(top(it.e)-top(it.s)-2,20)}px;left:${left};width:${w}`;
       if(it.t){const t=it.t;blocks+=`<div class="cb task ${t.fait?"done":""}" style="${mvars(t.matiere)};${pos}" data-tid="${esc(t.id)}">${t.matiere?`<span class="mn">${esc(shortNom(matById(t.matiere)))}</span>`:""}<span class="tx">${esc(t.texte)}</span><span class="h">${esc(t.heure)}${t.fin?" – "+esc(t.fin):""}${t.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}
       else{const k=it.k;blocks+=`<div class="cb kh ${k.fait?"done":""}" style="${mvars(k.matiere)};${pos}" data-kid="${esc(k.id)}"><span class="tx">${esc(khNom(k))}${k.rang?` · ${k.rang}/${k.total}`:""}</span><span class="h">${khStart(k)} – ${khEnd(k)}${k.fait?" · ✓":""}</span><span class="rz" aria-hidden="true"></span></div>`}});
+    J.forEach(b=>{const s0=toMin(b.d);let e0=b.f?toMin(b.f):CAL1*60;if(e0<=s0)e0=CAL1*60;if(s0<CAL0*60||s0>=CAL1*60)return;
+      blocks+=`<div class="cb tplb" data-jopen="1" style="--c:${JK[b.k]||JK.pause};top:${top(s0)}px;height:${Math.max(top(Math.min(e0,CAL1*60))-top(s0),12)}px" title="${esc(b.t)} · ${esc(b.d)}${b.f?"–"+esc(b.f):""}"><span class="tx">${esc(b.t)}</span></div>`});
     if(isT){const nw=new Date(),nm=nw.getHours()*60+nw.getMinutes();if(nm>=CAL0*60&&nm<CAL1*60)blocks+=`<div class="nowline" style="top:${top(nm)}px"></div>`}
     body+=`<div class="cal-col ${we}" data-date="${dIso}">${blocks}</div>`;
   }
@@ -807,6 +932,7 @@ function renderPlanning(){
   el.querySelectorAll(".cal-head[data-date]").forEach(h=>h.addEventListener("click",e=>{if(e.target===h)openTask(null,{date:h.dataset.date,heure:"",fin:""})}));
   el.querySelectorAll("[data-topen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openTask(b.dataset.topen)});
   el.querySelectorAll("[data-eopen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openEv(b.dataset.eopen)});
+  el.querySelectorAll("[data-jopen]").forEach(b=>b.onclick=e=>{e.stopPropagation();openJ()});
   el.querySelectorAll(".cb.task,.cb.kh").forEach(b=>wireDrag(b,el,HH));
 }
 function paintMonth(){if(!cal.dw)return;const d=addDays(cal.start,Math.round(cal.pos-cal.base+(cal.vis-1)/2));
@@ -1222,7 +1348,7 @@ $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"S
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
 /* Toucher à côté d'une fenêtre la ferme. */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.hidden=true}));
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#emodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#emodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true;$("#jmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
@@ -1285,7 +1411,108 @@ function renderBilan(){
 $("#bilanForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   try{await db.doc("bilans/"+WK).set({ok:$("#b-ok").value.trim(),ko:$("#b-ko").value.trim(),change:$("#b-change").value.trim(),energie:$("#b-energie").value,stress:$("#b-stress").value,date:today()});toast("Bilan enregistré")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
-function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan()}
+/* JOURNÉE TYPE : créneaux fixes (réveil, pauses, temps pour moi, coucher) affichés chaque jour. */
+const JK={matin:"#fdf3d6",pause:"#e4f5e6",moi:"#ece6fa",nuit:"#e3e4f5"};
+const JKN={matin:"Réveil",pause:"Pause",moi:"Temps pour moi",nuit:"Nuit"};
+function jRow(b){return `<div class="jrow"><input type="time" class="jd" value="${esc(b.d||"")}" aria-label="Début"><input type="time" class="jf" value="${esc(b.f||"")}" aria-label="Fin"><select class="jk" aria-label="Type">${Object.keys(JKN).map(k=>`<option value="${k}" ${k===(b.k||"pause")?"selected":""}>${JKN[k]}</option>`).join("")}</select><button type="button" class="x" aria-label="Supprimer ce créneau">✕</button><input type="text" class="jt" value="${esc(b.t||"")}" placeholder="Nom du créneau" aria-label="Nom"></div>`}
+function wireJRows(){$("#j-rows").querySelectorAll(".jrow .x").forEach(x=>x.onclick=()=>x.closest(".jrow").remove())}
+function openJ(){$("#j-rows").innerHTML=[...J].sort((a,b)=>toMin(a.d)-toMin(b.d)).map(jRow).join("");wireJRows();$("#jmodal").hidden=false}
+$("#pJour").onclick=openJ;
+$("#j-add").onclick=()=>{$("#j-rows").insertAdjacentHTML("beforeend",jRow({k:"pause",t:"Pause"}));wireJRows();const r=$("#j-rows").lastElementChild;r.querySelector(".jd").focus()};
+$("#j-cancel").onclick=()=>{$("#jmodal").hidden=true};
+$("#j-save").onclick=async()=>{const blocs=[...$("#j-rows").querySelectorAll(".jrow")].map(r=>({d:r.querySelector(".jd").value,f:r.querySelector(".jf").value,k:r.querySelector(".jk").value,t:r.querySelector(".jt").value.trim()||JKN[r.querySelector(".jk").value]})).filter(b=>b.d).sort((a,b)=>toMin(a.d)-toMin(b.d));
+  $("#jmodal").hidden=true;J=blocs;
+  /* le plan de sommeil suit la journée type : réveil = lever, temps pour moi = fin du travail, nuit = lumière éteinte */
+  const first=k=>blocs.find(b=>b.k===k),np={...SP};if(first("matin"))np.lever=first("matin").d;if(first("moi"))np.fin=first("moi").d;if(first("nuit"))np.coucher=first("nuit").d;SP=np;renderAll();
+  if(!db){toast("Données indisponibles ici");return}
+  try{await db.doc("config/journee").set({blocs});await db.doc("config/sommeil").set(np);toast("Journée type enregistrée")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+
+/* SOMMEIL : une fiche par matin (id = date du réveil). Les infos « journée » (café, sport…) agissent sur la nuit suivante. */
+let S=[],SP={fin:"22:30",coucher:"23:15",lever:"06:45"},slDate=today(),slCur={},slDirty=false;
+const SCOL=["","var(--sl-1)","var(--sl-2)","var(--sl-3)","var(--sl-4)","var(--sl-5)"];
+/* Minutes sur un axe de nuit : une heure avant 15 h compte pour le lendemain. */
+const nmin=h=>{const m=toMin(h);return m<0?null:(m<15*60?m+1440:m)};
+const dur=m=>m==null?"–":Math.floor(m/60)+" h "+String(Math.round(m%60)).padStart(2,"0");
+const clk=m=>m==null?"–":hm(Math.round(m)%1440).replace(":"," h ");
+const has=v=>v!=null&&v!=="";
+function slCalc(e){
+  if(!e)return null;const c=nmin(e.coucher),r=nmin(+e.rendormie===1&&e.lever?e.lever:(e.reveil||e.lever));if(c==null||r==null||r<=c)return null;
+  const debut=c+(has(e.latence)?+e.latence:10),l=nmin(e.lever);
+  return{coucher:c,debut,fin:r,sommeil:r-debut,lit:(l!=null&&l>=r?l:r)-c,milieu:(debut+r)/2};
+}
+const prevDay=d=>iso(addDays(new Date(d+"T12:00:00"),-1));
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const sd=a=>{const m=mean(a);return a.length>1?Math.sqrt(mean(a.map(x=>(x-m)**2))):null};
+function slScales(){document.querySelectorAll("#slForm .sl-scale").forEach(box=>{box.innerHTML=[1,2,3,4,5].map(v=>`<button type="button" data-v="${v}" style="--c:${SCOL[v]}" aria-label="${v} sur 5">${v}</button>`).join("")})}
+function slPaintBtns(){document.querySelectorAll("#slForm [data-f]").forEach(box=>{const f=box.dataset.f;box.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(has(slCur[f])||(f==="sport"&&slCur[f]==="")?String(slCur[f])===b.dataset.v:false)))});slCalcTxt()}
+const SLT={coucher:"#sl-coucher",reveil:"#sl-reveil",lever:"#sl-lever",cafes:"#sl-cafes",dcafe:"#sl-dcafe",barre:"#sl-barre",sieste:"#sl-sieste",finTravail:"#sl-fintravail",note:"#sl-note"};
+function slFill(){const e=S.find(x=>x.id===slDate)||{};slCur={};["latence","ecranSoir","rendormie","telMatin","forme","confiance","lumiere","sport"].forEach(k=>{if(e[k]!==undefined)slCur[k]=e[k]});
+  for(const k in SLT)$(SLT[k]).value=e[k]??"";$("#sl-date").value=slDate;slDirty=false;slPaintBtns()}
+function slRead(){const o={...slCur};for(const k in SLT){const v=$(SLT[k]).value.trim();o[k]=(k==="cafes"||k==="sieste")?(v===""?null:Number(v)):v}return o}
+function slCalcTxt(){const c=slCalc(slRead());$("#sl-calc").textContent=c?`≈ ${dur(c.sommeil)} de sommeil · ${dur(c.lit)} au lit`:""}
+document.querySelectorAll("#slForm [data-f]").forEach(box=>box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const f=box.dataset.f,v=b.dataset.v;
+  const val=f==="sport"?v:Number(v);slCur[f]=String(slCur[f])===v&&has(slCur[f])?undefined:val;if(slCur[f]===undefined)delete slCur[f];slDirty=true;slPaintBtns()}));
+$("#slForm").addEventListener("input",()=>{slDirty=true;slCalcTxt()});
+$("#sl-date").addEventListener("change",e=>{slDate=e.target.value||today();slFill()});
+$("#slForm").addEventListener("submit",async e=>{e.preventDefault();if(!db){toast("Données indisponibles ici");return}
+  const doc=slRead();doc.maj=Date.now();Object.keys(doc).forEach(k=>{if(doc[k]===undefined)delete doc[k]});
+  const i=S.findIndex(x=>x.id===slDate);if(i>=0)S[i]={id:slDate,...doc};else S.push({id:slDate,...doc});slDirty=false;renderSommeil();renderSlToday();
+  try{await db.doc("sommeil/"+slDate).set(doc);toast("Nuit enregistrée")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
+$("#slPlan").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;const p={fin:$("#sp-fin").value||SP.fin,coucher:$("#sp-coucher").value||SP.coucher,lever:$("#sp-lever").value||SP.lever};
+  SP=p;renderSommeil();renderSlToday();try{await db.doc("config/sommeil").set(p);toast("Plan mis à jour")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
+function slPlanLine(){const lit=nmin(SP.lever)-nmin(SP.coucher);
+  return `<div class="sl-tonight"><span>Ce soir : fin du travail <b>${esc(SP.fin)}</b> → temps pour moi, hors du lit → lumière éteinte <b>${esc(SP.coucher)}</b></span><span>Demain : lever <b>${esc(SP.lever)}</b>, téléphone loin du lit · ${dur(lit)} au lit</span></div>`}
+function renderSlToday(){const e=S.find(x=>x.id===today()),c=slCalc(e);
+  $("#slToday").innerHTML=(c?`<div class="sl-sum"><span>Cette nuit <b>${dur(c.sommeil)}</b></span>${has(e.forme)?`<span>forme <b>${e.forme}/5</b></span>`:""}${+e.rendormie===1?`<span>rendormie</span>`:""}</div>`
+    :`<button class="btn primary" type="button" data-goto="sommeil" style="justify-self:start">Noter ma nuit · 30 s</button>`)+slPlanLine()}
+function renderSommeil(){
+  if(!slDirty)slFill();
+  if(!$("#slPlan").contains(document.activeElement)){$("#sp-fin").value=SP.fin;$("#sp-coucher").value=SP.coucher;$("#sp-lever").value=SP.lever}$("#sl-planTxt").innerHTML=slPlanLine();
+  const byId={};S.forEach(e=>byId[e.id]=e);
+  const N=[...S].filter(e=>slCalc(e)).sort((a,b)=>a.id<b.id?1:-1);
+  const R=N.slice(0,14),cs=R.map(slCalc);
+  $("#sl-n").textContent=N.length?`${N.length} nuit${N.length>1?"s":""} notée${N.length>1?"s":""}`:"";
+  if(!R.length){$("#sl-sum").innerHTML=`<span>Note ta première nuit demain matin : les moyennes apparaîtront ici.</span>`;$("#sl-chart").innerHTML="";}
+  else{
+    const sm=mean(cs.map(c=>c.sommeil)),reg=sd(cs.map(c=>c.debut)),mil=mean(cs.map(c=>c.milieu)),fo=R.filter(e=>has(e.forme));
+    const ok=cs.filter(c=>c.sommeil>=450).length,ren=R.filter(e=>+e.rendormie===1).length;
+    const good=R.filter((e,i)=>+e.forme>=4&&+e.rendormie!==1).map(e=>slCalc(e).sommeil);
+    const need=N.length>=10&&good.length>=3?`<span>besoin estimé <b>≈ ${dur(mean(good))}</b></span>`:`<span>besoin estimé : encore ${Math.max(10-N.length,1)} nuit${Math.max(10-N.length,1)>1?"s":""}</span>`;
+    $("#sl-sum").innerHTML=`<span>sommeil moyen <b>${dur(sm)}</b></span><span>nuits ≥ 7 h 30 <b>${ok}/${R.length}</b></span><span>endormissement <b>${clk(mean(cs.map(c=>c.debut)))}</b>${reg!=null?` <b>± ${Math.round(reg)} min</b>`:""}</span><span>milieu de nuit <b>${clk(mil)}</b></span>${fo.length?`<span>forme <b>${mean(fo.map(e=>+e.forme)).toFixed(1)}/5</b></span>`:""}<span>rendormie <b>${ren}/${R.length}</b></span>${need}`;
+    /* frise des nuits : de 21 h à 11 h, la plus récente en haut */
+    const A=21*60,Z=35*60,W=640,L=74,Rm=10,T0=22,rh=20,H=T0+R.length*rh+8,x=m=>L+(Math.min(Z,Math.max(A,m))-A)/(Z-A)*(W-L-Rm);
+    let g="";for(let h=21;h<=35;h+=2)g+=`<line x1="${x(h*60)}" x2="${x(h*60)}" y1="${T0-6}" y2="${H-4}" stroke="var(--line)"/><text x="${x(h*60)}" y="12" text-anchor="middle" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${h%24}h</text>`;
+    const pc=nmin(SP.coucher),pl=nmin(SP.lever);
+    g+=`<line x1="${x(pc)}" x2="${x(pc)}" y1="${T0-6}" y2="${H-4}" stroke="var(--sl-night)" stroke-dasharray="4 3"/><line x1="${x(pl)}" x2="${x(pl)}" y1="${T0-6}" y2="${H-4}" stroke="var(--sl-night)" stroke-dasharray="4 3"/>`;
+    const DJ=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+    R.forEach((e,i)=>{const c=cs[i],y=T0+i*rh,col=has(e.forme)?SCOL[+e.forme]:"var(--ink-3)";
+      g+=`<text x="0" y="${y+13}" font-size="11" fill="var(--ink-2)">${DJ[new Date(e.id+"T12:00:00").getDay()]} ${fmt(e.id)}</text>`;
+      g+=`<rect x="${x(c.coucher)}" y="${y+5}" width="${Math.max(0,x(c.debut)-x(c.coucher))}" height="8" rx="3" fill="${col}" opacity=".3"/>`;
+      g+=`<rect x="${x(c.debut)}" y="${y+3}" width="${Math.max(2,x(c.fin)-x(c.debut))}" height="12" rx="4" fill="${col}"><title>${fmt(e.id)} · ${dur(c.sommeil)} · forme ${has(e.forme)?e.forme+"/5":"–"}</title></rect>`;
+      if(+e.rendormie===1)g+=`<text x="${x(c.fin)+4}" y="${y+13}" font-size="10" fill="var(--ink-2)">z</text>`});
+    $("#sl-chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nuits des deux dernières semaines, de 21 h à 11 h. Couleur = forme au réveil.">${g}</svg><div class="legend" style="margin-top:6px"><span style="--c:var(--sl-5)">forme 5</span><span style="--c:var(--sl-3)">3</span><span style="--c:var(--sl-1)">1</span><span style="--c:var(--sl-night)">pointillés = ton plan</span></div>`;
+  }
+  /* comparaisons : il faut au moins 3 nuits de chaque côté */
+  const cmp=(lbl,A,B,metric,fmtv,la,lb)=>{const va=A.map(metric).filter(v=>v!=null),vb=B.map(metric).filter(v=>v!=null);
+    if(va.length<3||vb.length<3){const k=Math.max(0,3-va.length)+Math.max(0,3-vb.length);return `<div class="it"><span>${lbl}</span><span class="muted small">encore ${k} nuit${k>1?"s":""}</span></div>`}
+    return `<div class="it"><span>${lbl}<br><span class="small muted">${la} (${va.length}) · ${lb} (${vb.length})</span></span><b>${fmtv(mean(va))} · ${fmtv(mean(vb))}</b></div>`};
+  const F=e=>has(e.forme)?+e.forme:null,f1=v=>v.toFixed(1)+"/5",Lat=e=>has(e.latence)?+e.latence:null,f2=v=>Math.round(v)+" min";
+  const sl=e=>slCalc(e).sommeil,pv=e=>byId[prevDay(e.id)];
+  const late=e=>slCalc(e).coucher>nmin(SP.coucher)+30;
+  const cafeTard=e=>{const p=pv(e);return p&&has(p.dcafe)&&toMin(p.dcafe)>=14*60};
+  const cafeTot=e=>{const p=pv(e);return p&&(has(p.dcafe)||p.cafes===0)&&!cafeTard(e)};
+  $("#sl-cmp").innerHTML=[
+    cmp("Forme au réveil selon la durée",N.filter(e=>sl(e)>=450),N.filter(e=>sl(e)<450),F,f1,"≥ 7 h 30","moins"),
+    cmp("Forme selon l'écran au lit",N.filter(e=>has(e.ecranSoir)&&+e.ecranSoir<=10),N.filter(e=>+e.ecranSoir>=40),F,f1,"pas ou peu","15 min et plus"),
+    cmp("Forme selon l'heure de coucher",N.filter(e=>!late(e)),N.filter(late),F,f1,"à l'heure du plan","30 min et plus après"),
+    cmp("Temps d'endormissement selon le café",N.filter(cafeTot),N.filter(cafeTard),Lat,f2,"café avant 14 h","café après 14 h"),
+    cmp("Forme selon le sport la veille",N.filter(e=>{const p=pv(e);return p&&has(p.sport)}),N.filter(e=>{const p=pv(e);return p&&p.sport===""}),F,f1,"sport","pas de sport"),
+    cmp("Confiance selon la forme au réveil",S.filter(e=>+e.forme>=4&&has(e.confiance)),S.filter(e=>has(e.forme)&&+e.forme<=2&&has(e.confiance)),e=>+e.confiance,f1,"réveil 4-5","réveil 1-2")
+  ].join("");
+}
+slScales();
+
+function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan();renderSommeil();renderSlToday()}
 renderSemaine();renderAll();
 
 /* DATA */
@@ -1296,8 +1523,10 @@ renderSemaine();renderAll();
   if(!db){$("#dbnote").hidden=false;return}
   let pend=0;const later=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;renderAll()})};
   const sub=(col,fn)=>db.collection(col).onSnapshot(s=>{fn(s.docs.map(d=>({id:d.id,...d.data()})));later()},e=>toast("Synchro interrompue : "+e.code));
-  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);
+  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);sub("sommeil",a=>S=a);
   db.doc("config/general").onSnapshot(s=>{window.__cfg=s.exists?s.data():{};later()});
+  db.doc("config/journee").onSnapshot(s=>{const d=s.exists?s.data():null;if(d&&Array.isArray(d.blocs))J=d.blocs;later()});
+  db.doc("config/sommeil").onSnapshot(s=>{if(s.exists)SP={...SP,...s.data()};later()});
 })();
 })();
 </script>
