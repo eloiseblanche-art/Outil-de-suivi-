@@ -1662,6 +1662,14 @@ let Q=[],QR=[];
 const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all"};
 const QPTS=[1,.6,.2,0],LET="ABCDE";
 const qById=id=>Q.find(x=>x.id===id);
+/* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
+   "items" = +1 par item juste, −1 par item faux, 0 sans réponse (soit +0,2 / −0,2 / 0 par proposition) ;
+   sinon barème prépa par question (0 erreur = 1, 1 erreur = 0,6, 2 = 0,2, au-delà 0 ; une case vide compte comme une erreur). */
+const barOf=q=>matById(q.matiere).bareme||"prepa";
+const BARL={items:"barème +1 / −1 / 0 par item",prepa:"barème par question"};
+function qPts(x,rp,bar){if(bar==="items"){let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-")p+=(c==="V")===it.v?.2:-.2});return Math.round(p*100)/100}
+  let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
+const qNote=(pts,nq)=>nq?Math.round(Math.max(0,pts)/nq*2000)/100:0;
 const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
 const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
 let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e){}
@@ -1743,9 +1751,9 @@ async function qFinish(){
   qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[];let e=0;
     x.it.forEach((it,k)=>{const v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
     const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-e;s.t+=5;
-    pts+=QPTS[Math.min(e,3)];ok[id]=e===0;rep[id]=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join("")});
+    rep[id]=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join("");pts+=qPts(x,rep[id],barOf(q));ok[id]=e===0});
   const nq=qz.order.length,total=nq*5;
-  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:Math.round(pts/nq*2000)/100,duree:Math.max(1,Math.round((Date.now()-qz.t0)/60000)),sec,ok,rep,order:qz.order};
+  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round((Date.now()-qz.t0)/60000)),sec,ok,rep,order:qz.order};
   qDropDraft(q.id);qShowRes(r);
   if(!db){toast("Résultat non enregistré : données indisponibles ici");return}
   try{const ref=await db.collection("qcmres").add(r);if(ref&&ref.id&&qz.res===r)r.id=ref.id;toast("Résultat enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
@@ -1755,6 +1763,7 @@ function renderQres(){
   const r=qz.res,q=r&&qById(r.qcm);if(!q)return renderQcmList();
   const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]);
   const per=order.map((id,i)=>{const x=qs[id],rp=(r.rep||{})[id]||"-----";let e=0;x.it.forEach((it,k)=>{if(rp[k]==="-"||(rp[k]==="V")!==it.v)e++});return{x,rp,e,i}});
+  const bar=barOf(q),note=qNote(per.reduce((a,p)=>a+qPts(p.x,p.rp,bar),0),per.length);
   const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>p.e>=3).length,nPart=per.length-nOk-nKo;
   const secs=Object.entries(r.sec||{}).map(([k,v])=>({k:+k,j:v.j,t:v.t,p:Math.round(v.j/v.t*100)})).sort((a,b)=>a.k-b.k);
   const c=C.find(x=>x.id===r.cours),pk=c?(["p1","p2","p3"].find(p=>!c[p])||"xnew"):null;
@@ -1765,7 +1774,7 @@ function renderQres(){
       <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
       <div class="stats">
         <div class="stat acc"><b class="num">${r.pct} %</b><span class="small">${r.mode==="erreurs"?"de propositions justes sur tes erreurs":r.mode==="revision"?"de propositions justes (révision espacée)":"du cours maîtrisé"}</span></div>
-        <div class="stat"><b class="num">${qNum(r.note)}<span class="small muted">/20</span></b><span class="small muted">note façon prépa</span></div>
+        <div class="stat"><b class="num">${qNum(note)}<span class="small muted">/20</span></b><span class="small muted">note · ${BARL[bar]||bar}</span></div>
         <div class="stat"><b class="num">${r.juste}<span class="small muted">/${r.total}</span></b><span class="small muted">propositions justes · ${r.faux} fausse${r.faux>1?"s":""} · ${r.vide} vide${r.vide>1?"s":""}</span></div>
         <div class="stat"><b class="num">${nOk}<span class="small muted">/${per.length}</span></b><span class="small muted">questions correctes · ${nPart} partielle${nPart>1?"s":""} · ${nKo} incorrecte${nKo>1?"s":""}</span></div>
       </div>
@@ -1781,7 +1790,7 @@ function renderQres(){
     <div class="panel">
       <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
       ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
-        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(QPTS[Math.min(p.e,3)])} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
+        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
         <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
         <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
         ${x.it.map((it,k)=>{const y=p.rp[k],bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
@@ -1966,10 +1975,10 @@ function renderRevSess(){
   const key=rvKey(e),a=rv.ans[key]||[],st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
   const done=Object.keys(rv.res).length,first=rv.list.filter(y=>!y.again).length;
   let verdict="";
-  if(chk){const err=rvErrs(x,x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F")),g=rvGrade(err),gr=GR[g];
+  if(chk){const rps=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join(""),err=rvErrs(x,rps),g=rvGrade(err),gr=GR[g],pt=qPts(x,rps,barOf(q));
     if(e.again)verdict=`<span class="pill ${gr[0]}">${err?err+" erreur"+(err>1?"s":""):"Tout juste"}</span><span class="small muted">Rappel de fin de séance : ne compte pas pour le calendrier.</span>`;
     else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g,LOAD);
-      verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):"5/5"}</span><span class="small">Revient ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${g===1?", et une 2e fois en fin de séance":""}.</span>`}}
+      verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):"5/5"}</span><span class="small">Revient ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${g===1?", et une 2e fois en fin de séance":""}.</span><span class="small muted">${pt>0?"+":""}${qNum(pt)} pt au concours</span>`}}
   const pill=v=>v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
   $("#revRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
@@ -2010,9 +2019,9 @@ async function rvSave(){
   for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0;const sec={},ok={},rep={},order=[];
     ks.forEach(k=>{const r=rv.res[k],id=k.split("|")[1],x=(q.questions||[]).find(y=>y.id===id);if(!x)return;
       x.it.forEach((it,i)=>{const c=r.rp[i];if(c==="-")vide++;else if((c==="V")===it.v)juste++;else faux++});
-      const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-r.e;s.t+=5;pts+=QPTS[Math.min(r.e,3)];ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
+      const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-r.e;s.t+=5;pts+=qPts(x,r.rp,barOf(q));ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
     const nq=order.length;if(!nq)continue;
-    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:nq*5,pct:Math.round(juste/(nq*5)*100),pts:Math.round(pts*100)/100,note:Math.round(pts/nq*2000)/100,duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order};
+    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:nq*5,pct:Math.round(juste/(nq*5)*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order};
     try{await db.collection("qcmres").add(doc);ks.forEach(k=>rv.res[k].saved=true);rvSaveDraft()}catch(e){toast("Pas enregistré : "+(e.code||"erreur"));return}}
   toast("Séance enregistrée");
 }
