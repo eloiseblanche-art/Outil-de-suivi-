@@ -737,6 +737,7 @@ details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
         <li><b>Chaque fausse a un commentaire de correction</b> qui donne la bonne réponse et la valeur exacte. Les vraies n'en ont que si c'est utile.</li>
         <li><b>Uniquement le contenu du cours</b>, avec ses termes et ses chiffres. Une proposition teste une seule info.</li>
         <li><b>Matières avec photos au concours (Histo)</b> : en plus, une question par photo de microscopie du poly, découpée sans ses légendes et passée en noir et blanc, dans une partie « Photos de microscopie ».</li>
+        <li><b>Ne jamais changer l'ordre des propositions d'un QCM déjà créé</b> (les réponses enregistrées sont rangées par position A à E) : pour un autre ordre ou d'autres pièges, ajouter une version dans alt. Ne pas modifier une banque pendant que je fais ce QCM.</li>
         <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}, et img = id d'une photo pour les questions sur photo, id « p01 »). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
       </ul>
     </details>
@@ -1671,7 +1672,9 @@ slScales();
    Barème façon prépa, par question : 0 erreur = 1 pt, 1 erreur = 0,6, 2 erreurs = 0,2, au-delà 0.
    Une proposition laissée sans réponse compte comme non sue (erreur). */
 let Q=[],QR=[];
-const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all"};
+/* qz.bank : copie des questions prise au début du QCM. Le QCM se fait et se corrige sur cette copie, pour qu'une modification
+   de la banque pendant le QCM (ordre des propositions, texte) ne décale pas les réponses déjà données. */
+const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null};
 const QPTS=[1,.6,.2,0],LET="ABCDE";
 const qById=id=>Q.find(x=>x.id===id);
 /* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
@@ -1711,7 +1714,7 @@ let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e)
 function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
 function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>m[x.id]===false).map(x=>x.id)}
 function qDraft(id){try{return JSON.parse(localStorage.getItem("qcmDraft:"+id)||"null")}catch(e){return null}}
-function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0}))}catch(e){}}
+function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank}))}catch(e){}}
 function qDropDraft(id){try{localStorage.removeItem("qcmDraft:"+id)}catch(e){}}
 const qTop=()=>{const r=$("#qcmRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
 const qAnswered=id=>(qz.ans[id]||[]).filter(v=>v!=null).length;
@@ -1746,14 +1749,14 @@ function qCard(q){
 }
 function qStart(id,how,only){
   const q=qById(id);if(!q)return;const ids=q.questions.map(x=>x.id);
-  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false});renderQuiz();qTop();return}}
+  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null});renderQuiz();qTop();return}}
   const order=only?only.filter(x=>ids.includes(x)):how==="err"?qErrIds(q):ids.slice();if(!order.length)return;
   if(qShuffle)for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
-  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false});qSaveDraft();renderQuiz();qTop();
+  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions))});qSaveDraft();renderQuiz();qTop();
 }
 function renderQuiz(){
   const q=qById(qz.id);if(!q)return renderQcmList();
-  const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),n=qz.order.length,cur=qs[qz.order[qz.i]];if(!cur)return renderQcmList();
+  const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x])),n=qz.order.length,cur=qs[qz.order[qz.i]];if(!cur)return renderQcmList();
   const a=qz.ans[cur.id]||[],done=qz.order.filter(id=>qAnswered(id)===5).length,blank=qz.order.reduce((s,id)=>s+5-qAnswered(id),0);
   $("#qcmRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
@@ -1780,7 +1783,7 @@ function renderQuiz(){
   $("#qQuit").onclick=()=>{qSaveDraft();renderQcmList();qTop()};
 }
 async function qFinish(){
-  const q=qById(qz.id);if(!q)return;const qs=Object.fromEntries(q.questions.map(x=>[x.id,x]));
+  const q=qById(qz.id);if(!q)return;const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x]));
   let juste=0,faux=0,vide=0,pts=0;const sec={},ok={},rep={};
   qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[];let e=0;
     x.it.forEach((it,k)=>{const v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
