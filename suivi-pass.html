@@ -1675,12 +1675,12 @@ const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:
 const QPTS=[1,.6,.2,0],LET="ABCDE";
 const qById=id=>Q.find(x=>x.id===id);
 /* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
-   "items" = +1 par item juste, −1 par item faux, 0 sans réponse (soit +0,2 / −0,2 / 0 par proposition) ;
+   "items" = +1 par item juste, −1 par item faux, 0 sans réponse (soit +0,2 / −0,2 / 0 par proposition) ; "items05" = pareil avec −0,5 par item faux ;
    sinon barème prépa par question (0 erreur = 1, 1 erreur = 0,6, 2 = 0,2, au-delà 0 ; une case vide compte comme une erreur). */
 const barOf=q=>matById(q.matiere).bareme||"prepa";
-const BARL={items:"barème +1 / −1 / 0 par item",prepa:"barème par question"};
+const BARL={items:"barème +1 / −1 / 0 par item",items05:"barème +1 / −0,5 / 0 par item",prepa:"barème par question"};
 /* Dans une réponse (rp), « x » = item non posé (retiré « trop facile », ou absent d'une question de rattrapage) : il ne compte pas. */
-function qPts(x,rp,bar){if(bar==="items"){let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-.2});return Math.round(p*100)/100}
+function qPts(x,rp,bar){if(bar==="items"||bar==="items05"){const neg=bar==="items05"?.1:.2;let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-neg});return Math.round(p*100)/100}
   let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
 const qImg=x=>x.img?`<figure class="qimg"><img src="/_blob/${esc(x.img)}" alt="Photo de microscopie de la question" loading="lazy"></figure>`:"";
 document.addEventListener("click",e=>{const f=e.target.closest&&e.target.closest(".qimg");if(f)f.classList.toggle("big")});
