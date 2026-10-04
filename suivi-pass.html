@@ -1815,12 +1815,18 @@ function buildSrs(){
       nx.e=e;nx.g=g;nx.hist=[...(st?st.hist:[]),{d,e}];if(!st)nx.via=r.mode||"complet";nx.due=rvDue(nx,g);out[k]=nx}});
   SRS=out;
 }
-const rvOpen=q=>{const c=C.find(x=>x.id===q.cours);return !c||!!c.p1};
+/* Un cours n'entre dans les révisions que quand tu le démarres (bouton sur sa carte, date gardée dans qcm.rev)
+   ou quand tu as déjà fait son QCM. rev = "" : cours mis en pause, rien n'en sort (ni à revoir, ni nouvelles). */
+const rvSeen=q=>(q.questions||[]).some(x=>SRS[q.id+"|"+x.id]);
+const rvActive=q=>q.rev!=null?!!q.rev:rvSeen(q);
+async function rvSetRev(id,v){const q=qById(id);if(!q)return;q.rev=v;renderRevHome();if(!db)return;
+  try{await db.doc("qcm/"+id).update({rev:v});toast(v?"Cours ajouté à tes révisions":"Cours mis en pause")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
 const rvBanks=()=>[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
 function rvQueue(){const td=today(),T=dayN(td),due=[],nw=[];
   const newToday=Object.values(SRS).filter(s=>s.first===td&&s.via==="revision").length;
-  rvBanks().forEach(q=>(q.questions||[]).forEach(x=>{const k=q.id+"|"+x.id,st=SRS[k];
-    if(st){if(st.due<=td)due.push({k,u:dayN(st.due),r:fR(T-dayN(st.last),st.s)})}else if(rvOpen(q))nw.push(k)}));
+  /* nouvelles questions : d'abord celles des cours démarrés en premier */
+  rvBanks().filter(rvActive).sort((a,b)=>(a.rev||"").localeCompare(b.rev||"")).forEach(q=>(q.questions||[]).forEach(x=>{const k=q.id+"|"+x.id,st=SRS[k];
+    if(st){if(st.due<=td)due.push({k,u:dayN(st.due),r:fR(T-dayN(st.last),st.s)})}else nw.push(k)}));
   due.sort((a,b)=>a.u-b.u||a.r-b.r);
   return{due:due.map(x=>x.k),nw:nw.slice(0,Math.max(0,(+RVC.nouv||0)-newToday)),nwLeft:nw.length};
 }
@@ -1859,7 +1865,7 @@ function renderRevHome(){
   const chips=Object.entries(per).map(([b,n])=>{const q=qById(b);return `<span class="mtag" style="${mvars(q.matiere)}">${esc(shortNom(matById(q.matiere)))} · ${esc(q.titre)} · <b class="num">${n}</b></span>`}).join("");
   /* 14 prochains jours : cours à revoir chaque jour (le retard compte pour aujourd'hui). */
   const days=[...Array(14)].map((_,i)=>({d:nIso(T+i),n:0,b:{}}));
-  for(const k in SRS){const st=SRS[k],i=Math.max(0,dayN(st.due)-T);if(i<14){const o=days[i],b=k.split("|")[0];o.n++;o.b[b]=(o.b[b]||0)+1}}
+  for(const k in SRS){const st=SRS[k],i=Math.max(0,dayN(st.due)-T),qb=qById(k.split("|")[0]);if(i<14&&qb&&rvActive(qb)){const o=days[i],b=k.split("|")[0];o.n++;o.b[b]=(o.b[b]||0)+1}}
   const banks=rvBanks(),noBank=C.filter(c=>c.p1&&!Q.some(q=>q.cours===c.id)).length;
   const btns=drOk?`<button class="btn primary" type="button" id="rvResume">Reprendre la séance${drLeft>0?` (${drLeft} restante${drLeft>1?"s":""})`:""}</button><button class="btn" type="button" id="rvDropDr">${drDone?"Enregistrer et arrêter":"Abandonner"}</button>`
     :tot?`<button class="btn primary" type="button" data-rvgo="${tot}">Tout réviser (${tot})</button>${tot>20?`<button class="btn" type="button" data-rvgo="20">Une série de 20</button>`:""}<button class="btn ghost" type="button" id="rvPlan">+ Ajouter à mon planning</button>`:"";
@@ -1870,7 +1876,7 @@ function renderRevHome(){
       <div class="rv-big num">${tot}<small>question${tot>1?"s":""}</small></div>
       <div style="display:grid;gap:8px">
         <div class="rv-split"><span><b>${nDue}</b> à revoir</span><span><b>${nNew}</b> nouvelle${nNew>1?"s":""}${qq.nwLeft>nNew?` <span class="small">(encore ${qq.nwLeft-nNew} en attente)</span>`:""}</span>${tot?`<span>≈ <b>${Math.max(1,Math.round(tot*1.2))}</b> min</span>`:""}</div>
-        ${chips?`<div class="rv-chips">${chips}</div>`:`<span class="muted">Rien à revoir aujourd'hui.${days.slice(1).find(x=>x.n)?` Prochaine révision ${dLbl(days.slice(1).find(x=>x.n).d)}.`:""}</span>`}
+        ${chips?`<div class="rv-chips">${chips}</div>`:!Q.some(rvActive)?`<span class="muted">Aucun cours démarré pour l'instant : choisis plus bas ceux que tu veux réviser.</span>`:`<span class="muted">Rien à revoir aujourd'hui.${days.slice(1).find(x=>x.n)?` Prochaine révision ${dLbl(days.slice(1).find(x=>x.n).d)}.`:""}</span>`}
       </div>
     </div>
     ${btns?`<div class="acts" style="flex-wrap:wrap;gap:6px">${btns}</div>`:""}
@@ -1888,7 +1894,7 @@ function renderRevHome(){
       <li><b>Chaque question de QCM est une carte Anki.</b> Le même algorithme qu'Anki (FSRS, rétention visée 0,90) décide quand elle revient, selon tes réponses et non selon une méthode des J fixe.</li>
       <li><b>Ta note vient du QCM</b> : 5 propositions justes = « Bien », 1 erreur = « Difficile » (revient plus tôt), 2 erreurs ou plus = « À revoir » (revient demain, et une 2e fois en fin de séance). Une proposition laissée vide compte comme une erreur.</li>
       <li><b>Tout compte</b> : les QCM complets faits dans l'onglet QCM entrent aussi dans le calendrier. Seul le premier passage de la journée compte.</li>
-      <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours dont tu as fait le 1er passage.</li>
+      <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours que tu as démarrés (bouton sur chaque cours), en commençant par le plus ancien. Un cours dont tu fais le QCM complet dans l'onglet QCM démarre tout seul. Tu peux mettre un cours en pause à tout moment.</li>
       <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
       <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
       <li><b>Progression</b> : sous chaque cours, la courbe montre ton score à chaque séance, et l'écart compare tes réponses à celles de la fois d'avant sur les mêmes questions : <span class="up">+</span> tu progresses, <span class="down">−</span> tu régresses.</li>
@@ -1900,6 +1906,8 @@ function renderRevHome(){
     </form>
   </details>`;
   root.querySelectorAll("[data-rvgo]").forEach(b=>b.onclick=()=>rvStart(+b.dataset.rvgo));
+  root.querySelectorAll("[data-rvstart]").forEach(b=>b.onclick=()=>rvSetRev(b.dataset.rvstart,today()));
+  root.querySelectorAll("[data-rvpause]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){rvSetRev(b.dataset.rvpause,"")}else{b.dataset.arm=1;b.textContent="Toucher encore pour mettre en pause"}});
   if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now()});
     if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   if($("#rvDropDr"))$("#rvDropDr").onclick=async()=>{const d=rvDraft();if(d){Object.assign(rv,{date:d.date,list:d.list||[],ans:d.ans||{},res:d.res||{}});await rvSave()}rvDropDraft();renderRevHome()};
@@ -1911,15 +1919,18 @@ function rvSpark(sess){const L=sess.slice(-10);if(!L.length)return"";const W=120
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score par séance : ${L.map(s=>s.p+" %").join(", ")}"><line x1="0" x2="${W}" y1="${y(80)}" y2="${y(80)}" stroke="var(--line)" stroke-dasharray="3 3"/>${L.length>1?`<polyline fill="none" stroke="var(--mfg,var(--accent))" stroke-width="2" stroke-linejoin="round" points="${L.map((s,i)=>x(i)+","+y(s.p)).join(" ")}"/>`:""}${L.map((s,i)=>`<circle cx="${x(i)}" cy="${y(s.p)}" r="${i===L.length-1?3.2:2.2}" fill="var(--mfg,var(--accent))"><title>${fmt(s.d)} : ${s.p} %</title></circle>`).join("")}</svg>`}
 function rvCard(q){const b=rvBank(q),st=rvStage(b),m=matById(q.matiere),last=b.sess[b.sess.length-1],c=C.find(x=>x.id===q.cours);
   const young=b.seen-b.mat,un=b.n-b.seen,w=v=>b.n?v/b.n*100:0,mc=(MCOL[q.matiere]||["#eee","#7c6fd6"])[1];
-  const nextTxt=b.due?`<b>${b.due}</b> question${b.due>1?"s":""} à revoir aujourd'hui`:b.next?`Prochaine révision ${dLbl(b.next)} (${inN(dayN(b.next)-dayN(today()))}, ${b.nextN} question${b.nextN>1?"s":""})`:b.seen?"":(c&&!c.p1?"Arrivera après ton 1er passage":"Nouvelles questions dès aujourd'hui");
+  const nextTxt=b.due?`<b>${b.due}</b> question${b.due>1?"s":""} à revoir aujourd'hui`:b.next?`Prochaine révision ${dLbl(b.next)} (${inN(dayN(b.next)-dayN(today()))}, ${b.nextN} question${b.nextN>1?"s":""})`:"";
+  const act=rvActive(q),paused=q.rev==="";
   return `<div class="panel mat rv-card" style="${mvars(q.matiere)}">
     <div class="mat-head"><h3>${esc(q.titre)}</h3><span class="mtag">${esc(shortNom(m))}</span></div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill ${st[0]}">${st[1]}</span><span class="small muted">${b.sess.length} séance${b.sess.length>1?"s":""}${last?` · dernière ${ago(dayN(today())-dayN(last.d))}`:""}</span></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill ${act?st[0]:"nil"}">${act?st[1]:paused?"En pause":"Pas encore démarré"}</span><span class="small muted">${b.sess.length} séance${b.sess.length>1?"s":""}${last?` · dernière ${ago(dayN(today())-dayN(last.d))}`:""}</span></div>
     <div class="rv-kpi"><div><b class="num">${b.su} %</b><span>du cours su</span></div><div><b class="num">${b.mem!=null?b.mem+" %":"–"}</b><span>mémoire aujourd'hui</span></div></div>
     <div class="rv-dist" role="img" aria-label="${b.mat} acquises, ${young} en cours, ${un} jamais vues"><i style="width:${w(b.mat)}%;background:${mc}"></i><i style="width:${w(young)}%;background:${mc}66"></i><i style="width:${w(un)}%;background:var(--line)"></i></div>
     <div class="rv-leg"><span style="--c:${mc}">${b.mat} acquise${b.mat>1?"s":""}</span><span style="--c:${mc}66">${young} en cours</span><span style="--c:var(--line)">${un} jamais vue${un>1?"s":""}</span></div>
     ${last?`<div class="rv-trend">${rvSpark(b.sess)}<span>Dernière séance <b class="num">${last.p} %</b>${last.dl!=null?` · <span class="${last.dl>0?"up":last.dl<0?"down":""}">${last.dl>0?"+":last.dl<0?"−":"±"}${Math.abs(last.dl)} pts</span> sur les mêmes questions`:""}</span></div>`:""}
-    ${nextTxt?`<span class="small">${nextTxt}</span>`:""}
+    ${act&&nextTxt?`<span class="small">${nextTxt}</span>`:""}
+    ${act?(b.seen<b.n?`<span class="small muted">Ses ${b.n-b.seen} questions jamais vues arrivent peu à peu, avec les nouvelles du jour.</span>`:"")+`<div><button class="link" type="button" data-rvpause="${esc(q.id)}">Mettre en pause</button></div>`
+      :`<span class="small muted">${paused?"Rien de ce cours ne t'est proposé tant qu'il est en pause.":"Pas encore dans tes révisions : démarre-le quand tu veux (après ton P2, par exemple)."}</span><div><button class="btn primary sm" type="button" data-rvstart="${esc(q.id)}">${paused?"Reprendre les révisions":"Démarrer les révisions"}</button></div>`}
   </div>`}
 
 function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
