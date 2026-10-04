@@ -407,9 +407,11 @@ td,th{border-bottom-color:#f0f0f5}
 .qimg{margin:0;display:flex;justify-content:center;background:#1c1c22;border-radius:12px;padding:8px}
 .qimg img{display:block;max-width:100%;max-height:380px;width:auto;height:auto;filter:grayscale(1);border-radius:6px;cursor:zoom-in}
 .qimg.big img{max-height:none;cursor:zoom-out}
-.btn.sus{font-weight:700;font-size:.76rem;color:var(--ink-2);background:var(--surface-2)}
-.qcorr>header .sus{margin-left:auto}
-.rv-verdict .sus{margin-left:auto}
+.isus{border:1px solid var(--line);background:#fff;color:var(--ink-2);border-radius:999px;padding:2px 9px;font:700 .7rem var(--font-b);cursor:pointer;white-space:nowrap}
+.isus[data-on="0"]{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.crow .isus{margin-left:6px;vertical-align:1px}
+.rv-it .yo .isus{margin-left:auto}
+.crow.off,.rv-it.off{opacity:.55}
 details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
 .rv-susit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;font-size:.8rem;padding:4px 0;border-bottom:1px solid var(--line)}
 .qz-items{list-style:none;margin:0;padding:0;display:grid;gap:8px}
@@ -1677,23 +1679,30 @@ const qById=id=>Q.find(x=>x.id===id);
    sinon barème prépa par question (0 erreur = 1, 1 erreur = 0,6, 2 = 0,2, au-delà 0 ; une case vide compte comme une erreur). */
 const barOf=q=>matById(q.matiere).bareme||"prepa";
 const BARL={items:"barème +1 / −1 / 0 par item",prepa:"barème par question"};
-function qPts(x,rp,bar){if(bar==="items"){let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-")p+=(c==="V")===it.v?.2:-.2});return Math.round(p*100)/100}
-  let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
+/* Dans une réponse (rp), « x » = item non posé (retiré « trop facile », ou absent d'une question de rattrapage) : il ne compte pas. */
+function qPts(x,rp,bar){if(bar==="items"){let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-.2});return Math.round(p*100)/100}
+  let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
 const qImg=x=>x.img?`<figure class="qimg"><img src="/_blob/${esc(x.img)}" alt="Photo de microscopie de la question" loading="lazy"></figure>`:"";
 document.addEventListener("click",e=>{const f=e.target.closest&&e.target.closest(".qimg");if(f)f.classList.toggle("big")});
 /* Versions d'une question : la version 0 est la question elle-même, les suivantes sont dans x.alt = [{q?, it}]
    (même notion, autres formulations et autres pièges). Les révisions changent de version à chaque passage. */
 const qVer=(x,v)=>{const a=v>0&&x.alt&&x.alt[v-1];return a?{...x,q:a.q||x.q,it:a.it}:x};
 const nVer=x=>1+(x.alt||[]).length;
-/* Questions retirées des révisions (« trop facile »), comme une carte suspendue dans Anki :
-   collection « qcmsusp », un document par QCM { ids: { q01: true } }. Elles restent dans le QCM complet. */
+/* Items retirés des révisions (« trop facile »), comme une carte suspendue dans Anki : collection « qcmsusp »,
+   un document par QCM { ids: { "q01|0|2": true } } (question, version, numéro d'item). Une ancienne clé « q01 » retire toute la question.
+   Une question dont plus aucun item ne peut être posé (dans aucune version) sort des révisions et compte comme sue.
+   Tout reste dans le QCM complet de l'onglet QCM. */
 let SUS={};
-const isSus=(b,id)=>!!(SUS[b]&&SUS[b][id]);
-async function qSus(b,id,on){const m={...(SUS[b]||{})};if(on)m[id]=true;else delete m[id];SUS[b]=m;
+const isSusIt=(b,id,v,k)=>!!(SUS[b]&&(SUS[b][id]||SUS[b][id+"|"+v+"|"+k]));
+const shownIdx=(b,x,v)=>qVer(x,v).it.map((_,k)=>k).filter(k=>!isSusIt(b,x.id,v,k));
+const isSus=(b,id)=>{const m=SUS[b];if(!m)return false;if(m[id])return true;const x=((qById(b)||{}).questions||[]).find(y=>y.id===id);if(!x)return false;
+  for(let v=0;v<nVer(x);v++)if(shownIdx(b,x,v).length)return false;return true};
+async function qSus(b,key,on){const m={...(SUS[b]||{})};if(on)m[key]=true;else delete m[key];SUS[b]=m;
   if(qz.mode==="res")renderQres();if(rv.mode==="sess")renderRevSess();else if(rv.mode==="home")renderRevHome();
-  if(!db)return;try{await db.doc("qcmsusp/"+b).set({ids:m});toast(on?"Question retirée de tes révisions":"Question remise dans tes révisions")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
-const susBtn=(b,id)=>`<button class="btn sm ghost sus" type="button" data-sus="${esc(b)}|${esc(id)}" data-on="${isSus(b,id)?0:1}">${isSus(b,id)?"↺ Remettre dans mes révisions":"Trop facile : ne plus me la proposer"}</button>`;
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-sus]");if(!b)return;const [bk,id]=b.dataset.sus.split("|");qSus(bk,id,b.dataset.on==="1")});
+  if(!db)return;try{await db.doc("qcmsusp/"+b).set({ids:m});toast(on?"Item retiré de tes révisions":"Remis dans tes révisions")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+const isusBtn=(b,id,v,k)=>{const on=isSusIt(b,id,v,k);return `<button class="isus" type="button" data-sus="${esc(b)}|${esc(id)}|${v}|${k}" data-on="${on?0:1}" title="${on?"Remettre cet item dans mes révisions":"Cet item est trop facile : ne plus me le poser"}">${on?"↺ Remettre":"Trop facile"}</button>`};
+const susBtn=(b,key)=>`<button class="isus" type="button" data-sus="${esc(b)}|${esc(key)}" data-on="0">↺ Remettre</button>`;
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-sus]");if(!b)return;const t=b.dataset.sus,i=t.indexOf("|");qSus(t.slice(0,i),t.slice(i+1),b.dataset.on==="1")});
 const qNote=(pts,nq)=>nq?Math.round(Math.max(0,pts)/nq*2000)/100:0;
 const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
 const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
@@ -1787,7 +1796,7 @@ function qShowRes(r){qz.mode="res";qz.res=r;qz.filt="all";renderQres();qTop()}
 function renderQres(){
   const r=qz.res,q=r&&qById(r.qcm);if(!q)return renderQcmList();
   const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]);
-  const per=order.map((id,i)=>{const x=qVer(qs[id],(r.ver||{})[id]||0),rp=(r.rep||{})[id]||"-----";let e=0;x.it.forEach((it,k)=>{if(rp[k]==="-"||(rp[k]==="V")!==it.v)e++});return{x,rp,e,i}});
+  const per=order.map((id,i)=>{const v=(r.ver||{})[id]||0,x=qVer(qs[id],v),rp=(r.rep||{})[id]||"-----";return{x,rp,e:rvErrs(x,rp),i,v}});
   const bar=barOf(q),note=qNote(per.reduce((a,p)=>a+qPts(p.x,p.rp,bar),0),per.length);
   const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>p.e>=3).length,nPart=per.length-nOk-nKo;
   const secs=Object.entries(r.sec||{}).map(([k,v])=>({k:+k,j:v.j,t:v.t,p:Math.round(v.j/v.t*100)})).sort((a,b)=>a.k-b.k);
@@ -1815,11 +1824,11 @@ function renderQres(){
     <div class="panel">
       <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
       ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
-        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span>${!p.e||isSus(q.id,x.id)?susBtn(q.id,x.id):""}</header>
+        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
         ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
         <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
-        ${x.it.map((it,k)=>{const y=p.rp[k],bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
-        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
+        ${x.it.map((it,k)=>{const y=p.rp[k];if(y==="x")return"";const bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""} ${isSusIt(q.id,x.id,p.v,k)?"off":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}${!bad||isSusIt(q.id,x.id,p.v,k)?isusBtn(q.id,x.id,p.v,k):""}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
+        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>p.rp[k]==="x"?"":`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
     </div>`;
   const root=$("#qcmRoot");
   $("#qBack").onclick=()=>{renderQcmList();qTop()};
@@ -1858,14 +1867,15 @@ function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOU
   if(ivl>=3){const dl=Math.max(1,Math.round(ivl*(ivl<7?.15:ivl<20?.1:.05)));lo=Math.max(2,ivl-dl);hi=Math.min(max,ivl+dl)}
   let best=null;for(let i=lo;i<=hi;i++){let d=L+i;if(d>cap)d=Math.max(L+1,cap);const sc=(load&&load[d]||0)+Math.abs(i-ivl)*.01;if(!best||sc<best.sc)best={d,sc}}
   return nIso(best.d)}
-function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
+function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
+const rpN=rp=>[...(rp||"-----")].filter(c=>c!=="x").length;
 function buildSrs(){
   const qb=Object.fromEntries(Q.map(q=>[q.id,Object.fromEntries((q.questions||[]).map(x=>[x.id,x]))])),out={},load={};
   [...QR].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>{const qs=qb[r.qcm];if(!qs)return;const d=r.date||iso(r.ts||Date.now());
     for(const id in (r.rep||{})){const x=qs[id];if(!x)continue;const k=r.qcm+"|"+id,st=out[k];if(st&&st.last>=d)continue;
       const ver=(r.ver||{})[id]||0,e=rvErrs(qVer(x,ver),r.rep[id]),g=rvGrade(e),nx=fNext(st,g,d);nx.ver=ver;
       if(st)load[dayN(st.due)]--;
-      nx.e=e;nx.g=g;nx.hist=[...(st?st.hist:[]),{d,e}];if(!st)nx.via=r.mode||"complet";nx.lastVia=r.mode||"complet";
+      nx.e=e;nx.g=g;nx.rp=r.rep[id];nx.n=rpN(r.rep[id]);nx.hist=[...(st?st.hist:[]),{d,e,n:nx.n}];if(!st)nx.via=r.mode||"complet";nx.lastVia=r.mode||"complet";
       nx.due=rvDue(nx,g,load);load[dayN(nx.due)]=(load[dayN(nx.due)]||0)+1;out[k]=nx}});
   SRS=out;LOAD=load;
 }
@@ -1890,9 +1900,11 @@ function rvQueue(){const td=today(),T=dayN(td),due=[],nw=[];
 function rvBank(q){const td=today(),T=dayN(td),qs=q.questions||[];let su=0,seen=0,mat=0,due=0,mem=0,next=null,nextN=0,ns=0;const days={};
   qs.forEach(x=>{if(isSus(q.id,x.id)){ns++;su+=5;return}const st=SRS[q.id+"|"+x.id];if(!st)return;seen++;su+=5-st.e;if(st.s>=21)mat++;mem+=fR(Math.max(0,T-dayN(st.last)),st.s);
     if(st.due<=td)due++;else if(!next||st.due<next){next=st.due;nextN=1}else if(st.due===next)nextN++;
-    st.hist.forEach((h,i)=>{const o=days[h.d]=days[h.d]||{j:0,t:0,dj:0,dt:0};o.j+=5-h.e;o.t+=5;if(i){o.dj+=st.hist[i-1].e-h.e;o.dt+=5}})});
+    st.hist.forEach((h,i)=>{const o=days[h.d]=days[h.d]||{j:0,t:0,dj:0,dt:0},hn=h.n||5;o.j+=hn-h.e;o.t+=hn;
+      if(i&&hn===5){const pr=st.hist.slice(0,i).reverse().find(y=>(y.n||5)===5);if(pr){o.dj+=pr.e-h.e;o.dt+=5}}})});
   const sess=Object.keys(days).sort().map(d=>({d,p:Math.round(days[d].j/days[d].t*100),dl:days[d].dt?Math.round(days[d].dj/days[d].dt*100):null}));
-  return{n:qs.length,ns,seen,mat,due,next,nextN,su:qs.length?Math.round(su/(5*qs.length)*100):0,mem:seen?Math.round(mem/seen*100):null,sess};
+  const ni=Object.keys(SUS[q.id]||{}).length;
+  return{n:qs.length,ns,ni,seen,mat,due,next,nextN,su:qs.length?Math.round(su/(5*qs.length)*100):0,mem:seen?Math.round(mem/seen*100):null,sess};
 }
 function rvStage(b){const n=b.n-b.ns;if(!b.seen)return["nil","Pas commencé"];if(b.mat>=.9*n&&b.su>=90)return["ok","Acquis"];if(b.seen<n)return["info","En découverte"];return["due","En consolidation"]}
 function rvBadge(){const b=document.querySelector('nav.tabs button[data-tab="rev"]');if(!b)return;buildSrs();const q=rvQueue(),n=q.due.length+q.nw.length;
@@ -1949,14 +1961,15 @@ function renderRevHome(){
     <summary><h2>Comment ça marche</h2></summary>
     <ul class="prose">
       <li><b>Chaque question de QCM est une carte Anki.</b> Le même algorithme qu'Anki (FSRS, rétention visée 0,90) décide quand elle revient, selon tes réponses et non selon une méthode des J fixe.</li>
-      <li><b>Ta note vient du QCM</b> : 5 propositions justes = « Bien », 1 erreur = « Difficile » (revient plus tôt), 2 erreurs ou plus = « À revoir » (revient demain, et une 2e fois en fin de séance). Une proposition laissée vide compte comme une erreur.</li>
+      <li><b>Ta note vient du QCM</b> : toutes les propositions justes = « Bien », 1 erreur = « Difficile » (revient plus tôt), 2 erreurs ou plus = « À revoir » (revient demain). Une proposition laissée vide compte comme une erreur.</li>
+      <li><b>Rattrapage des items ratés</b> : quand tu rates des items, ils repassent seuls en fin de séance, puis le jour où la question revient, tu n'as que ces items-là. Une fois rattrapés, la question revient plus tard en entier (dans une autre version quand il y en a), pour vérifier que tout tient.</li>
       <li><b>Tout compte</b> : les QCM complets faits dans l'onglet QCM entrent aussi dans le calendrier. Seul le premier passage de la journée compte.</li>
       <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours que tu as démarrés (bouton sur chaque cours), en commençant par le plus ancien. Un cours dont tu fais le QCM complet dans l'onglet QCM démarre tout seul. Tu peux mettre un cours en pause à tout moment.</li>
       <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
       <li><b>Pas d'embouteillage</b> : comme dans Anki, les dates de retour sont légèrement étalées (± 15 % environ) vers les jours les moins chargés. Les questions d'un QCM complet ne reviennent donc pas toutes le même jour. En plus, au-delà de ${+RVC.cap} questions dans la journée, le reste passe au lendemain, les plus urgentes d'abord.</li>
       <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
       <li><b>Plusieurs versions par question</b> : quand un QCM en a, chaque révision te pose une autre version de la même notion (autres formulations, autres pièges, d'autres propositions vraies ou fausses), pour tester ce que tu sais et pas ta mémoire des questions. Le QCM complet de l'onglet QCM garde la version d'origine.</li>
-      <li><b>Trop facile ?</b> À la correction (QCM complet ou révision), sur une question que tu as eue entièrement juste, le bouton « Trop facile » retire la question de tes révisions, comme une carte suspendue dans Anki. Elle compte alors comme sue, et tu peux la remettre depuis la carte du cours.</li>
+      <li><b>Trop facile ?</b> À la correction (QCM complet ou révision), chaque item que tu as eu juste a un bouton « Trop facile » : il retire cet item de tes révisions, comme une carte suspendue dans Anki. La question est ensuite posée sans lui ; si tous ses items sont retirés, elle sort des révisions et compte comme sue. Tu peux tout remettre depuis la carte du cours.</li>
       <li><b>Progression</b> : sous chaque cours, la courbe montre ton score à chaque séance, et l'écart compare tes réponses à celles de la fois d'avant sur les mêmes questions : <span class="up">+</span> tu progresses, <span class="down">−</span> tu régresses.</li>
     </ul>
     <form class="rv-set" id="rvSet">
@@ -1987,47 +2000,58 @@ function rvCard(q){const b=rvBank(q),st=rvStage(b),m=matById(q.matiere),last=b.s
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill ${act?st[0]:"nil"}">${act?st[1]:paused?"En pause":"Pas encore démarré"}</span><span class="small muted">${b.sess.length} séance${b.sess.length>1?"s":""}${last?` · dernière ${ago(dayN(today())-dayN(last.d))}`:""}</span></div>
     <div class="rv-kpi"><div><b class="num">${b.su} %</b><span>du cours su</span></div><div><b class="num">${b.mem!=null?b.mem+" %":"–"}</b><span>mémoire aujourd'hui</span></div></div>
     <div class="rv-dist" role="img" aria-label="${b.mat} acquises, ${young} en cours, ${un} jamais vues"><i style="width:${w(b.mat)}%;background:${mc}"></i><i style="width:${w(young)}%;background:${mc}66"></i><i style="width:${w(un)}%;background:var(--line)"></i>${b.ns?`<i style="width:${w(b.ns)}%;background:var(--ok)"></i>`:""}</div>
-    <div class="rv-leg"><span style="--c:${mc}">${b.mat} acquise${b.mat>1?"s":""}</span><span style="--c:${mc}66">${young} en cours</span><span style="--c:var(--line)">${un} jamais vue${un>1?"s":""}</span>${b.ns?`<span style="--c:var(--ok)">${b.ns} retirée${b.ns>1?"s":""} (trop faciles)</span>`:""}</div>
+    <div class="rv-leg"><span style="--c:${mc}">${b.mat} acquise${b.mat>1?"s":""}</span><span style="--c:${mc}66">${young} en cours</span><span style="--c:var(--line)">${un} jamais vue${un>1?"s":""}</span>${b.ns?`<span style="--c:var(--ok)">${b.ns} entièrement retirée${b.ns>1?"s":""}</span>`:""}</div>
     ${last?`<div class="rv-trend">${rvSpark(b.sess)}<span>Dernière séance <b class="num">${last.p} %</b>${last.dl!=null?` · <span class="${last.dl>0?"up":last.dl<0?"down":""}">${last.dl>0?"+":last.dl<0?"−":"±"}${Math.abs(last.dl)} pts</span> sur les mêmes questions`:""}</span></div>`:""}
     ${act&&nextTxt?`<span class="small">${nextTxt}</span>`:""}
-    ${b.ns?`<details class="rv-sus"><summary>Voir les ${b.ns} question${b.ns>1?"s":""} retirée${b.ns>1?"s":""}</summary>${(q.questions||[]).filter(x=>isSus(q.id,x.id)).map(x=>`<div class="rv-susit"><span>${esc(x.q)}</span>${susBtn(q.id,x.id)}</div>`).join("")}</details>`:""}
+    ${b.ni?`<details class="rv-sus"><summary>Voir ${b.ni>1?"les "+b.ni+" éléments retirés":"l'élément retiré"} (trop faciles)</summary>${Object.keys(SUS[q.id]).map(key=>{const [id,v,k]=key.split("|"),x=(q.questions||[]).find(y=>y.id===id);if(!x)return"";
+      const txt=v==null?"Toute la question : "+x.q:(qVer(x,+v).it[+k]||{}).t||"";return `<div class="rv-susit"><span>${esc(txt)}</span>${susBtn(q.id,key)}</div>`}).join("")}</details>`:""}
     ${act?(un>0?`<span class="small muted">Ses ${un} questions jamais vues arrivent peu à peu, avec les nouvelles du jour.</span>`:"")+`<div><button class="link" type="button" data-rvpause="${esc(q.id)}">Mettre en pause</button></div>`
       :`<span class="small muted">${paused?"Rien de ce cours ne t'est proposé tant qu'il est en pause.":"Pas encore dans tes révisions : démarre-le quand tu veux (après ton P2, par exemple)."}</span><div><button class="btn primary sm" type="button" data-rvstart="${esc(q.id)}">${paused?"Reprendre les révisions":"Démarrer les révisions"}</button></div>`}
   </div>`}
 
+/* Ce qu'on pose pour une question due :
+   - si la dernière fois des items étaient faux, une question de rattrapage avec seulement ces items (même version) ;
+   - sinon la version suivante, sans les items retirés. Le rattrapage réussi, la question revient plus tard en entier. */
+function rvPick(k){const [b]=k.split("|"),{x}=rvQ(k),st=SRS[k];if(!x)return{k,again:false,v:0};
+  if(st&&st.e>0&&st.rp){const v=st.ver||0,it=qVer(x,v).it,wr=it.map((_,i)=>i).filter(i=>{const c=st.rp[i];return c!=="x"&&(!c||c==="-"||(c==="V")!==it[i].v)&&!isSusIt(b,x.id,v,i)});
+    if(wr.length)return{k,again:false,v,sub:wr,rat:true}}
+  const nv=nVer(x);let v=st?((st.ver||0)+1)%nv:0;for(let t=0;t<nv&&!shownIdx(b,x,v).length;t++)v=(v+1)%nv;
+  const sh=shownIdx(b,x,v);return{k,again:false,v,sub:sh.length<qVer(x,v).it.length?sh:null}}
 function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
   for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]]}
-  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(k=>{const {x}=rvQ(k),st=SRS[k];return{k,again:false,v:x&&st?((st.ver||0)+1)%nVer(x):0}}),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null});rvSaveDraft();renderRevSess();rvTop()}
+  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null});rvSaveDraft();renderRevSess();rvTop()}
 function renderRevSess(){
   const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x:x0}=rvQ(e.k);if(!q||!x0){rv.i++;return renderRevSess()}
-  const x=qVer(x0,e.v||0),nv=nVer(x0);
+  const x=qVer(x0,e.v||0),nv=nVer(x0),idx=e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i),ni=idx.length;
   const key=rvKey(e),a=rv.ans[key]||[],st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
   const done=Object.keys(rv.res).length,first=rv.list.filter(y=>!y.again).length;
+  const rpOf=()=>x.it.map((_,k)=>idx.includes(k)?(a[k]==null?"-":a[k]?"V":"F"):"x").join("");
   let verdict="";
-  if(chk){const rps=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join(""),err=rvErrs(x,rps),g=rvGrade(err),gr=GR[g],pt=qPts(x,rps,barOf(q));
+  if(chk){const rps=rpOf(),err=rvErrs(x,rps),g=rvGrade(err),gr=GR[g],pt=qPts(x,rps,barOf(q));
     if(e.again)verdict=`<span class="pill ${gr[0]}">${err?err+" erreur"+(err>1?"s":""):"Tout juste"}</span><span class="small muted">Rappel de fin de séance : ne compte pas pour le calendrier.</span>`;
     else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g,LOAD);
-      verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):"5/5"}</span><span class="small">Revient ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${g===1?", et une 2e fois en fin de séance":""}.</span><span class="small muted">${pt>0?"+":""}${qNum(pt)} pt au concours</span>${!err||isSus(q.id,x.id)?susBtn(q.id,x.id):""}`}}
+      verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):ni+"/"+ni}</span><span class="small">${err?"Tes items ratés reviennent seuls":"La question revient en entier"} ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${err?", et une 2e fois en fin de séance":""}.</span><span class="small muted">${pt>0?"+":""}${qNum(pt)} pt au concours</span>`}}
   const pill=v=>v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
+  const tag=e.again?`<span class="pill due">Rappel · tes items ratés</span>`:e.rat?`<span class="pill due">Rattrapage · ${ni>1?"les "+ni+" items ratés":"l'item raté"} la dernière fois</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`;
   $("#revRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="rvQuit">Arrêter</button></header>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${e.again?`<span class="pill due">Rappel</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`}<span class="small muted">${esc((q.sections||[])[x.s]||"")}${nv>1?` · version ${(e.v||0)+1} sur ${nv}`:""}</span></div>
-      ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
-      <ol class="qz-items">${x.it.map((it,k)=>{if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
-        const ok=a[k]!=null&&(a[k]===1)===it.v;return `<li class="qz-it rv-it chk ${ok?"ok":"bad"}"><span class="lt">${LET[k]}</span><span class="tx"><b>${it.v?"VRAI":"FAUX"}</b> · ${esc(it.t)}</span><span class="yo">Ta réponse : ${pill(a[k])}</span>${it.c?`<span class="cm">${esc(it.c)}</span>`:""}</li>`}).join("")}</ol>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${tag}<span class="small muted">${esc((q.sections||[])[x.s]||"")}${nv>1?` · version ${(e.v||0)+1} sur ${nv}`:""}${ni<x.it.length&&!e.rat&&!e.again?` · ${x.it.length-ni} item${x.it.length-ni>1?"s":""} retiré${x.it.length-ni>1?"s":""}`:""}</span></div>
+      ${qImg(x)}<p class="qz-stem">${ni<x.it.length?(ni>1?"Ces propositions":"Cette proposition")+" concernant "+esc(x.q)+" "+(ni>1?"sont-elles vraies ou fausses ?":"est-elle vraie ou fausse ?"):"Parmi les propositions suivantes concernant "+esc(x.q)+", laquelle ou lesquelles sont vraies ou fausses ?"}</p>
+      <ol class="qz-items">${idx.map((k,pos)=>{const it=x.it[k];if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
+        const ok=a[k]!=null&&(a[k]===1)===it.v,off=isSusIt(q.id,x.id,e.v||0,k);return `<li class="qz-it rv-it chk ${ok?"ok":"bad"} ${off?"off":""}"><span class="lt">${LET[pos]}</span><span class="tx"><b>${it.v?"VRAI":"FAUX"}</b> · ${esc(it.t)}</span><span class="yo">Ta réponse : ${pill(a[k])}${ok||off?isusBtn(q.id,x.id,e.v||0,k):""}</span>${it.c?`<span class="cm">${esc(it.c)}</span>`:""}</li>`}).join("")}</ol>
       ${chk?`<div class="rv-verdict">${verdict}</div>`:""}
       <div class="qz-nav"><span></span>${chk?`<button class="btn primary" type="button" id="rvNext">${rv.i<n-1?"Suivante ›":"Terminer"}</button>`:`<button class="btn primary" type="button" id="rvCheck">Valider</button>`}</div>
     </div>
     <aside class="panel qz-side">
       <div class="bar-top"><b>Séance du jour</b><span class="num">${done}/${first}</span></div>
       <span class="prog"><i style="width:${first?done/first*100:0}%"></i></span>
-      <p class="small muted" style="margin:0">Réponds aux 5 propositions puis valide : la correction s'affiche tout de suite. Touche une 2e fois une réponse pour l'effacer. Tu peux arrêter quand tu veux : ce qui est fait est enregistré, le reste attend.</p>
+      <p class="small muted" style="margin:0">Réponds aux propositions puis valide : la correction s'affiche tout de suite. Touche une 2e fois une réponse pour l'effacer. « Trop facile » sur un item juste le retire de tes révisions. Tu peux arrêter quand tu veux : ce qui est fait est enregistré, le reste attend.</p>
     </aside></div>`;
   const root=$("#revRoot");
   root.querySelectorAll(".vfb").forEach(b=>b.onclick=()=>{const k=+b.dataset.k,v=+b.dataset.a,arr=[...(rv.ans[key]||[null,null,null,null,null])];arr[k]=arr[k]===v?null:v;rv.ans[key]=arr;rvSaveDraft();renderRevSess()});
-  if($("#rvCheck"))$("#rvCheck").onclick=()=>{const rp=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join(""),err=rvErrs(x,rp);
-    if(!e.again){rv.res[e.k]={rp,e:err,v:e.v||0,ms:Math.min(600000,Date.now()-rv.tq),d:rv.date};if(err>=2)rv.list.push({k:e.k,again:true,v:e.v||0})}
+  if($("#rvCheck"))$("#rvCheck").onclick=()=>{const rp=rpOf(),err=rvErrs(x,rp),wr=idx.filter(k=>a[k]==null||(a[k]===1)!==x.it[k].v);
+    if(!e.again){rv.res[e.k]={rp,e:err,n:ni,part:ni<x.it.length,v:e.v||0,ms:Math.min(600000,Date.now()-rv.tq),d:rv.date};if(err>=1)rv.list.push({k:e.k,again:true,v:e.v||0,sub:wr})}
     rv.chk=true;rvSaveDraft();renderRevSess()};
   if($("#rvNext"))$("#rvNext").onclick=()=>{rv.i++;rv.chk=false;rv.tq=Date.now();rvSaveDraft();if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   $("#rvQuit").onclick=()=>rvFinish();
@@ -2035,9 +2059,9 @@ function renderRevSess(){
 /* Fin de séance (ou arrêt) : bilan par cours, puis un résultat « révision » par QCM dans qcmres. */
 async function rvFinish(){
   const by={};for(const k in rv.res){const r=rv.res[k];if(r.saved)continue;const b=k.split("|")[0];(by[b]=by[b]||[]).push(k)}
-  const rows=Object.entries(by).map(([b,ks])=>{const q=qById(b);let j=0,cj=0,pj=0,pt=0;const g={1:0,2:0,3:0};
-    ks.forEach(k=>{const r=rv.res[k],st=SRS[k];j+=5-r.e;g[rvGrade(r.e)]++;if(st&&st.last<r.d){cj+=5-r.e;pj+=5-st.e;pt+=5}});
-    return{q,n:ks.length,p:Math.round(j/(ks.length*5)*100),dl:pt?Math.round((cj-pj)/pt*100):null,g}});
+  const rows=Object.entries(by).map(([b,ks])=>{const q=qById(b);let j=0,t=0,cj=0,pj=0,pt=0;const g={1:0,2:0,3:0};
+    ks.forEach(k=>{const r=rv.res[k],st=SRS[k],rn=r.n||5;j+=rn-r.e;t+=rn;g[rvGrade(r.e)]++;if(st&&st.last<r.d&&!r.part&&(st.n||5)===5){cj+=5-r.e;pj+=5-st.e;pt+=5}});
+    return{q,n:ks.length,p:t?Math.round(j/t*100):0,dl:pt?Math.round((cj-pj)/pt*100):null,g}});
   rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date};
   rv.mode="done";renderRevDone();rvTop();
   await rvSave();rvDropDraft();
@@ -2045,12 +2069,12 @@ async function rvFinish(){
 async function rvSave(){
   const by={};for(const k in rv.res){const r=rv.res[k];if(r.saved)continue;const b=k.split("|")[0];(by[b]=by[b]||[]).push(k)}
   if(!Object.keys(by).length)return;if(!db){toast("Non enregistré : données indisponibles ici");return}
-  for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0;const sec={},ok={},rep={},order=[],ver={};
+  for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0,tot=0;const sec={},ok={},rep={},order=[],ver={};
     ks.forEach(k=>{const r=rv.res[k],id=k.split("|")[1],x0=(q.questions||[]).find(y=>y.id===id);if(!x0)return;const x=qVer(x0,r.v||0);ver[id]=r.v||0;
-      x.it.forEach((it,i)=>{const c=r.rp[i];if(c==="-")vide++;else if((c==="V")===it.v)juste++;else faux++});
-      const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-r.e;s.t+=5;pts+=qPts(x,r.rp,barOf(q));ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
+      x.it.forEach((it,i)=>{const c=r.rp[i];if(c==="x")return;if(c==="-")vide++;else if((c==="V")===it.v)juste++;else faux++});
+      const rn=r.n||5,s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=rn-r.e;s.t+=rn;tot+=rn;pts+=qPts(x,r.rp,barOf(q));ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
     const nq=order.length;if(!nq)continue;
-    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:nq*5,pct:Math.round(juste/(nq*5)*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order,ver};
+    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:tot,pct:tot?Math.round(juste/tot*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order,ver};
     try{await db.collection("qcmres").add(doc);ks.forEach(k=>rv.res[k].saved=true);rvSaveDraft()}catch(e){toast("Pas enregistré : "+(e.code||"erreur"));return}}
   toast("Séance enregistrée");
 }
