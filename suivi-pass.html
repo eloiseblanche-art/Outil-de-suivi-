@@ -1163,11 +1163,18 @@ function renderPies(){
   $("#pies").querySelectorAll("[data-preste]").forEach(t=>{t.oninput=()=>saveReste(t.dataset.preste,t.value);t.onblur=()=>saveReste(t.dataset.preste,t.value,true)});
   if(keepN){const t=$("#pies").querySelector(`[data-${keepN[0]}="${keepN[1]}"]`);if(t){t.value=keepN[2];t.focus();try{t.setSelectionRange(keepN[3],keepN[4])}catch(_){}}}
 }
+/* Échéance des révisions : mardi 6 octobre après-midi. On compte les demi-journées (matin 8 h–12 h, après-midi 13 h 30–18 h)
+   qui restent d'ici là, celle en cours comprise ; l'après-midi de mardi lui-même n'est pas compté. */
+const ECHEANCE="2026-10-06";
+function halfDaysLeft(){const now=new Date();let n=0;
+  for(let d=new Date(now);iso(d)<=ECHEANCE;d=addDays(d,1)){const day=iso(d);
+    [["12:00",true],["18:00",day<ECHEANCE]].forEach(([fin,ok])=>{if(ok&&new Date(day+"T"+fin)>now)n++})}
+  return n}
 /* Total des heures de révision estimées, toutes matières confondues. */
 function paintTot(){const el=$("#ptot");if(!el)return;
   const ms=M.filter(m=>C.some(c=>c.matiere===m.id)),v=ms.filter(m=>m.reste!=null&&m.reste!=="").map(m=>+m.reste);
-  const tot=v.reduce((a,b)=>a+b,0),jr=Math.max(1,dayN(CONCOURS)-dayN(today())),f=x=>String(Math.round(x*10)/10).replace(".",",");
-  el.innerHTML=`<span class="small">Il me reste en tout</span><b class="num">${f(tot)} h</b><span class="sub">${v.length?`soit ≈ ${(x=>{const mn=Math.round(x*60);return mn<60?mn+" min":Math.floor(mn/60)+" h"+(mn%60?" "+String(mn%60).padStart(2,"0"):"")})(tot/jr)} par jour d'ici le concours`:"Remplis le temps sous chaque matière"}${v.length&&v.length<ms.length?` · ${ms.length-v.length} matière${ms.length-v.length>1?"s":""} sans estimation`:""}</span>`}
+  const tot=v.reduce((a,b)=>a+b,0),nd=halfDaysLeft(),f=x=>String(Math.round(x*10)/10).replace(".",",");
+  el.innerHTML=`<span class="small">Il me reste en tout</span><b class="num">${f(tot)} h</b><span class="sub">${v.length?`${nd?`soit ≈ ${(x=>{const mn=Math.round(x*60);return mn<60?mn+" min":Math.floor(mn/60)+" h"+(mn%60?" "+String(mn%60).padStart(2,"0"):"")})(tot/nd)} par demi-journée d'ici mardi après-midi (${nd} demi-journée${nd>1?"s":""})`:"Échéance de mardi après-midi passée"}`:"Remplis le temps sous chaque matière"}${v.length&&v.length<ms.length?` · ${ms.length-v.length} matière${ms.length-v.length>1?"s":""} sans estimation`:""}</span>`}
 const resteTimers={};
 function saveReste(mid,raw,now){
   clearTimeout(resteTimers[mid]);const t=String(raw).trim().replace(",",".").replace(/\s*h$/i,""),v=t===""||isNaN(+t)?null:Math.max(0,+t);
