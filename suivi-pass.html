@@ -403,6 +403,10 @@ td,th{border-bottom-color:#f0f0f5}
 .qz-side{position:sticky;top:64px}
 @media (max-width:860px){.qz-side{position:static}}
 .qz-stem{margin:0;font-size:1.02rem;line-height:1.45}
+/* photo d'une question (microscopie), en noir et blanc comme au concours ; toucher pour agrandir */
+.qimg{margin:0;display:flex;justify-content:center;background:#1c1c22;border-radius:12px;padding:8px}
+.qimg img{display:block;max-width:100%;max-height:380px;width:auto;height:auto;filter:grayscale(1);border-radius:6px;cursor:zoom-in}
+.qimg.big img{max-height:none;cursor:zoom-out}
 .qz-items{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .qz-it{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .qz-it .vf{grid-column:2;display:flex;gap:6px}
@@ -725,7 +729,8 @@ td,th{border-bottom-color:#f0f0f5}
         <li><b>Les fausses reprennent les pièges du concours</b> : chiffre ou valeur modifiée, inversion (mitose/méiose, haploïde/diploïde, avant/après), « comme » à la place de « contrairement à », transitoire/définitif, mauvaise structure ou mauvaise étape.</li>
         <li><b>Chaque fausse a un commentaire de correction</b> qui donne la bonne réponse et la valeur exacte. Les vraies n'en ont que si c'est utile.</li>
         <li><b>Uniquement le contenu du cours</b>, avec ses termes et ses chiffres. Une proposition teste une seule info.</li>
-        <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
+        <li><b>Matières avec photos au concours (Histo)</b> : en plus, une question par photo de microscopie du poly, découpée sans ses légendes et passée en noir et blanc, dans une partie « Photos de microscopie ».</li>
+        <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}, et img = id d'une photo pour les questions sur photo, id « p01 »). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
       </ul>
     </details>
     <details class="panel fold">
@@ -1669,6 +1674,8 @@ const barOf=q=>matById(q.matiere).bareme||"prepa";
 const BARL={items:"barème +1 / −1 / 0 par item",prepa:"barème par question"};
 function qPts(x,rp,bar){if(bar==="items"){let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-")p+=(c==="V")===it.v?.2:-.2});return Math.round(p*100)/100}
   let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
+const qImg=x=>x.img?`<figure class="qimg"><img src="/_blob/${esc(x.img)}" alt="Photo de microscopie de la question" loading="lazy"></figure>`:"";
+document.addEventListener("click",e=>{const f=e.target.closest&&e.target.closest(".qimg");if(f)f.classList.toggle("big")});
 const qNote=(pts,nq)=>nq?Math.round(Math.max(0,pts)/nq*2000)/100:0;
 const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
 const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
@@ -1724,7 +1731,7 @@ function renderQuiz(){
   $("#qcmRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">${esc(q.titre)}${qz.only?" · mes erreurs":""}</span><h2>Question ${qz.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="qQuit">Quitter</button></header>
-      <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+      ${qImg(cur)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
       <ol class="qz-items">${cur.it.map((it,k)=>`<li class="qz-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`).join("")}</ol>
       <div class="qz-nav"><button class="btn" type="button" id="qPrev" ${qz.i?"":"disabled"}>‹ Précédente</button>${qz.i<n-1?`<button class="btn primary" type="button" id="qNext">Suivante ›</button>`:`<button class="btn primary" type="button" id="qEnd2">Terminer</button>`}</div>
     </div>
@@ -1791,7 +1798,7 @@ function renderQres(){
       <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
       ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
         return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
-        <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+        ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
         <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
         ${x.it.map((it,k)=>{const y=p.rp[k],bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
         <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
@@ -1984,7 +1991,7 @@ function renderRevSess(){
     <div class="panel qz-main" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="rvQuit">Arrêter</button></header>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${e.again?`<span class="pill due">Rappel</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`}<span class="small muted">${esc((q.sections||[])[x.s]||"")}</span></div>
-      <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+      ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
       <ol class="qz-items">${x.it.map((it,k)=>{if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
         const ok=a[k]!=null&&(a[k]===1)===it.v;return `<li class="qz-it rv-it chk ${ok?"ok":"bad"}"><span class="lt">${LET[k]}</span><span class="tx"><b>${it.v?"VRAI":"FAUX"}</b> · ${esc(it.t)}</span><span class="yo">Ta réponse : ${pill(a[k])}</span>${it.c?`<span class="cm">${esc(it.c)}</span>`:""}</li>`}).join("")}</ol>
       ${chk?`<div class="rv-verdict">${verdict}</div>`:""}
