@@ -390,6 +390,12 @@ td,th{border-bottom-color:#f0f0f5}
 /* ---- QCM ---- */
 .qcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:18px}
 .qcard{align-content:start}
+.qmat{display:grid;gap:12px}
+.qmat>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:4px 2px;border-bottom:2px solid var(--mbg,var(--line))}
+.qmat>summary::-webkit-details-marker{display:none}
+.qmat>summary h2{margin:0;color:var(--mfg,var(--ink))}
+.qmat>summary::after{content:"–";margin-left:auto;font:700 1.2rem var(--font-b);color:var(--ink-3)}
+.qmat:not([open])>summary::after{content:"+"}
 .qcard .acts{flex-wrap:wrap;gap:6px}
 .qkpi{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;font-size:.85rem;color:var(--ink-2)}
 .qkpi b{font-family:var(--font-d);font-size:1.5rem;color:var(--mfg,var(--ink));line-height:1}
@@ -1710,6 +1716,8 @@ const qNote=(pts,nq)=>nq?Math.round(Math.max(0,pts)/nq*2000)/100:0;
 const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
 const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
 let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e){}
+/* Matières repliées dans l'onglet QCM (souvenir propre à ce navigateur). */
+let qClosed=new Set();try{qClosed=new Set(JSON.parse(localStorage.getItem("qcmClosed")||"[]"))}catch(e){}
 /* Dernier résultat connu de chaque question (true = les 5 propositions justes). */
 function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
 function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>m[x.id]===false).map(x=>x.id)}
@@ -1724,8 +1732,13 @@ function renderQcmList(){
   const root=$("#qcmRoot");qz.mode="list";
   if(!Q.length){root.innerHTML=`<div class="panel"><h2>Mes QCM</h2><p class="muted" style="margin:0">Aucun QCM pour l'instant. Envoie un cours à Claude : il ajoutera ici un QCM qui reprend tout le cours.</p></div>`;return}
   const list=[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
+  const groups=[];list.forEach(q=>{const k=q.matiere||"";let g=groups[groups.length-1];if(!g||g.k!==k)groups.push(g={k,qs:[]});g.qs.push(q)});
   root.innerHTML=`<div class="bar-top"><p class="muted small" style="margin:0">Chaque QCM reprend tout le cours : ton score est la part des propositions que tu connais.</p><label class="toggle"><input type="checkbox" id="qShuf" ${qShuffle?"checked":""}> Mélanger les questions</label></div>
-    <div class="qcards">${list.map(qCard).join("")}</div>`;
+    ${groups.map(g=>{const m=matById(g.k),last=g.qs.map(q=>QR.filter(r=>r.qcm===q.id&&r.mode!=="erreurs"&&r.mode!=="revision").sort((a,b)=>(a.ts||0)-(b.ts||0)).pop()).filter(Boolean);
+      const av=last.length?Math.round(last.reduce((s,r)=>s+(r.pct||0),0)/last.length):null;
+      return `<details class="qmat" data-qmat="${esc(g.k||"_")}" style="${mvars(g.k)}"${qClosed.has(g.k||"_")?"":" open"}><summary><h2>${esc(m.nom||"Sans matière")}</h2><span class="small muted">${g.qs.length} QCM${av!=null?` · moyenne ${av} % au dernier passage`:""}</span></summary>
+      <div class="qcards">${g.qs.map(qCard).join("")}</div></details>`}).join("")}`;
+  root.querySelectorAll("details.qmat").forEach(d=>d.addEventListener("toggle",()=>{const k=d.dataset.qmat;d.open?qClosed.delete(k):qClosed.add(k);try{localStorage.setItem("qcmClosed",JSON.stringify([...qClosed]))}catch(e){}}));
   $("#qShuf").onchange=e=>{qShuffle=e.target.checked;try{localStorage.setItem("qcmShuffle",qShuffle?"1":"0")}catch(_){}};
   root.querySelectorAll("[data-qstart]").forEach(b=>b.onclick=()=>qStart(b.dataset.qstart,b.dataset.how));
   root.querySelectorAll("[data-qres]").forEach(b=>b.onclick=()=>{const r=QR.find(x=>x.id===b.dataset.qres);if(r)qShowRes(r)});
@@ -1738,7 +1751,7 @@ function qCard(q){
   const drN=drOk?dr.order.filter(id=>((dr.ans||{})[id]||[]).some(v=>v!=null)).length:0;
   const hist=rs.slice(-12).map(r=>`<button type="button" class="qh ${r.mode==="erreurs"||r.mode==="revision"?"err":""}" data-qres="${esc(r.id)}" title="${fmt(r.date)} · ${r.pct} %${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}" aria-label="Résultat du ${fmt(r.date)} : ${r.pct} %"><span>${r.pct}</span><i style="height:${Math.max(4,(r.pct||0)*.78)}%"></i></button>`).join("");
   return `<div class="panel mat qcard" style="${mvars(q.matiere)}">
-    <div class="mat-head"><h3>${esc(q.titre)}</h3><span class="mtag">${esc(shortNom(matById(q.matiere)))}</span></div>
+    <div class="mat-head"><h3>${esc(q.titre)}</h3></div>
     <span class="small muted">${n} questions · ${n*5} propositions · ${(q.sections||[]).length} parties du cours</span>
     ${last?`<div class="qkpi"><span><b>${last.pct} %</b> au dernier passage (${fmt(last.date)})</span>${full.length>1?`<span>meilleur ${best} %</span>`:""}</div>`:`<span class="small muted">${rs.length?"Pas encore fait en entier (seulement en révisions).":"Pas encore fait."}</span>`}
     ${hist?`<div class="qhist">${hist}</div>`:""}
