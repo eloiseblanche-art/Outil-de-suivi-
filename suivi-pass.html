@@ -386,6 +386,99 @@ td,th{border-bottom-color:#f0f0f5}
 .sl-plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
 .sl-tonight{display:grid;gap:4px;border-left:3px solid var(--sl-night);background:var(--sl-night-soft);border-radius:0 10px 10px 0;padding:8px 12px;font-size:.88rem}
 .sl-tonight b{font-family:var(--font-m);font-weight:500}
+
+/* ---- QCM ---- */
+.qcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:18px}
+.qcard{align-content:start}
+.qcard .acts{flex-wrap:wrap;gap:6px}
+.qkpi{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;font-size:.85rem;color:var(--ink-2)}
+.qkpi b{font-family:var(--font-d);font-size:1.5rem;color:var(--mfg,var(--ink));line-height:1}
+.qhist{display:flex;align-items:flex-end;gap:5px;height:58px}
+.qh{flex:0 0 26px;height:100%;border:0;background:var(--surface-2);border-radius:6px;padding:0;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}
+.qh i{display:block;width:100%;background:var(--mfg,var(--accent));opacity:.8}
+.qh.err i{opacity:.35}
+.qh span{position:absolute;left:0;right:0;top:2px;font:500 .62rem var(--font-m);color:var(--ink-2);text-align:center}
+.qz{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}
+@media (max-width:860px){.qz{grid-template-columns:1fr}}
+.qz-side{position:sticky;top:64px}
+@media (max-width:860px){.qz-side{position:static}}
+.qz-stem{margin:0;font-size:1.02rem;line-height:1.45}
+.qz-items{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.qz-it{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.qz-it .vf{grid-column:2;display:flex;gap:6px}
+@media (min-width:640px){.qz-it{grid-template-columns:auto minmax(0,1fr) auto}.qz-it .vf{grid-column:auto}}
+.lt{font:500 .8rem var(--font-m);width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:var(--surface-2);color:var(--ink-2)}
+.vfb{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font:700 .85rem var(--font-b);color:var(--ink-2);cursor:pointer;min-width:78px}
+.vfb.v[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.vfb.f[aria-pressed="true"]{background:var(--late-soft);border-color:var(--late);color:var(--late)}
+.qz-nav{display:flex;justify-content:space-between;gap:8px}
+.qz-nav .btn:disabled{opacity:.4;cursor:default}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px;max-height:320px;overflow:auto;padding:2px}
+.qgrid button{height:34px;border-radius:8px;border:1px solid var(--line);background:#fff;font:500 .78rem var(--font-m);color:var(--ink-2);cursor:pointer}
+.qgrid button.qfull{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.qgrid button.part{background:var(--due-soft);border-color:var(--due);color:var(--due)}
+.qgrid button[aria-current="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.prog{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;display:block}
+.prog i{display:block;height:100%;background:var(--accent)}
+.prog.ok i{background:var(--ok)} .prog.due i{background:#d9a21c} .prog.late i{background:var(--late)}
+.stat.acc{background:var(--accent-soft);border-color:transparent} .stat.acc b{color:var(--accent)}
+.secrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,180px) auto;gap:10px;align-items:center;font-size:.88rem}
+.secrow .n{white-space:nowrap;text-align:right;font-family:var(--font-m);font-size:.8rem;color:var(--ink-2)}
+@media (max-width:560px){.secrow{grid-template-columns:minmax(0,1fr) auto}.secrow .prog{grid-column:1/-1;order:3}}
+.qcorr{display:grid;gap:10px}
+.qcorr>header{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qn{font:500 .8rem var(--font-m);background:var(--ink);color:#fff;border-radius:7px;padding:3px 8px}
+.crows{display:grid;gap:4px}
+.crow{display:grid;grid-template-columns:auto minmax(0,1fr) 92px 92px;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:var(--ok-soft)}
+.crow.bad{background:var(--late-soft)}
+.crow.head{background:transparent;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700;padding-block:0}
+.crow .pill{justify-self:start}
+.crow .lab{display:none;font-size:.72rem;color:var(--ink-2);margin-right:4px}
+.pill.nil{background:#fff;color:var(--ink-3)}
+@media (max-width:620px){.crow{grid-template-columns:auto minmax(0,1fr)}.crow.head{display:none}.crow .ya,.crow .ex{grid-column:2;display:flex;align-items:center}.crow .lab{display:inline}}
+.cmt{background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:.9rem;display:grid;gap:3px}
+.cmt b{font-family:var(--font-d)}
+
+/* ---- Révisions (répétition espacée) ---- */
+.tbadge{display:inline-grid;place-items:center;min-width:1.55em;height:1.55em;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--late);color:#fff;font:500 .68rem var(--font-m);vertical-align:1px}
+.rv-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 22px;align-items:center}
+@media (max-width:560px){.rv-hero{grid-template-columns:1fr}}
+.rv-big{font-family:var(--font-d);font-size:3.2rem;font-weight:700;line-height:1;color:var(--accent)}
+.rv-big small{display:block;font:700 .8rem var(--font-b);color:var(--ink-2);margin-top:4px}
+.rv-split{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:.88rem;color:var(--ink-2)}
+.rv-split b{font-family:var(--font-m);font-weight:500;color:var(--ink)}
+.rv-chips{display:flex;flex-wrap:wrap;gap:5px}
+.rv-chips .mtag{white-space:normal}
+.rv-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+@media (max-width:760px){.rv-days{grid-template-columns:repeat(2,minmax(0,1fr))}.rv-day{min-height:0}}
+.rv-day{background:var(--surface-2);border-radius:12px;padding:8px;display:grid;gap:4px;align-content:start;min-height:78px;min-width:0}
+.rv-day.today{outline:2px solid var(--accent);background:#fff}
+.rv-day .dh{display:flex;justify-content:space-between;gap:4px;font-size:.74rem;color:var(--ink-3)}
+.rv-day .dh b{font-family:var(--font-m);color:var(--ink);font-weight:500}
+.rv-day .mtag{white-space:normal;font-size:.68rem;line-height:1.25;padding:2px 7px;overflow-wrap:anywhere}
+.rv-day.empty .dh b{color:var(--ink-3)}
+.rv-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:18px}
+.rv-card{align-content:start}
+.rv-kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rv-kpi div{background:var(--surface-2);border-radius:10px;padding:8px 10px;display:grid;gap:1px}
+.rv-kpi b{font-family:var(--font-d);font-size:1.35rem;line-height:1.1;color:var(--mfg,var(--ink))}
+.rv-kpi span{font-size:.74rem;color:var(--ink-2)}
+.rv-dist{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--surface-2);gap:2px}
+.rv-dist i{display:block;height:100%}
+.rv-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.74rem;color:var(--ink-2)}
+.rv-leg span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
+.rv-trend{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:center;font-size:.8rem;color:var(--ink-2)}
+.rv-trend svg{display:block;width:120px;height:36px}
+.up{color:var(--ok);font-weight:700} .down{color:var(--late);font-weight:700}
+.pill.nil{border:1px solid var(--line)}
+.rv-it{grid-template-columns:auto minmax(0,1fr)!important}
+.rv-it.ok{background:var(--ok-soft);border-color:transparent}
+.rv-it.bad{background:var(--late-soft);border-color:transparent}
+.rv-it .cm{grid-column:2;font-size:.82rem;color:var(--ink-2)}
+.rv-it .yo{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.76rem;color:var(--ink-2)}
+@media (min-width:640px){.rv-it:not(.chk){grid-template-columns:auto minmax(0,1fr) auto!important}}
+.rv-verdict{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:10px 14px;background:var(--surface-2);font-size:.9rem}
+.rv-set{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end}
 </style>
 
 <div class="wrap">
@@ -400,6 +493,8 @@ td,th{border-bottom-color:#f0f0f5}
     <button role="tab" data-tab="auj" aria-selected="true">Aujourd'hui</button>
     <button role="tab" data-tab="planning" aria-selected="false">Planning</button>
     <button role="tab" data-tab="cours" aria-selected="false">Cours</button>
+    <button role="tab" data-tab="qcm" aria-selected="false">QCM</button>
+    <button role="tab" data-tab="rev" aria-selected="false">Révisions</button>
     <button role="tab" data-tab="kholles" aria-selected="false">Kholles</button>
     <button role="tab" data-tab="sommeil" aria-selected="false">Sommeil</button>
     <button role="tab" data-tab="methode" aria-selected="false">Méthode</button>
@@ -468,6 +563,16 @@ td,th{border-bottom-color:#f0f0f5}
     <div class="pies" id="pies"></div>
     <div class="chips" id="matChips"></div>
     <div id="coursList" style="display:grid;gap:16px"></div>
+  </section>
+
+  <!-- QCM -->
+  <section class="view" id="v-qcm" hidden>
+    <div id="qcmRoot" style="display:grid;gap:18px"></div>
+  </section>
+
+  <!-- RÉVISIONS -->
+  <section class="view" id="v-rev" hidden>
+    <div id="revRoot" style="display:grid;gap:18px"></div>
   </section>
 
   <!-- KHOLLES -->
@@ -1538,7 +1643,354 @@ function renderSommeil(){
 }
 slScales();
 
-function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan();renderSommeil();renderSlToday()}
+/* QCM : une banque de questions par cours (collection « qcm »), un résultat par passage (collection « qcmres »).
+   Barème façon prépa, par question : 0 erreur = 1 pt, 1 erreur = 0,6, 2 erreurs = 0,2, au-delà 0.
+   Une proposition laissée sans réponse compte comme non sue (erreur). */
+let Q=[],QR=[];
+const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all"};
+const QPTS=[1,.6,.2,0],LET="ABCDE";
+const qById=id=>Q.find(x=>x.id===id);
+const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
+const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
+let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e){}
+/* Dernier résultat connu de chaque question (true = les 5 propositions justes). */
+function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
+function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>m[x.id]===false).map(x=>x.id)}
+function qDraft(id){try{return JSON.parse(localStorage.getItem("qcmDraft:"+id)||"null")}catch(e){return null}}
+function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0}))}catch(e){}}
+function qDropDraft(id){try{localStorage.removeItem("qcmDraft:"+id)}catch(e){}}
+const qTop=()=>{const r=$("#qcmRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
+const qAnswered=id=>(qz.ans[id]||[]).filter(v=>v!=null).length;
+
+function renderQcm(){if(qz.mode==="quiz")renderQuiz();else if(qz.mode==="res")renderQres();else renderQcmList()}
+function renderQcmList(){
+  const root=$("#qcmRoot");qz.mode="list";
+  if(!Q.length){root.innerHTML=`<div class="panel"><h2>Mes QCM</h2><p class="muted" style="margin:0">Aucun QCM pour l'instant. Envoie un cours à Claude : il ajoutera ici un QCM qui reprend tout le cours.</p></div>`;return}
+  const list=[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
+  root.innerHTML=`<div class="bar-top"><p class="muted small" style="margin:0">Chaque QCM reprend tout le cours : ton score est la part des propositions que tu connais.</p><label class="toggle"><input type="checkbox" id="qShuf" ${qShuffle?"checked":""}> Mélanger les questions</label></div>
+    <div class="qcards">${list.map(qCard).join("")}</div>`;
+  $("#qShuf").onchange=e=>{qShuffle=e.target.checked;try{localStorage.setItem("qcmShuffle",qShuffle?"1":"0")}catch(_){}};
+  root.querySelectorAll("[data-qstart]").forEach(b=>b.onclick=()=>qStart(b.dataset.qstart,b.dataset.how));
+  root.querySelectorAll("[data-qres]").forEach(b=>b.onclick=()=>{const r=QR.find(x=>x.id===b.dataset.qres);if(r)qShowRes(r)});
+}
+function qCard(q){
+  const n=q.questions.length,rs=QR.filter(r=>r.qcm===q.id).sort((a,b)=>(a.ts||0)-(b.ts||0));
+  const full=rs.filter(r=>r.mode!=="erreurs"&&r.mode!=="revision"),last=full[full.length-1],best=full.length?Math.max(...full.map(r=>r.pct||0)):null;
+  const errs=qErrIds(q).length,dr=qDraft(q.id),ids=q.questions.map(x=>x.id);
+  const drOk=dr&&Array.isArray(dr.order)&&dr.order.length&&dr.order.every(x=>ids.includes(x));
+  const drN=drOk?dr.order.filter(id=>((dr.ans||{})[id]||[]).some(v=>v!=null)).length:0;
+  const hist=rs.slice(-12).map(r=>`<button type="button" class="qh ${r.mode==="erreurs"||r.mode==="revision"?"err":""}" data-qres="${esc(r.id)}" title="${fmt(r.date)} · ${r.pct} %${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}" aria-label="Résultat du ${fmt(r.date)} : ${r.pct} %"><span>${r.pct}</span><i style="height:${Math.max(4,(r.pct||0)*.78)}%"></i></button>`).join("");
+  return `<div class="panel mat qcard" style="${mvars(q.matiere)}">
+    <div class="mat-head"><h3>${esc(q.titre)}</h3><span class="mtag">${esc(shortNom(matById(q.matiere)))}</span></div>
+    <span class="small muted">${n} questions · ${n*5} propositions · ${(q.sections||[]).length} parties du cours</span>
+    ${last?`<div class="qkpi"><span><b>${last.pct} %</b> au dernier passage (${fmt(last.date)})</span>${full.length>1?`<span>meilleur ${best} %</span>`:""}</div>`:`<span class="small muted">${rs.length?"Pas encore fait en entier (seulement en révisions).":"Pas encore fait."}</span>`}
+    ${hist?`<div class="qhist">${hist}</div>`:""}
+    <div class="acts">
+      ${drOk?`<button class="btn primary" type="button" data-qstart="${esc(q.id)}" data-how="resume">Reprendre (${drN}/${dr.order.length})</button><button class="btn" type="button" data-qstart="${esc(q.id)}" data-how="new">Recommencer</button>`:`<button class="btn primary" type="button" data-qstart="${esc(q.id)}" data-how="new">${full.length?"Refaire tout le QCM":"Commencer"}</button>`}
+      ${errs?`<button class="btn" type="button" data-qstart="${esc(q.id)}" data-how="err">Revoir mes erreurs (${errs})</button>`:""}
+    </div></div>`;
+}
+function qStart(id,how,only){
+  const q=qById(id);if(!q)return;const ids=q.questions.map(x=>x.id);
+  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false});renderQuiz();qTop();return}}
+  const order=only?only.filter(x=>ids.includes(x)):how==="err"?qErrIds(q):ids.slice();if(!order.length)return;
+  if(qShuffle)for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false});qSaveDraft();renderQuiz();qTop();
+}
+function renderQuiz(){
+  const q=qById(qz.id);if(!q)return renderQcmList();
+  const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),n=qz.order.length,cur=qs[qz.order[qz.i]];if(!cur)return renderQcmList();
+  const a=qz.ans[cur.id]||[],done=qz.order.filter(id=>qAnswered(id)===5).length,blank=qz.order.reduce((s,id)=>s+5-qAnswered(id),0);
+  $("#qcmRoot").innerHTML=`<div class="qz">
+    <div class="panel qz-main" style="${mvars(q.matiere)}">
+      <header><div><span class="eyebrow">${esc(q.titre)}${qz.only?" · mes erreurs":""}</span><h2>Question ${qz.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="qQuit">Quitter</button></header>
+      <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+      <ol class="qz-items">${cur.it.map((it,k)=>`<li class="qz-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`).join("")}</ol>
+      <div class="qz-nav"><button class="btn" type="button" id="qPrev" ${qz.i?"":"disabled"}>‹ Précédente</button>${qz.i<n-1?`<button class="btn primary" type="button" id="qNext">Suivante ›</button>`:`<button class="btn primary" type="button" id="qEnd2">Terminer</button>`}</div>
+    </div>
+    <aside class="panel qz-side">
+      <div class="bar-top"><b>Répondues</b><span class="num">${done}/${n}</span></div>
+      <span class="prog"><i style="width:${done/n*100}%"></i></span>
+      <div class="qgrid">${qz.order.map((id,k)=>{const c=qAnswered(id);return `<button type="button" data-go="${k}" class="${c===5?"qfull":c?"part":""}" aria-current="${k===qz.i}" aria-label="Question ${k+1}">${k+1}</button>`}).join("")}</div>
+      <button class="btn primary" type="button" id="qEnd">Terminer</button>
+      <p class="small" ${qz.arm?"":"hidden"} style="margin:0;color:var(--late)">${blank} proposition${blank>1?"s":""} sans réponse : ${blank>1?"elles compteront comme non sues":"elle comptera comme non sue"}. Touche encore « Terminer » pour valider.</p>
+      <p class="small muted" style="margin:0">Touche une 2e fois une réponse pour l'effacer et laisser la proposition vide. Tu peux quitter : tes réponses sont gardées sur cet appareil.</p>
+    </aside></div>`;
+  const root=$("#qcmRoot");
+  root.querySelectorAll(".vfb").forEach(b=>b.onclick=()=>{const k=+b.dataset.k,v=+b.dataset.a,arr=[...(qz.ans[cur.id]||[null,null,null,null,null])];arr[k]=arr[k]===v?null:v;qz.ans[cur.id]=arr;qz.arm=false;qSaveDraft();renderQuiz()});
+  root.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{qz.i=+b.dataset.go;qz.arm=false;qSaveDraft();renderQuiz();qTop()});
+  const go=d=>{qz.i=Math.max(0,Math.min(n-1,qz.i+d));qz.arm=false;qSaveDraft();renderQuiz();qTop()};
+  $("#qPrev").onclick=()=>go(-1);if($("#qNext"))$("#qNext").onclick=()=>go(1);
+  const end=()=>{if(blank&&!qz.arm){qz.arm=true;renderQuiz();return}qFinish()};
+  $("#qEnd").onclick=end;if($("#qEnd2"))$("#qEnd2").onclick=end;
+  $("#qQuit").onclick=()=>{qSaveDraft();renderQcmList();qTop()};
+}
+async function qFinish(){
+  const q=qById(qz.id);if(!q)return;const qs=Object.fromEntries(q.questions.map(x=>[x.id,x]));
+  let juste=0,faux=0,vide=0,pts=0;const sec={},ok={},rep={};
+  qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[];let e=0;
+    x.it.forEach((it,k)=>{const v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
+    const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-e;s.t+=5;
+    pts+=QPTS[Math.min(e,3)];ok[id]=e===0;rep[id]=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join("")});
+  const nq=qz.order.length,total=nq*5;
+  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:Math.round(pts/nq*2000)/100,duree:Math.max(1,Math.round((Date.now()-qz.t0)/60000)),sec,ok,rep,order:qz.order};
+  qDropDraft(q.id);qShowRes(r);
+  if(!db){toast("Résultat non enregistré : données indisponibles ici");return}
+  try{const ref=await db.collection("qcmres").add(r);if(ref&&ref.id&&qz.res===r)r.id=ref.id;toast("Résultat enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
+}
+function qShowRes(r){qz.mode="res";qz.res=r;qz.filt="all";renderQres();qTop()}
+function renderQres(){
+  const r=qz.res,q=r&&qById(r.qcm);if(!q)return renderQcmList();
+  const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]);
+  const per=order.map((id,i)=>{const x=qs[id],rp=(r.rep||{})[id]||"-----";let e=0;x.it.forEach((it,k)=>{if(rp[k]==="-"||(rp[k]==="V")!==it.v)e++});return{x,rp,e,i}});
+  const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>p.e>=3).length,nPart=per.length-nOk-nKo;
+  const secs=Object.entries(r.sec||{}).map(([k,v])=>({k:+k,j:v.j,t:v.t,p:Math.round(v.j/v.t*100)})).sort((a,b)=>a.k-b.k);
+  const c=C.find(x=>x.id===r.cours),pk=c?(["p1","p2","p3"].find(p=>!c[p])||"xnew"):null;
+  const wrongIds=per.filter(p=>p.e).map(p=>p.x.id),show=qz.filt==="err"?per.filter(p=>p.e):per;
+  const pill=v=>v==="V"?`<span class="pill ok">✓ Vrai</span>`:v==="F"?`<span class="pill late">✕ Faux</span>`:`<span class="pill nil">sans réponse</span>`;
+  $("#qcmRoot").innerHTML=`
+    <div class="panel" style="${mvars(q.matiere)}">
+      <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
+      <div class="stats">
+        <div class="stat acc"><b class="num">${r.pct} %</b><span class="small">${r.mode==="erreurs"?"de propositions justes sur tes erreurs":r.mode==="revision"?"de propositions justes (révision espacée)":"du cours maîtrisé"}</span></div>
+        <div class="stat"><b class="num">${qNum(r.note)}<span class="small muted">/20</span></b><span class="small muted">note façon prépa</span></div>
+        <div class="stat"><b class="num">${r.juste}<span class="small muted">/${r.total}</span></b><span class="small muted">propositions justes · ${r.faux} fausse${r.faux>1?"s":""} · ${r.vide} vide${r.vide>1?"s":""}</span></div>
+        <div class="stat"><b class="num">${nOk}<span class="small muted">/${per.length}</span></b><span class="small muted">questions correctes · ${nPart} partielle${nPart>1?"s":""} · ${nKo} incorrecte${nKo>1?"s":""}</span></div>
+      </div>
+      <div class="acts" style="flex-wrap:wrap;gap:6px">
+        ${wrongIds.length?`<button class="btn primary" type="button" id="qRedo">Refaire mes ${wrongIds.length} question${wrongIds.length>1?"s":""} ratée${wrongIds.length>1?"s":""}</button>`:""}
+        ${c&&r.mode!=="erreurs"&&r.mode!=="revision"?`<button class="btn" type="button" id="qPass">Noter ${r.juste}/${r.total} dans mon ${pk==="xnew"?"passage suivant":pk.toUpperCase()}</button>`:""}
+      </div>
+    </div>
+    <div class="panel">
+      <header><h2>Par partie du cours</h2><span class="muted small">propositions justes</span></header>
+      <div class="rows">${secs.map(s=>`<div class="secrow"><span>${esc((q.sections||[])[s.k]||"Partie "+(s.k+1))}</span><span class="prog ${pctCls(s.p)}"><i style="width:${s.p}%"></i></span><span class="n">${s.j}/${s.t} · ${s.p} %</span></div>`).join("")}</div>
+    </div>
+    <div class="panel">
+      <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
+      ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
+        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(QPTS[Math.min(p.e,3)])} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
+        <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+        <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
+        ${x.it.map((it,k)=>{const y=p.rp[k],bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
+        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
+    </div>`;
+  const root=$("#qcmRoot");
+  $("#qBack").onclick=()=>{renderQcmList();qTop()};
+  root.querySelectorAll("[data-qf]").forEach(b=>b.onclick=()=>{qz.filt=b.dataset.qf;renderQres()});
+  if($("#qRedo"))$("#qRedo").onclick=()=>qStart(q.id,"err",wrongIds);
+  if($("#qPass"))$("#qPass").onclick=()=>{openPass(c.id,pk);$("#pm-score").value=r.juste;$("#pm-total").value=r.total;if(!$("#pm-note").value)$("#pm-note").value="QCM complet : "+r.pct+" %"};
+}
+
+/* RÉVISIONS : répétition espacée façon Anki (algorithme FSRS, rétention visée 0,90), avec les questions des QCM pour cartes.
+   L'état de chaque question est recalculé à partir de l'historique « qcmres » : rien d'autre n'est stocké.
+   Note d'une question : 0 erreur = « Bien », 1 erreur = « Difficile », 2 erreurs ou plus = « À revoir » (revient le lendemain).
+   Comme dans Anki, seul le premier passage d'une question dans la journée compte pour le calendrier.
+   Une question est « acquise » quand sa stabilité atteint 21 jours ; un cours est acquis quand 90 % de ses questions le sont
+   et qu'il est su à 90 % au moins. */
+const FW=[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.031,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.587,0.2272,2.8755];
+const F_DEC=-.5,F_FAC=19/81;
+let RVC={nouv:15,max:21},SRS={};
+const nIso=n=>new Date(n*864e5).toISOString().slice(0,10);
+const clampD=d=>Math.min(10,Math.max(1,d));
+const fR=(t,s)=>Math.pow(1+F_FAC*t/s,F_DEC);
+function fNext(st,g,d){
+  if(!st)return{s:FW[g-1],d:clampD(FW[4]-(g-3)*FW[5]),last:d,first:d,n:1,lap:g===1?1:0};
+  const r=fR(Math.max(0,dayN(d)-dayN(st.last)),st.s);
+  const s=g===1?Math.min(st.s,FW[11]*Math.pow(st.d,-FW[12])*(Math.pow(st.s+1,FW[13])-1)*Math.exp(FW[14]*(1-r)))
+    :st.s*(Math.exp(FW[8])*(11-st.d)*Math.pow(st.s,-FW[9])*(Math.exp(FW[10]*(1-r))-1)*(g===2?FW[15]:1)+1);
+  return{...st,s,d:clampD(FW[7]*FW[4]+(1-FW[7])*(st.d-FW[6]*(g-3))),last:d,n:st.n+1,lap:st.lap+(g===1?1:0)};
+}
+const rvGrade=e=>e===0?3:e===1?2:1;
+const GR={3:["ok","Bien"],2:["due","Difficile"],1:["late","À revoir"]};
+/* Prochaine date : intervalle = stabilité (rétention 0,90), plafonné à l'intervalle max, et jamais après le 15 décembre (J-2). */
+function rvDue(st,g){const max=+RVC.max||21,L=dayN(st.last);let due=L+(g===1?1:Math.min(max,Math.max(1,Math.round(st.s))));
+  const cap=dayN(CONCOURS)-2;if(due>cap)due=Math.max(L+1,cap);return nIso(due)}
+function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
+function buildSrs(){
+  const qb=Object.fromEntries(Q.map(q=>[q.id,Object.fromEntries((q.questions||[]).map(x=>[x.id,x]))])),out={};
+  [...QR].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>{const qs=qb[r.qcm];if(!qs)return;const d=r.date||iso(r.ts||Date.now());
+    for(const id in (r.rep||{})){const x=qs[id];if(!x)continue;const k=r.qcm+"|"+id,st=out[k];if(st&&st.last>=d)continue;
+      const e=rvErrs(x,r.rep[id]),g=rvGrade(e),nx=fNext(st,g,d);
+      nx.e=e;nx.g=g;nx.hist=[...(st?st.hist:[]),{d,e}];if(!st)nx.via=r.mode||"complet";nx.due=rvDue(nx,g);out[k]=nx}});
+  SRS=out;
+}
+const rvOpen=q=>{const c=C.find(x=>x.id===q.cours);return !c||!!c.p1};
+const rvBanks=()=>[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
+function rvQueue(){const td=today(),T=dayN(td),due=[],nw=[];
+  const newToday=Object.values(SRS).filter(s=>s.first===td&&s.via==="revision").length;
+  rvBanks().forEach(q=>(q.questions||[]).forEach(x=>{const k=q.id+"|"+x.id,st=SRS[k];
+    if(st){if(st.due<=td)due.push({k,u:dayN(st.due),r:fR(T-dayN(st.last),st.s)})}else if(rvOpen(q))nw.push(k)}));
+  due.sort((a,b)=>a.u-b.u||a.r-b.r);
+  return{due:due.map(x=>x.k),nw:nw.slice(0,Math.max(0,(+RVC.nouv||0)-newToday)),nwLeft:nw.length};
+}
+function rvBank(q){const td=today(),T=dayN(td),qs=q.questions||[];let su=0,seen=0,mat=0,due=0,mem=0,next=null,nextN=0;const days={};
+  qs.forEach(x=>{const st=SRS[q.id+"|"+x.id];if(!st)return;seen++;su+=5-st.e;if(st.s>=21)mat++;mem+=fR(Math.max(0,T-dayN(st.last)),st.s);
+    if(st.due<=td)due++;else if(!next||st.due<next){next=st.due;nextN=1}else if(st.due===next)nextN++;
+    st.hist.forEach((h,i)=>{const o=days[h.d]=days[h.d]||{j:0,t:0,dj:0,dt:0};o.j+=5-h.e;o.t+=5;if(i){o.dj+=st.hist[i-1].e-h.e;o.dt+=5}})});
+  const sess=Object.keys(days).sort().map(d=>({d,p:Math.round(days[d].j/days[d].t*100),dl:days[d].dt?Math.round(days[d].dj/days[d].dt*100):null}));
+  return{n:qs.length,seen,mat,due,next,nextN,su:qs.length?Math.round(su/(5*qs.length)*100):0,mem:seen?Math.round(mem/seen*100):null,sess};
+}
+function rvStage(b){if(!b.seen)return["nil","Pas commencé"];if(b.mat>=.9*b.n&&b.su>=90)return["ok","Acquis"];if(b.seen<b.n)return["info","En découverte"];return["due","En consolidation"]}
+function rvBadge(){const b=document.querySelector('nav.tabs button[data-tab="rev"]');if(!b)return;buildSrs();const q=rvQueue(),n=q.due.length+q.nw.length;
+  b.innerHTML="Révisions"+(n?`<span class="tbadge">${n}</span>`:"");b.setAttribute("aria-label",n?`Révisions, ${n} questions aujourd'hui`:"Révisions")}
+
+/* Séance du jour : une question à la fois, correction tout de suite (comme le verso d'une carte).
+   Une question ratée (2 erreurs ou plus) repasse en fin de séance, sans compter pour le calendrier. */
+const rv={mode:"home",date:"",list:[],i:0,ans:{},res:{},chk:false,tq:0,sum:null};
+const rvKey=e=>e.k+(e.again?"#2":"");
+function rvDraft(){try{return JSON.parse(localStorage.getItem("revDraft")||"null")}catch(e){return null}}
+function rvSaveDraft(){try{localStorage.setItem("revDraft",JSON.stringify({date:rv.date,list:rv.list,i:rv.i,ans:rv.ans,res:rv.res,chk:rv.chk}))}catch(e){}}
+function rvDropDraft(){try{localStorage.removeItem("revDraft")}catch(e){}}
+const rvQ=k=>{const [b,id]=k.split("|"),q=qById(b);return q?{q,x:(q.questions||[]).find(y=>y.id===id)}:{}};
+const rvTop=()=>{const r=$("#revRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
+const ago=n=>n<=0?"aujourd'hui":n===1?"hier":"il y a "+n+" j";
+const inN=n=>n<=0?"aujourd'hui":n===1?"demain":"dans "+n+" j";
+const DJC=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+const dLbl=s=>DJC[new Date(s+"T12:00:00").getDay()]+" "+fmt(s);
+
+function renderRev(){if(rv.mode==="sess")renderRevSess();else if(rv.mode==="done")renderRevDone();else renderRevHome()}
+function renderRevHome(){
+  rv.mode="home";buildSrs();rvBadge();const root=$("#revRoot");if(!root)return;
+  if(!Q.length){root.innerHTML=`<div class="panel"><h2>Révisions</h2><p class="muted" style="margin:0">Il faut d'abord des QCM. Envoie un cours à Claude : il ajoutera son QCM dans l'onglet QCM, et ses questions arriveront ici.</p></div>`;return}
+  const td=today(),T=dayN(td),qq=rvQueue(),nDue=qq.due.length,nNew=qq.nw.length,tot=nDue+nNew,dr=rvDraft();
+  const drLeft=dr&&dr.list?dr.list.length-(dr.i||0)-(dr.chk?1:0):0,drDone=dr&&dr.res?Object.keys(dr.res).filter(k=>!dr.res[k].saved).length:0,drOk=dr&&(drLeft>0||drDone>0);
+  const per={};[...qq.due,...qq.nw].forEach(k=>{const b=k.split("|")[0];per[b]=(per[b]||0)+1});
+  const chips=Object.entries(per).map(([b,n])=>{const q=qById(b);return `<span class="mtag" style="${mvars(q.matiere)}">${esc(shortNom(matById(q.matiere)))} · ${esc(q.titre)} · <b class="num">${n}</b></span>`}).join("");
+  /* 14 prochains jours : cours à revoir chaque jour (le retard compte pour aujourd'hui). */
+  const days=[...Array(14)].map((_,i)=>({d:nIso(T+i),n:0,b:{}}));
+  for(const k in SRS){const st=SRS[k],i=Math.max(0,dayN(st.due)-T);if(i<14){const o=days[i],b=k.split("|")[0];o.n++;o.b[b]=(o.b[b]||0)+1}}
+  const banks=rvBanks(),noBank=C.filter(c=>c.p1&&!Q.some(q=>q.cours===c.id)).length;
+  const btns=drOk?`<button class="btn primary" type="button" id="rvResume">Reprendre la séance${drLeft>0?` (${drLeft} restante${drLeft>1?"s":""})`:""}</button><button class="btn" type="button" id="rvDropDr">${drDone?"Enregistrer et arrêter":"Abandonner"}</button>`
+    :tot?`<button class="btn primary" type="button" data-rvgo="${tot}">Tout réviser (${tot})</button>${tot>20?`<button class="btn" type="button" data-rvgo="20">Une série de 20</button>`:""}<button class="btn ghost" type="button" id="rvPlan">+ Ajouter à mon planning</button>`:"";
+  root.innerHTML=`
+  <div class="panel">
+    <header><h2>À réviser aujourd'hui</h2><span class="muted small">${new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</span></header>
+    <div class="rv-hero">
+      <div class="rv-big num">${tot}<small>question${tot>1?"s":""}</small></div>
+      <div style="display:grid;gap:8px">
+        <div class="rv-split"><span><b>${nDue}</b> à revoir</span><span><b>${nNew}</b> nouvelle${nNew>1?"s":""}${qq.nwLeft>nNew?` <span class="small">(encore ${qq.nwLeft-nNew} en attente)</span>`:""}</span>${tot?`<span>≈ <b>${Math.max(1,Math.round(tot*1.2))}</b> min</span>`:""}</div>
+        ${chips?`<div class="rv-chips">${chips}</div>`:`<span class="muted">Rien à revoir aujourd'hui.${days.slice(1).find(x=>x.n)?` Prochaine révision ${dLbl(days.slice(1).find(x=>x.n).d)}.`:""}</span>`}
+      </div>
+    </div>
+    ${btns?`<div class="acts" style="flex-wrap:wrap;gap:6px">${btns}</div>`:""}
+    <p class="small muted" style="margin:0">Indicatif : cette page ne touche pas à ton planning. Fais-la quand tu veux dans la journée, même en plusieurs fois.</p>
+  </div>
+  <div class="panel">
+    <header><h2>Les 14 prochains jours</h2><span class="muted small">cours à revoir chaque jour · nombre de questions</span></header>
+    <div class="rv-days">${days.map((o,i)=>`<div class="rv-day ${i?"":"today"} ${o.n?"":"empty"}"><div class="dh"><span>${i?dLbl(o.d):"Aujourd'hui"}</span><b>${o.n||"–"}</b></div>${Object.entries(o.b).map(([b,n])=>{const q=qById(b);return q?`<span class="mtag" style="${mvars(q.matiere)}" title="${esc(q.titre)}">${esc(shortNom(matById(q.matiere)))} ${esc((q.titre||"").split(" · ")[0])} · ${n}</span>`:""}).join("")}</div>`).join("")}</div>
+  </div>
+  <div class="rv-cards">${banks.map(rvCard).join("")}</div>
+  ${noBank?`<p class="small muted" style="margin:0;text-align:center">${noBank} cours déjà vu${noBank>1?"s":""} n'${noBank>1?"ont":"a"} pas encore de QCM : envoie-les à Claude pour qu'ils entrent dans tes révisions.</p>`:""}
+  <details class="panel fold">
+    <summary><h2>Comment ça marche</h2></summary>
+    <ul class="prose">
+      <li><b>Chaque question de QCM est une carte Anki.</b> Le même algorithme qu'Anki (FSRS, rétention visée 0,90) décide quand elle revient, selon tes réponses et non selon une méthode des J fixe.</li>
+      <li><b>Ta note vient du QCM</b> : 5 propositions justes = « Bien », 1 erreur = « Difficile » (revient plus tôt), 2 erreurs ou plus = « À revoir » (revient demain, et une 2e fois en fin de séance). Une proposition laissée vide compte comme une erreur.</li>
+      <li><b>Tout compte</b> : les QCM complets faits dans l'onglet QCM entrent aussi dans le calendrier. Seul le premier passage de la journée compte.</li>
+      <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours dont tu as fait le 1er passage.</li>
+      <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
+      <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
+      <li><b>Progression</b> : sous chaque cours, la courbe montre ton score à chaque séance, et l'écart compare tes réponses à celles de la fois d'avant sur les mêmes questions : <span class="up">+</span> tu progresses, <span class="down">−</span> tu régresses.</li>
+    </ul>
+    <form class="rv-set" id="rvSet">
+      <label>Nouvelles questions par jour<input type="number" id="rv-nouv" min="0" max="200" inputmode="numeric" value="${esc(RVC.nouv)}"></label>
+      <label>Intervalle max (jours)<input type="number" id="rv-max" min="2" max="60" inputmode="numeric" value="${esc(RVC.max)}"></label>
+      <div><button class="btn" type="submit">Enregistrer</button></div>
+    </form>
+  </details>`;
+  root.querySelectorAll("[data-rvgo]").forEach(b=>b.onclick=()=>rvStart(+b.dataset.rvgo));
+  if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now()});
+    if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
+  if($("#rvDropDr"))$("#rvDropDr").onclick=async()=>{const d=rvDraft();if(d){Object.assign(rv,{date:d.date,list:d.list||[],ans:d.ans||{},res:d.res||{}});await rvSave()}rvDropDraft();renderRevHome()};
+  if($("#rvPlan"))$("#rvPlan").onclick=()=>addTask({date:today(),heure:"",texte:`Révisions espacées · ${tot} question${tot>1?"s":""}`,matiere:""});
+  $("#rvSet").addEventListener("submit",async e=>{e.preventDefault();const nv=Math.max(0,Math.round(+$("#rv-nouv").value||0)),mx=Math.min(60,Math.max(2,Math.round(+$("#rv-max").value||21)));
+    RVC={nouv:nv,max:mx};renderRevHome();if(!db)return;try{await db.doc("config/revision").set(RVC);toast("Réglages enregistrés")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
+}
+function rvSpark(sess){const L=sess.slice(-10);if(!L.length)return"";const W=120,H=36,x=i=>L.length<2?W/2:6+i*(W-12)/(L.length-1),y=p=>H-5-p/100*(H-10);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score par séance : ${L.map(s=>s.p+" %").join(", ")}"><line x1="0" x2="${W}" y1="${y(80)}" y2="${y(80)}" stroke="var(--line)" stroke-dasharray="3 3"/>${L.length>1?`<polyline fill="none" stroke="var(--mfg,var(--accent))" stroke-width="2" stroke-linejoin="round" points="${L.map((s,i)=>x(i)+","+y(s.p)).join(" ")}"/>`:""}${L.map((s,i)=>`<circle cx="${x(i)}" cy="${y(s.p)}" r="${i===L.length-1?3.2:2.2}" fill="var(--mfg,var(--accent))"><title>${fmt(s.d)} : ${s.p} %</title></circle>`).join("")}</svg>`}
+function rvCard(q){const b=rvBank(q),st=rvStage(b),m=matById(q.matiere),last=b.sess[b.sess.length-1],c=C.find(x=>x.id===q.cours);
+  const young=b.seen-b.mat,un=b.n-b.seen,w=v=>b.n?v/b.n*100:0,mc=(MCOL[q.matiere]||["#eee","#7c6fd6"])[1];
+  const nextTxt=b.due?`<b>${b.due}</b> question${b.due>1?"s":""} à revoir aujourd'hui`:b.next?`Prochaine révision ${dLbl(b.next)} (${inN(dayN(b.next)-dayN(today()))}, ${b.nextN} question${b.nextN>1?"s":""})`:b.seen?"":(c&&!c.p1?"Arrivera après ton 1er passage":"Nouvelles questions dès aujourd'hui");
+  return `<div class="panel mat rv-card" style="${mvars(q.matiere)}">
+    <div class="mat-head"><h3>${esc(q.titre)}</h3><span class="mtag">${esc(shortNom(m))}</span></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill ${st[0]}">${st[1]}</span><span class="small muted">${b.sess.length} séance${b.sess.length>1?"s":""}${last?` · dernière ${ago(dayN(today())-dayN(last.d))}`:""}</span></div>
+    <div class="rv-kpi"><div><b class="num">${b.su} %</b><span>du cours su</span></div><div><b class="num">${b.mem!=null?b.mem+" %":"–"}</b><span>mémoire aujourd'hui</span></div></div>
+    <div class="rv-dist" role="img" aria-label="${b.mat} acquises, ${young} en cours, ${un} jamais vues"><i style="width:${w(b.mat)}%;background:${mc}"></i><i style="width:${w(young)}%;background:${mc}66"></i><i style="width:${w(un)}%;background:var(--line)"></i></div>
+    <div class="rv-leg"><span style="--c:${mc}">${b.mat} acquise${b.mat>1?"s":""}</span><span style="--c:${mc}66">${young} en cours</span><span style="--c:var(--line)">${un} jamais vue${un>1?"s":""}</span></div>
+    ${last?`<div class="rv-trend">${rvSpark(b.sess)}<span>Dernière séance <b class="num">${last.p} %</b>${last.dl!=null?` · <span class="${last.dl>0?"up":last.dl<0?"down":""}">${last.dl>0?"+":last.dl<0?"−":"±"}${Math.abs(last.dl)} pts</span> sur les mêmes questions`:""}</span></div>`:""}
+    ${nextTxt?`<span class="small">${nextTxt}</span>`:""}
+  </div>`}
+
+function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
+  for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]]}
+  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(k=>({k,again:false})),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null});rvSaveDraft();renderRevSess();rvTop()}
+function renderRevSess(){
+  const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x}=rvQ(e.k);if(!q||!x){rv.i++;return renderRevSess()}
+  const key=rvKey(e),a=rv.ans[key]||[],st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
+  const done=Object.keys(rv.res).length,first=rv.list.filter(y=>!y.again).length;
+  let verdict="";
+  if(chk){const err=rvErrs(x,x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F")),g=rvGrade(err),gr=GR[g];
+    if(e.again)verdict=`<span class="pill ${gr[0]}">${err?err+" erreur"+(err>1?"s":""):"Tout juste"}</span><span class="small muted">Rappel de fin de séance : ne compte pas pour le calendrier.</span>`;
+    else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g);
+      verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):"5/5"}</span><span class="small">Revient ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${g===1?", et une 2e fois en fin de séance":""}.</span>`}}
+  const pill=v=>v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
+  $("#revRoot").innerHTML=`<div class="qz">
+    <div class="panel qz-main" style="${mvars(q.matiere)}">
+      <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="rvQuit">Arrêter</button></header>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${e.again?`<span class="pill due">Rappel</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`}<span class="small muted">${esc((q.sections||[])[x.s]||"")}</span></div>
+      <p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+      <ol class="qz-items">${x.it.map((it,k)=>{if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
+        const ok=a[k]!=null&&(a[k]===1)===it.v;return `<li class="qz-it rv-it chk ${ok?"ok":"bad"}"><span class="lt">${LET[k]}</span><span class="tx"><b>${it.v?"VRAI":"FAUX"}</b> · ${esc(it.t)}</span><span class="yo">Ta réponse : ${pill(a[k])}</span>${it.c?`<span class="cm">${esc(it.c)}</span>`:""}</li>`}).join("")}</ol>
+      ${chk?`<div class="rv-verdict">${verdict}</div>`:""}
+      <div class="qz-nav"><span></span>${chk?`<button class="btn primary" type="button" id="rvNext">${rv.i<n-1?"Suivante ›":"Terminer"}</button>`:`<button class="btn primary" type="button" id="rvCheck">Valider</button>`}</div>
+    </div>
+    <aside class="panel qz-side">
+      <div class="bar-top"><b>Séance du jour</b><span class="num">${done}/${first}</span></div>
+      <span class="prog"><i style="width:${first?done/first*100:0}%"></i></span>
+      <p class="small muted" style="margin:0">Réponds aux 5 propositions puis valide : la correction s'affiche tout de suite. Touche une 2e fois une réponse pour l'effacer. Tu peux arrêter quand tu veux : ce qui est fait est enregistré, le reste attend.</p>
+    </aside></div>`;
+  const root=$("#revRoot");
+  root.querySelectorAll(".vfb").forEach(b=>b.onclick=()=>{const k=+b.dataset.k,v=+b.dataset.a,arr=[...(rv.ans[key]||[null,null,null,null,null])];arr[k]=arr[k]===v?null:v;rv.ans[key]=arr;rvSaveDraft();renderRevSess()});
+  if($("#rvCheck"))$("#rvCheck").onclick=()=>{const rp=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join(""),err=rvErrs(x,rp);
+    if(!e.again){rv.res[e.k]={rp,e:err,ms:Math.min(600000,Date.now()-rv.tq),d:rv.date};if(err>=2)rv.list.push({k:e.k,again:true})}
+    rv.chk=true;rvSaveDraft();renderRevSess()};
+  if($("#rvNext"))$("#rvNext").onclick=()=>{rv.i++;rv.chk=false;rv.tq=Date.now();rvSaveDraft();if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
+  $("#rvQuit").onclick=()=>rvFinish();
+}
+/* Fin de séance (ou arrêt) : bilan par cours, puis un résultat « révision » par QCM dans qcmres. */
+async function rvFinish(){
+  const by={};for(const k in rv.res){const r=rv.res[k];if(r.saved)continue;const b=k.split("|")[0];(by[b]=by[b]||[]).push(k)}
+  const rows=Object.entries(by).map(([b,ks])=>{const q=qById(b);let j=0,cj=0,pj=0,pt=0;const g={1:0,2:0,3:0};
+    ks.forEach(k=>{const r=rv.res[k],st=SRS[k];j+=5-r.e;g[rvGrade(r.e)]++;if(st&&st.last<r.d){cj+=5-r.e;pj+=5-st.e;pt+=5}});
+    return{q,n:ks.length,p:Math.round(j/(ks.length*5)*100),dl:pt?Math.round((cj-pj)/pt*100):null,g}});
+  rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date};
+  rv.mode="done";renderRevDone();rvTop();
+  await rvSave();rvDropDraft();
+}
+async function rvSave(){
+  const by={};for(const k in rv.res){const r=rv.res[k];if(r.saved)continue;const b=k.split("|")[0];(by[b]=by[b]||[]).push(k)}
+  if(!Object.keys(by).length)return;if(!db){toast("Non enregistré : données indisponibles ici");return}
+  for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0;const sec={},ok={},rep={},order=[];
+    ks.forEach(k=>{const r=rv.res[k],id=k.split("|")[1],x=(q.questions||[]).find(y=>y.id===id);if(!x)return;
+      x.it.forEach((it,i)=>{const c=r.rp[i];if(c==="-")vide++;else if((c==="V")===it.v)juste++;else faux++});
+      const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-r.e;s.t+=5;pts+=QPTS[Math.min(r.e,3)];ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
+    const nq=order.length;if(!nq)continue;
+    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:nq*5,pct:Math.round(juste/(nq*5)*100),pts:Math.round(pts*100)/100,note:Math.round(pts/nq*2000)/100,duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order};
+    try{await db.collection("qcmres").add(doc);ks.forEach(k=>rv.res[k].saved=true);rvSaveDraft()}catch(e){toast("Pas enregistré : "+(e.code||"erreur"));return}}
+  toast("Séance enregistrée");
+}
+function renderRevDone(){const s=rv.sum;if(!s)return renderRevHome();
+  const tj=s.rows.reduce((a,r)=>a+r.p*r.n,0),tp=s.n?Math.round(tj/s.n):0;
+  $("#revRoot").innerHTML=`<div class="panel">
+    <header><div><span class="eyebrow">Séance du ${fmt(s.date)}</span><h2>${s.n?"Bien joué":"Séance arrêtée"}</h2></div><button class="link" type="button" id="rvBack">Retour aux révisions</button></header>
+    ${s.n?`<div class="stats"><div class="stat acc"><b class="num">${tp} %</b><span class="small">de propositions justes</span></div><div class="stat"><b class="num">${s.n}</b><span class="small muted">question${s.n>1?"s":""} revue${s.n>1?"s":""}</span></div></div>
+    <div class="rows">${s.rows.map(r=>`<div class="secrow" style="${mvars(r.q.matiere)}"><span><b>${esc(shortNom(matById(r.q.matiere)))}</b> · ${esc(r.q.titre)} <span class="small muted">· ${r.n} q. · ${r.g[3]} bien, ${r.g[2]} difficile${r.g[2]>1?"s":""}, ${r.g[1]} à revoir${r.dl!=null?` · <span class="${r.dl>0?"up":r.dl<0?"down":""}">${r.dl>0?"+":r.dl<0?"−":"±"}${Math.abs(r.dl)} pts</span> vs la fois d'avant`:""}</span></span><span class="prog ${pctCls(r.p)}"><i style="width:${r.p}%"></i></span><span class="n">${r.p} %</span></div>`).join("")}</div>`:`<p class="muted" style="margin:0">Aucune question validée : rien n'a changé dans ton calendrier.</p>`}
+  </div>`;
+  $("#rvBack").onclick=()=>{rv.mode="home";rv.sum=null;renderRevHome();rvTop()};
+}
+
+function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan();renderSommeil();renderSlToday();if(qz.mode==="list")renderQcmList();if(rv.mode==="home")renderRevHome();else rvBadge()}
 renderSemaine();renderAll();
 
 /* DATA */
@@ -1549,7 +2001,8 @@ renderSemaine();renderAll();
   if(!db){$("#dbnote").hidden=false;return}
   let pend=0;const later=()=>{if(pend)return;pend=requestAnimationFrame(()=>{pend=0;renderAll()})};
   const sub=(col,fn)=>db.collection(col).onSnapshot(s=>{fn(s.docs.map(d=>({id:d.id,...d.data()})));later()},e=>toast("Synchro interrompue : "+e.code));
-  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);sub("sommeil",a=>S=a);
+  sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);sub("sommeil",a=>S=a);sub("qcm",a=>Q=a);sub("qcmres",a=>QR=a);
+  db.doc("config/revision").onSnapshot(s=>{if(s.exists)RVC={...RVC,...s.data()};later()});
   db.doc("config/general").onSnapshot(s=>{window.__cfg=s.exists?s.data():{};later()});
   db.doc("config/journee").onSnapshot(s=>{const d=s.exists?s.data():null;if(d&&Array.isArray(d.blocs))J=d.blocs;later()});
   db.doc("config/sommeil").onSnapshot(s=>{if(s.exists)SP={...SP,...s.data()};later()});
