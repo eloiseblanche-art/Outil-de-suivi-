@@ -407,6 +407,10 @@ td,th{border-bottom-color:#f0f0f5}
 .qz{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}
 @media (max-width:860px){.qz{grid-template-columns:1fr}}
 .qz-side{position:sticky;top:64px}
+.chrono{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface-2);border-radius:10px;padding:6px 6px 6px 10px}
+.chrono b{font:500 1.25rem var(--font-m);font-variant-numeric:tabular-nums}
+.chrono .small{flex:1}
+.chrono.paused b{color:var(--ink-3)}
 @media (max-width:860px){.qz-side{position:static}}
 .qz-stem{margin:0;font-size:1.02rem;line-height:1.45}
 /* photo d'une question (microscopie), en noir et blanc comme au concours ; toucher pour agrandir */
@@ -1752,7 +1756,17 @@ slScales();
 let Q=[],QR=[];
 /* qz.bank : copie des questions prise au début du QCM. Le QCM se fait et se corrige sur cette copie, pour qu'une modification
    de la banque pendant le QCM (ordre des propositions, texte) ne décale pas les réponses déjà données. */
-const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null};
+const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null,acc:0,run:0};
+/* CHRONO : temps passé (acc) + depuis la reprise (run, 0 = en pause). Quitter ou fermer la page ne compte pas :
+   au retour, le chrono repart de ce qui était enregistré. */
+const chEl=o=>(o.acc||0)+(o.run?Date.now()-o.run:0);
+const chFmt=ms=>{const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t/60)%60,x=t%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0")};
+const chPer=(ms,n)=>n?(ms/n<60000?Math.round(ms/n/1000)+" s":Math.floor(ms/n/60000)+" min "+String(Math.round(ms/n/1000)%60).padStart(2,"0"))+" par question":"";
+const chHtml=(k,o,n)=>`<div class="chrono ${o.run?"":"paused"}" data-chrono="${k}" data-n="${n}"><span aria-hidden="true">⏱</span><b>${chFmt(chEl(o))}</b><span class="small muted">${o.run?chPer(chEl(o),n):"en pause"}</span><button class="btn sm" type="button" data-chpause="${k}">${o.run?"Pause":"Reprendre"}</button></div>`;
+const chObj=k=>k==="qz"?qz:rv;
+setInterval(()=>document.querySelectorAll("[data-chrono]").forEach(el=>{const o=chObj(el.dataset.chrono);if(!o.run)return;const ms=chEl(o);el.querySelector("b").textContent=chFmt(ms);el.querySelector(".small").textContent=chPer(ms,+el.dataset.n)}),1000);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-chpause]");if(!b)return;const k=b.dataset.chpause,o=chObj(k);
+  if(o.run){o.acc=chEl(o);o.run=0}else o.run=Date.now();if(k==="qz"){qSaveDraft();renderQuiz()}else{rvSaveDraft();renderRevSess()}});
 const QPTS=[1,.6,.2,0],LET="ABCDE";
 const qById=id=>Q.find(x=>x.id===id);
 /* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
@@ -1794,7 +1808,7 @@ let qClosed=new Set();try{qClosed=new Set(JSON.parse(localStorage.getItem("qcmCl
 function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
 function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>m[x.id]===false).map(x=>x.id)}
 function qDraft(id){try{return JSON.parse(localStorage.getItem("qcmDraft:"+id)||"null")}catch(e){return null}}
-function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank}))}catch(e){}}
+function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank,acc:chEl(qz)}))}catch(e){}}
 function qDropDraft(id){try{localStorage.removeItem("qcmDraft:"+id)}catch(e){}}
 const qTop=()=>{const r=$("#qcmRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
 const qAnswered=id=>(qz.ans[id]||[]).filter(v=>v!=null).length;
@@ -1834,10 +1848,10 @@ function qCard(q){
 }
 function qStart(id,how,only){
   const q=qById(id);if(!q)return;const ids=q.questions.map(x=>x.id);
-  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null});renderQuiz();qTop();return}}
+  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null,acc:d.acc||0,run:Date.now()});renderQuiz();qTop();return}}
   const order=only?only.filter(x=>ids.includes(x)):how==="err"?qErrIds(q):ids.slice();if(!order.length)return;
   if(qShuffle)for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
-  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions))});qSaveDraft();renderQuiz();qTop();
+  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions)),acc:0,run:Date.now()});qSaveDraft();renderQuiz();qTop();
 }
 function renderQuiz(){
   const q=qById(qz.id);if(!q)return renderQcmList();
@@ -1851,6 +1865,7 @@ function renderQuiz(){
       <div class="qz-nav"><button class="btn" type="button" id="qPrev" ${qz.i?"":"disabled"}>‹ Précédente</button>${qz.i<n-1?`<button class="btn primary" type="button" id="qNext">Suivante ›</button>`:`<button class="btn primary" type="button" id="qEnd2">Terminer</button>`}</div>
     </div>
     <aside class="panel qz-side">
+      ${chHtml("qz",qz,done)}
       <div class="bar-top"><b>Répondues</b><span class="num">${done}/${n}</span></div>
       <span class="prog"><i style="width:${done/n*100}%"></i></span>
       <div class="qgrid">${qz.order.map((id,k)=>{const c=qAnswered(id);return `<button type="button" data-go="${k}" class="${c===5?"qfull":c?"part":""}" aria-current="${k===qz.i}" aria-label="Question ${k+1}">${k+1}</button>`}).join("")}</div>
@@ -1865,7 +1880,7 @@ function renderQuiz(){
   $("#qPrev").onclick=()=>go(-1);if($("#qNext"))$("#qNext").onclick=()=>go(1);
   const end=()=>{if(blank&&!qz.arm){qz.arm=true;renderQuiz();return}qFinish()};
   $("#qEnd").onclick=end;if($("#qEnd2"))$("#qEnd2").onclick=end;
-  $("#qQuit").onclick=()=>{qSaveDraft();renderQcmList();qTop()};
+  $("#qQuit").onclick=()=>{qSaveDraft();qz.acc=chEl(qz);qz.run=0;renderQcmList();qTop()};
 }
 async function qFinish(){
   const q=qById(qz.id);if(!q)return;const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x]));
@@ -1875,7 +1890,7 @@ async function qFinish(){
     const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-e;s.t+=5;
     rep[id]=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join("");pts+=qPts(x,rep[id],barOf(q));ok[id]=e===0});
   const nq=qz.order.length,total=nq*5;
-  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round((Date.now()-qz.t0)/60000)),sec,ok,rep,order:qz.order};
+  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(chEl(qz)/60000)),dsec:Math.round(chEl(qz)/1000),sec,ok,rep,order:qz.order};qz.run=0;
   qDropDraft(q.id);qShowRes(r);
   if(!db){toast("Résultat non enregistré : données indisponibles ici");return}
   try{const ref=await db.collection("qcmres").add(r);if(ref&&ref.id&&qz.res===r)r.id=ref.id;toast("Résultat enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
@@ -1893,7 +1908,7 @@ function renderQres(){
   const pill=v=>v==="V"?`<span class="pill ok">✓ Vrai</span>`:v==="F"?`<span class="pill late">✕ Faux</span>`:`<span class="pill nil">sans réponse</span>`;
   $("#qcmRoot").innerHTML=`
     <div class="panel" style="${mvars(q.matiere)}">
-      <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
+      <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.dsec?" · "+chFmt(r.dsec*1000)+" · "+chPer(r.dsec*1000,r.nq):r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
       <div class="stats">
         <div class="stat acc"><b class="num">${r.pct} %</b><span class="small">${r.mode==="erreurs"?"de propositions justes sur tes erreurs":r.mode==="revision"?"de propositions justes (révision espacée)":"du cours maîtrisé"}</span></div>
         <div class="stat"><b class="num">${qNum(note)}<span class="small muted">/20</span></b><span class="small muted">note · ${BARL[bar]||bar}</span></div>
@@ -2007,10 +2022,10 @@ function rvBadge(){const b=document.querySelector('nav.tabs button[data-tab="rev
 
 /* Séance du jour : une question à la fois, correction tout de suite (comme le verso d'une carte).
    Une question ratée (2 erreurs ou plus) repasse en fin de séance, sans compter pour le calendrier. */
-const rv={mode:"home",date:"",list:[],i:0,ans:{},res:{},chk:false,tq:0,sum:null};
+const rv={mode:"home",date:"",list:[],i:0,ans:{},res:{},chk:false,tq:0,sum:null,acc:0,run:0};
 const rvKey=e=>e.k+(e.again?"#2":"");
 function rvDraft(){try{return JSON.parse(localStorage.getItem("revDraft")||"null")}catch(e){return null}}
-function rvSaveDraft(){try{localStorage.setItem("revDraft",JSON.stringify({date:rv.date,list:rv.list,i:rv.i,ans:rv.ans,res:rv.res,chk:rv.chk}))}catch(e){}}
+function rvSaveDraft(){try{localStorage.setItem("revDraft",JSON.stringify({date:rv.date,list:rv.list,i:rv.i,ans:rv.ans,res:rv.res,chk:rv.chk,acc:chEl(rv)}))}catch(e){}}
 function rvDropDraft(){try{localStorage.removeItem("revDraft")}catch(e){}}
 const rvQ=k=>{const [b,id]=k.split("|"),q=qById(b);return q?{q,x:(q.questions||[]).find(y=>y.id===id)}:{}};
 const rvTop=()=>{const r=$("#revRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
@@ -2078,7 +2093,7 @@ function renderRevHome(){
   root.querySelectorAll("[data-rvgo]").forEach(b=>b.onclick=()=>rvStart(+b.dataset.rvgo));
   root.querySelectorAll("[data-rvstart]").forEach(b=>b.onclick=()=>rvSetRev(b.dataset.rvstart,today()));
   root.querySelectorAll("[data-rvpause]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){rvSetRev(b.dataset.rvpause,"")}else{b.dataset.arm=1;b.textContent="Toucher encore pour mettre en pause"}});
-  if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now()});
+  if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now(),acc:d.acc||0,run:Date.now()});
     if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   if($("#rvDropDr"))$("#rvDropDr").onclick=async()=>{const d=rvDraft();if(d){Object.assign(rv,{date:d.date,list:d.list||[],ans:d.ans||{},res:d.res||{}});await rvSave()}rvDropDraft();renderRevHome()};
   if($("#rvPlan"))$("#rvPlan").onclick=()=>addTask({date:today(),heure:"",texte:`Révisions espacées · ${tot} question${tot>1?"s":""}`,matiere:""});
@@ -2115,7 +2130,7 @@ function rvPick(k){const [b]=k.split("|"),{x}=rvQ(k),st=SRS[k];if(!x)return{k,ag
   const sh=shownIdx(b,x,v);return{k,again:false,v,sub:sh.length<qVer(x,v).it.length?sh:null}}
 function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
   for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]]}
-  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null});rvSaveDraft();renderRevSess();rvTop()}
+  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null,acc:0,run:Date.now()});rvSaveDraft();renderRevSess();rvTop()}
 function renderRevSess(){
   const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x:x0}=rvQ(e.k);if(!q||!x0){rv.i++;return renderRevSess()}
   const x=qVer(x0,e.v||0),nv=nVer(x0),idx=e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i),ni=idx.length;
@@ -2140,6 +2155,7 @@ function renderRevSess(){
       <div class="qz-nav"><span></span>${chk?`<button class="btn primary" type="button" id="rvNext">${rv.i<n-1?"Suivante ›":"Terminer"}</button>`:`<button class="btn primary" type="button" id="rvCheck">Valider</button>`}</div>
     </div>
     <aside class="panel qz-side">
+      ${chHtml("rv",rv,done)}
       <div class="bar-top"><b>Séance du jour</b><span class="num">${done}/${first}</span></div>
       <span class="prog"><i style="width:${first?done/first*100:0}%"></i></span>
       <p class="small muted" style="margin:0">Réponds aux propositions puis valide : la correction s'affiche tout de suite. Touche une 2e fois une réponse pour l'effacer. « Trop facile » sur un item juste le retire de tes révisions. Tu peux arrêter quand tu veux : ce qui est fait est enregistré, le reste attend.</p>
@@ -2158,7 +2174,7 @@ async function rvFinish(){
   const rows=Object.entries(by).map(([b,ks])=>{const q=qById(b);let j=0,t=0,cj=0,pj=0,pt=0;const g={1:0,2:0,3:0};
     ks.forEach(k=>{const r=rv.res[k],st=SRS[k],rn=r.n||5;j+=rn-r.e;t+=rn;g[rvGrade(r.e)]++;if(st&&st.last<r.d&&!r.part&&(st.n||5)===5){cj+=5-r.e;pj+=5-st.e;pt+=5}});
     return{q,n:ks.length,p:t?Math.round(j/t*100):0,dl:pt?Math.round((cj-pj)/pt*100):null,g}});
-  rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date};
+  rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date,ms:chEl(rv)};rv.acc=rv.sum.ms;rv.run=0;
   rv.mode="done";renderRevDone();rvTop();
   await rvSave();rvDropDraft();
 }
@@ -2178,7 +2194,7 @@ function renderRevDone(){const s=rv.sum;if(!s)return renderRevHome();
   const tj=s.rows.reduce((a,r)=>a+r.p*r.n,0),tp=s.n?Math.round(tj/s.n):0;
   $("#revRoot").innerHTML=`<div class="panel">
     <header><div><span class="eyebrow">Séance du ${fmt(s.date)}</span><h2>${s.n?"Bien joué":"Séance arrêtée"}</h2></div><button class="link" type="button" id="rvBack">Retour aux révisions</button></header>
-    ${s.n?`<div class="stats"><div class="stat acc"><b class="num">${tp} %</b><span class="small">de propositions justes</span></div><div class="stat"><b class="num">${s.n}</b><span class="small muted">question${s.n>1?"s":""} revue${s.n>1?"s":""}</span></div></div>
+    ${s.n?`<div class="stats"><div class="stat acc"><b class="num">${tp} %</b><span class="small">de propositions justes</span></div><div class="stat"><b class="num">${s.n}</b><span class="small muted">question${s.n>1?"s":""} revue${s.n>1?"s":""}</span></div>${s.ms?`<div class="stat"><b class="num">${chFmt(s.ms)}</b><span class="small muted">${chPer(s.ms,s.n)}</span></div>`:""}</div>
     <div class="rows">${s.rows.map(r=>`<div class="secrow" style="${mvars(r.q.matiere)}"><span><b>${esc(shortNom(matById(r.q.matiere)))}</b> · ${esc(r.q.titre)} <span class="small muted">· ${r.n} q. · ${r.g[3]} bien, ${r.g[2]} difficile${r.g[2]>1?"s":""}, ${r.g[1]} à revoir${r.dl!=null?` · <span class="${r.dl>0?"up":r.dl<0?"down":""}">${r.dl>0?"+":r.dl<0?"−":"±"}${Math.abs(r.dl)} pts</span> vs la fois d'avant`:""}</span></span><span class="prog ${pctCls(r.p)}"><i style="width:${r.p}%"></i></span><span class="n">${r.p} %</span></div>`).join("")}</div>`:`<p class="muted" style="margin:0">Aucune question validée : rien n'a changé dans ton calendrier.</p>`}
   </div>`;
   $("#rvBack").onclick=()=>{rv.mode="home";rv.sum=null;renderRevHome();rvTop()};
