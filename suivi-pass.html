@@ -1950,10 +1950,17 @@ const GR={3:["ok","Bien"],2:["due","Difficile"],1:["late","À revoir"]};
 /* Comme Anki (« fuzz » + répartition de la charge) : à partir de 3 jours, l'intervalle peut bouger de ±15 % (±10 % dès 7 j,
    ±5 % dès 20 j, au moins ±1 j), et on prend le jour le moins chargé de cette fourchette. Les questions vues le même jour
    ne reviennent donc pas toutes le même jour. Une question ratée revient le lendemain, sans fourchette. */
-function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2;
+/* Gros bilan (beaucoup de QCM complets le même jour) : un jour qui a déjà sa dose (questions max par jour moins la place
+   des nouvelles) est plein. Si toute la fourchette est pleine, la question passe au premier jour suivant qui a de la place,
+   au plus 5 jours après pour une question ratée, au plus 2 × l'intervalle + 2 jours sinon. Si tout est plein jusque-là,
+   elle va au jour le moins chargé. */
+function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2,room=Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0));
   const ivl=g===1?1:Math.min(max,Math.max(1,Math.round(st.s)));let lo=ivl,hi=ivl;
   if(ivl>=3){const dl=Math.max(1,Math.round(ivl*(ivl<7?.15:ivl<20?.1:.05)));lo=Math.max(2,ivl-dl);hi=Math.min(max,ivl+dl)}
   let best=null;for(let i=lo;i<=hi;i++){let d=L+i;if(d>cap)d=Math.max(L+1,cap);const sc=(load&&load[d]||0)+Math.abs(i-ivl)*.01;if(!best||sc<best.sc)best={d,sc}}
+  if(load&&(load[best.d]||0)>=room){const far=Math.min(max,ivl<2?5:2*ivl+2);let lw=best;
+    for(let i=hi+1;i<=far&&L+i<=cap;i++){const n=load[L+i]||0;if(n<room){best={d:L+i};lw=null;break}if(n<(load[lw.d]||0))lw={d:L+i}}
+    if(lw)best=lw}
   return nIso(best.d)}
 function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
 const rpN=rp=>[...(rp||"-----")].filter(c=>c!=="x").length;
@@ -2055,6 +2062,7 @@ function renderRevHome(){
       <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, et seulement pour les cours que tu as démarrés (bouton sur chaque cours), en commençant par le plus ancien. Un cours dont tu fais le QCM complet dans l'onglet QCM démarre tout seul. Tu peux mettre un cours en pause à tout moment.</li>
       <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
       <li><b>Pas d'embouteillage</b> : comme dans Anki, les dates de retour sont légèrement étalées (± 15 % environ) vers les jours les moins chargés. Les questions d'un QCM complet ne reviennent donc pas toutes le même jour. En plus, au-delà de ${+RVC.cap} questions dans la journée, le reste passe au lendemain, les plus urgentes d'abord.</li>
+      <li><b>Gros bilan d'un coup ?</b> Tu peux faire en une soirée les QCM complets de plusieurs cours : chaque jour reçoit au plus ${Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0))} questions à revoir (questions max par jour moins les nouvelles), le reste est réparti sur les jours suivants. Les questions ratées reviennent dans les 5 jours, les réussies dans les 10 jours environ. Regarde « Les 14 prochains jours » pour voir la répartition.</li>
       <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
       <li><b>Plusieurs versions par question</b> : quand un QCM en a, chaque révision te pose une autre version de la même notion (autres formulations, autres pièges, d'autres propositions vraies ou fausses), pour tester ce que tu sais et pas ta mémoire des questions. Le QCM complet de l'onglet QCM garde la version d'origine.</li>
       <li><b>Trop facile ?</b> À la correction (QCM complet ou révision), chaque item que tu as eu juste a un bouton « Trop facile » : il retire cet item de tes révisions, comme une carte suspendue dans Anki. La question est ensuite posée sans lui ; si tous ses items sont retirés, elle sort des révisions et compte comme sue. Tu peux tout remettre depuis la carte du cours.</li>
