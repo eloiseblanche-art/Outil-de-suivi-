@@ -384,6 +384,10 @@ td,th{border-bottom-color:#f0f0f5}
 .qz{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}
 @media (max-width:860px){.qz{grid-template-columns:1fr}}
 .qz-side{position:sticky;top:64px}
+.chrono{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface-2);border-radius:10px;padding:6px 6px 6px 10px}
+.chrono b{font:500 1.25rem var(--font-m);font-variant-numeric:tabular-nums}
+.chrono .small{flex:1}
+.chrono.paused b{color:var(--ink-3)}
 @media (max-width:860px){.qz-side{position:static}}
 .qz-stem{margin:0;font-size:1.02rem;line-height:1.45}
 /* photo d'une question (microscopie), en noir et blanc comme au concours ; toucher pour agrandir */
@@ -432,6 +436,25 @@ details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
 @media (max-width:620px){.crow{grid-template-columns:auto minmax(0,1fr)}.crow.head{display:none}.crow .ya,.crow .ex{grid-column:2;display:flex;align-items:center}.crow .lab{display:inline}}
 .cmt{background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:.9rem;display:grid;gap:3px}
 .cmt b{font-family:var(--font-d)}
+/* modifier un QCM */
+.qeopen{border:0;background:transparent;color:var(--accent);font:700 .8rem var(--font-b);cursor:pointer;padding:2px 4px;white-space:nowrap}
+.qcorr>header .qeopen{margin-left:auto}
+#qmodal .card{width:min(680px,100%)}
+.qe-it{display:grid;gap:6px;padding:10px;border-radius:12px;background:var(--surface-2)}
+.qe-it.off{opacity:.55}
+.qe-it.off .qe-t{text-decoration:line-through}
+.qe-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start}
+.qe-it textarea{min-height:48px}
+.qe-ctl{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+.qe-ctl .vf{display:flex;gap:6px}
+.qe-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.qe-q{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:9px 2px;font:inherit;color:inherit;cursor:pointer}
+.qe-list .qe-q:last-child{border-bottom:0}
+.qe-q .ed{color:var(--accent);font-weight:700;font-size:.85rem}
+.qe-q.off .tx{text-decoration:line-through;color:var(--ink-3)}
+.qe-q .tx small{display:block;color:var(--ink-2);font-size:.76rem}
+.qe-meta{display:grid;gap:8px}
+.qe-meta summary{cursor:pointer;font-size:.85rem;color:var(--ink-2);font-weight:700}
 
 /* ---- Révisions (répétition espacée) ---- */
 .tbadge{display:inline-grid;place-items:center;min-width:1.55em;height:1.55em;padding:0 5px;margin-left:6px;border-radius:999px;background:var(--late);color:#fff;font:500 .68rem var(--font-m);vertical-align:1px}
@@ -718,6 +741,7 @@ nav.tabs .tmore-list{display:contents}
         <li><b>Cours à mécanismes (physio, régulations…)</b> : en plus des questions de définitions, des questions de raisonnement sur chaque boucle, dans les deux sens : « en cas de… » (sens des variations ↗ ↘ de chaque étape), ordre des étapes, quel capteur détecte quoi, quelle hormone est produite et relarguée où, et le cas inverse (« c'est le mécanisme inverse »).</li>
         <li><b>Matières avec photos au concours (Histo)</b> : en plus, une question par photo de microscopie du poly, découpée sans ses légendes et passée en noir et blanc, dans une partie « Photos de microscopie ».</li>
         <li><b>Ne jamais changer l'ordre des propositions d'un QCM déjà créé</b> (les réponses enregistrées sont rangées par position A à E) : pour un autre ordre ou d'autres pièges, ajouter une version dans alt. Ne pas modifier une banque pendant que je fais ce QCM.</li>
+        <li><b>Mes corrections</b> : je corrige moi-même les questions dans l'onglet QCM (bouton « ✎ Modifier » ou « ✎ Corriger »). Une proposition avec off = true ou une question avec off = true est hors programme : la garder telle quelle quand tu retouches une banque, ne pas la réécrire ni reposer cette notion ailleurs. Mes corrections de texte, de vrai/faux et de commentaire priment sur le cours.</li>
         <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}, et img = id d'une photo pour les questions sur photo, id « p01 »). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
       </ul>
     </details>
@@ -852,6 +876,11 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
   <div id="j-rows" style="display:grid;gap:6px"></div>
   <button class="btn sm" id="j-add" type="button" style="justify-self:start">+ Ajouter un créneau</button>
   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="j-cancel" type="button">Annuler</button><button class="btn primary" id="j-save" type="button">Enregistrer</button></div>
+</div></div>
+<div class="modal" id="qmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="qe-title">
+  <div><span class="eyebrow" id="qe-eye"></span><h3 id="qe-title">Modifier la question</h3></div>
+  <div id="qe-body" style="display:grid;gap:12px"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="qe-cancel" type="button">Annuler</button><button class="btn primary" id="qe-save" type="button">Enregistrer</button></div>
 </div></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -1486,9 +1515,9 @@ function openModal(id,fallback){const c=C.find(x=>x.id===id)||fallback;if(!c)ret
 $("#m-cancel").onclick=()=>{$("#modal").hidden=true};
 $("#m-save").onclick=async()=>{const patch={titre:$("#m-titre").value.trim()||"Sans titre",donne:$("#m-donne").value,p1:$("#m-p1").value,p2:$("#m-p2").value,p3:$("#m-p3").value,anki:$("#m-anki").checked,note:$("#m-note").value.trim(),lien:$("#m-lien").value.trim()};$("#modal").hidden=true;await setField(editing,patch)};
 $("#m-del").onclick=async()=>{if($("#m-confirm").hidden){$("#m-confirm").hidden=false;return}$("#modal").hidden=true;try{await db.doc("cours/"+editing).delete();toast("Cours supprimé")}catch(e){toast("Suppression impossible")}};
-/* Toucher à côté d'une fenêtre la ferme. */
-document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.hidden=true}));
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#emodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true;$("#jmodal").hidden=true}});
+/* Toucher à côté d'une fenêtre la ferme (sauf l'éditeur de question, pour ne pas perdre une correction en cours). */
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m&&m.id!=="qmodal")m.hidden=true}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#pdfv").hidden)closePdf();$("#modal").hidden=true;$("#kmodal").hidden=true;$("#emodal").hidden=true;$("#pmodal").hidden=true;$("#tmodal").hidden=true;$("#jmodal").hidden=true;$("#qmodal").hidden=true}});
 
 /* KHOLLES */
 function refs(){const c=window.__cfg||{};return c.placesMed?{lo:c.promo?c.placesMed/c.promo*100:null,hi:c.candidats?c.placesMed/c.candidats*100:null,c}:{lo:null,hi:null,c}}
@@ -1572,7 +1601,17 @@ $("#j-save").onclick=async()=>{const blocs=[...$("#j-rows").querySelectorAll(".j
 let Q=[],QR=[];
 /* qz.bank : copie des questions prise au début du QCM. Le QCM se fait et se corrige sur cette copie, pour qu'une modification
    de la banque pendant le QCM (ordre des propositions, texte) ne décale pas les réponses déjà données. */
-const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null};
+const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null,acc:0,run:0};
+/* CHRONO : temps passé (acc) + depuis la reprise (run, 0 = en pause). Quitter ou fermer la page ne compte pas :
+   au retour, le chrono repart de ce qui était enregistré. */
+const chEl=o=>(o.acc||0)+(o.run?Date.now()-o.run:0);
+const chFmt=ms=>{const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t/60)%60,x=t%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0")};
+const chPer=(ms,n)=>n?(ms/n<60000?Math.round(ms/n/1000)+" s":Math.floor(ms/n/60000)+" min "+String(Math.round(ms/n/1000)%60).padStart(2,"0"))+" par question":"";
+const chHtml=(k,o,n)=>`<div class="chrono ${o.run?"":"paused"}" data-chrono="${k}" data-n="${n}"><span aria-hidden="true">⏱</span><b>${chFmt(chEl(o))}</b><span class="small muted">${o.run?chPer(chEl(o),n):"en pause"}</span><button class="btn sm" type="button" data-chpause="${k}">${o.run?"Pause":"Reprendre"}</button></div>`;
+const chObj=k=>k==="qz"?qz:rv;
+setInterval(()=>document.querySelectorAll("[data-chrono]").forEach(el=>{const o=chObj(el.dataset.chrono);if(!o.run)return;const ms=chEl(o);el.querySelector("b").textContent=chFmt(ms);el.querySelector(".small").textContent=chPer(ms,+el.dataset.n)}),1000);
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-chpause]");if(!b)return;const k=b.dataset.chpause,o=chObj(k);
+  if(o.run){o.acc=chEl(o);o.run=0}else o.run=Date.now();if(k==="qz"){qSaveDraft();renderQuiz()}else{rvSaveDraft();renderRevSess()}});
 const QPTS=[1,.6,.2,0],LET="ABCDE";
 const qById=id=>Q.find(x=>x.id===id);
 /* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
@@ -1581,8 +1620,9 @@ const qById=id=>Q.find(x=>x.id===id);
 const barOf=q=>matById(q.matiere).bareme||"prepa";
 const BARL={items:"barème +1 / −1 / 0 par item, 0 minimum par question",items05:"barème +1 / −0,5 / 0 par item, 0 minimum par question",prepa:"barème par question"};
 /* Dans une réponse (rp), « x » = item non posé (retiré « trop facile », ou absent d'une question de rattrapage) : il ne compte pas. */
-function qPts(x,rp,bar){if(bar==="items"||bar==="items05"){const neg=bar==="items05"?.1:.2;let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-neg});return Math.max(0,Math.round(p*100)/100)}
-  let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
+/* it.off = proposition hors programme (marquée par toi dans « Modifier ») : comme « x », elle ne compte nulle part, même dans les anciens résultats. */
+function qPts(x,rp,bar){if(bar==="items"||bar==="items05"){const neg=bar==="items05"?.1:.2;let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(it.off)return;if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-neg});return Math.max(0,Math.round(p*100)/100)}
+  let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x"||it.off)return;if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
 const qImg=x=>x.img?`<figure class="qimg"><img src="/_blob/${esc(x.img)}" alt="Photo de microscopie de la question" loading="lazy"></figure>`:"";
 document.addEventListener("click",e=>{const f=e.target.closest&&e.target.closest(".qimg");if(f)f.classList.toggle("big")});
 /* Versions d'une question : la version 0 est la question elle-même, les suivantes sont dans x.alt = [{q?, it}]
@@ -1595,8 +1635,8 @@ const nVer=x=>1+(x.alt||[]).length;
    Tout reste dans le QCM complet de l'onglet QCM. */
 let SUS={};
 const isSusIt=(b,id,v,k)=>!!(SUS[b]&&(SUS[b][id]||SUS[b][id+"|"+v+"|"+k]));
-const shownIdx=(b,x,v)=>qVer(x,v).it.map((_,k)=>k).filter(k=>!isSusIt(b,x.id,v,k));
-const isSus=(b,id)=>{const m=SUS[b];if(!m)return false;if(m[id])return true;const x=((qById(b)||{}).questions||[]).find(y=>y.id===id);if(!x)return false;
+const shownIdx=(b,x,v)=>{const it=qVer(x,v).it;return it.map((_,k)=>k).filter(k=>!it[k].off&&!isSusIt(b,x.id,v,k))};
+const isSus=(b,id)=>{const x=((qById(b)||{}).questions||[]).find(y=>y.id===id);if(x&&x.off)return true;const m=SUS[b];if(m&&m[id])return true;if(!x)return false;
   for(let v=0;v<nVer(x);v++)if(shownIdx(b,x,v).length)return false;return true};
 async function qSus(b,key,on){const m={...(SUS[b]||{})};if(on)m[key]=true;else delete m[key];SUS[b]=m;
   if(qz.mode==="res")renderQres();if(rv.mode==="sess")renderRevSess();else if(rv.mode==="home")renderRevHome();
@@ -1612,14 +1652,18 @@ let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e)
 let qClosed=new Set();try{qClosed=new Set(JSON.parse(localStorage.getItem("qcmClosed")||"[]"))}catch(e){}
 /* Dernier résultat connu de chaque question (true = les 5 propositions justes). */
 function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
-function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>m[x.id]===false).map(x=>x.id)}
+function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>!x.off&&m[x.id]===false).map(x=>x.id)}
 function qDraft(id){try{return JSON.parse(localStorage.getItem("qcmDraft:"+id)||"null")}catch(e){return null}}
-function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank}))}catch(e){}}
+function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank,acc:chEl(qz)}))}catch(e){}}
 function qDropDraft(id){try{localStorage.removeItem("qcmDraft:"+id)}catch(e){}}
 const qTop=()=>{const r=$("#qcmRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
-const qAnswered=id=>(qz.ans[id]||[]).filter(v=>v!=null).length;
+/* Propositions posées d'une question : toutes sauf celles hors programme (aucune si toute la question l'est). */
+const qActive=x=>x&&!x.off?x.it.map((_,k)=>k).filter(k=>!x.it[k].off):[];
+const qBankX=id=>(qz.bank||(qById(qz.id)||{}).questions||[]).find(x=>x.id===id);
+const qAnswered=id=>{const a=qz.ans[id]||[];return qActive(qBankX(id)).filter(k=>a[k]!=null).length};
+const qFull=id=>qAnswered(id)===qActive(qBankX(id)).length;
 
-function renderQcm(){if(qz.mode==="quiz")renderQuiz();else if(qz.mode==="res")renderQres();else renderQcmList()}
+function renderQcm(){if(qz.mode==="quiz")renderQuiz();else if(qz.mode==="res")renderQres();else if(qz.mode==="edit")renderQedit();else renderQcmList()}
 function renderQcmList(){
   const root=$("#qcmRoot");qz.mode="list";
   if(!Q.length){root.innerHTML=`<div class="panel"><h2>Mes QCM</h2><p class="muted" style="margin:0">Aucun QCM pour l'instant. Envoie un cours à Claude : il ajoutera ici un QCM qui reprend tout le cours.</p></div>`;return}
@@ -1633,10 +1677,11 @@ function renderQcmList(){
   root.querySelectorAll("details.qmat").forEach(d=>d.addEventListener("toggle",()=>{const k=d.dataset.qmat;d.open?qClosed.delete(k):qClosed.add(k);try{localStorage.setItem("qcmClosed",JSON.stringify([...qClosed]))}catch(e){}}));
   $("#qShuf").onchange=e=>{qShuffle=e.target.checked;try{localStorage.setItem("qcmShuffle",qShuffle?"1":"0")}catch(_){}};
   root.querySelectorAll("[data-qstart]").forEach(b=>b.onclick=()=>qStart(b.dataset.qstart,b.dataset.how));
+  root.querySelectorAll("[data-qedit]").forEach(b=>b.onclick=()=>{qz.id=b.dataset.qedit;qz.ef="";renderQedit();qTop()});
   root.querySelectorAll("[data-qres]").forEach(b=>b.onclick=()=>{const r=QR.find(x=>x.id===b.dataset.qres);if(r)qShowRes(r)});
 }
 function qCard(q){
-  const n=q.questions.length,rs=QR.filter(r=>r.qcm===q.id).sort((a,b)=>(a.ts||0)-(b.ts||0));
+  const act=q.questions.filter(x=>!x.off),n=act.length,np=act.reduce((s,x)=>s+qActive(x).length,0),nOff=q.questions.length-n,rs=QR.filter(r=>r.qcm===q.id).sort((a,b)=>(a.ts||0)-(b.ts||0));
   const full=rs.filter(r=>r.mode!=="erreurs"&&r.mode!=="revision"),last=full[full.length-1],best=full.length?Math.max(...full.map(r=>r.pct||0)):null;
   const errs=qErrIds(q).length,dr=qDraft(q.id),ids=q.questions.map(x=>x.id);
   const drOk=dr&&Array.isArray(dr.order)&&dr.order.length&&dr.order.every(x=>ids.includes(x));
@@ -1644,36 +1689,38 @@ function qCard(q){
   const hist=rs.slice(-12).map(r=>`<button type="button" class="qh ${r.mode==="erreurs"||r.mode==="revision"?"err":""}" data-qres="${esc(r.id)}" title="${fmt(r.date)} · ${r.pct} %${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}" aria-label="Résultat du ${fmt(r.date)} : ${r.pct} %"><span>${r.pct}</span><i style="height:${Math.max(4,(r.pct||0)*.78)}%"></i></button>`).join("");
   return `<div class="panel mat qcard" style="${mvars(q.matiere)}">
     <div class="mat-head"><h3>${esc(q.titre)}</h3></div>
-    <span class="small muted">${n} questions · ${n*5} propositions · ${(q.sections||[]).length} parties du cours</span>
+    <span class="small muted">${n} questions · ${np} propositions · ${(q.sections||[]).length} parties du cours${nOff?` · ${nOff} question${nOff>1?"s":""} hors programme`:""}</span>
     ${last?`<div class="qkpi"><span><b>${last.pct} %</b> au dernier passage (${fmt(last.date)})</span>${full.length>1?`<span>meilleur ${best} %</span>`:""}</div>`:`<span class="small muted">${rs.length?"Pas encore fait en entier (seulement en révisions).":"Pas encore fait."}</span>`}
     ${hist?`<div class="qhist">${hist}</div>`:""}
     <div class="acts">
       ${drOk?`<button class="btn primary" type="button" data-qstart="${esc(q.id)}" data-how="resume">Reprendre (${drN}/${dr.order.length})</button><button class="btn" type="button" data-qstart="${esc(q.id)}" data-how="new">Recommencer</button>`:`<button class="btn primary" type="button" data-qstart="${esc(q.id)}" data-how="new">${full.length?"Refaire tout le QCM":"Commencer"}</button>`}
       ${errs?`<button class="btn" type="button" data-qstart="${esc(q.id)}" data-how="err">Revoir mes erreurs (${errs})</button>`:""}
+      <button class="btn ghost" type="button" data-qedit="${esc(q.id)}">✎ Modifier</button>
     </div></div>`;
 }
 function qStart(id,how,only){
-  const q=qById(id);if(!q)return;const ids=q.questions.map(x=>x.id);
-  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>ids.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null});renderQuiz();qTop();return}}
+  const q=qById(id);if(!q)return;const all=q.questions.map(x=>x.id),ids=q.questions.filter(x=>!x.off).map(x=>x.id);
+  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>all.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null,acc:d.acc||0,run:Date.now()});renderQuiz();qTop();return}}
   const order=only?only.filter(x=>ids.includes(x)):how==="err"?qErrIds(q):ids.slice();if(!order.length)return;
   if(qShuffle)for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
-  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions))});qSaveDraft();renderQuiz();qTop();
+  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions)),acc:0,run:Date.now()});qSaveDraft();renderQuiz();qTop();
 }
 function renderQuiz(){
   const q=qById(qz.id);if(!q)return renderQcmList();
   const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x])),n=qz.order.length,cur=qs[qz.order[qz.i]];if(!cur)return renderQcmList();
-  const a=qz.ans[cur.id]||[],done=qz.order.filter(id=>qAnswered(id)===5).length,blank=qz.order.reduce((s,id)=>s+5-qAnswered(id),0);
+  const a=qz.ans[cur.id]||[],done=qz.order.filter(qFull).length,blank=qz.order.reduce((s,id)=>s+qActive(qBankX(id)).length-qAnswered(id),0),idx=qActive(cur);
   $("#qcmRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
-      <header><div><span class="eyebrow">${esc(q.titre)}${qz.only?" · mes erreurs":""}</span><h2>Question ${qz.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="qQuit">Quitter</button></header>
-      ${qImg(cur)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
-      <ol class="qz-items">${cur.it.map((it,k)=>`<li class="qz-it"><span class="lt">${LET[k]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`).join("")}</ol>
+      <header><div><span class="eyebrow">${esc(q.titre)}${qz.only?" · mes erreurs":""}</span><h2>Question ${qz.i+1} <span class="muted small">/ ${n}</span></h2></div><span style="display:flex;gap:10px;align-items:baseline"><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(cur.id)}|0">✎ Corriger</button><button class="link" type="button" id="qQuit">Quitter</button></span></header>
+      ${idx.length?`${qImg(cur)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>`:`<p class="notice" style="margin:0">Tu as mis cette question hors programme : elle ne compte pas. Passe à la suivante.</p>`}
+      <ol class="qz-items">${idx.map((k,pos)=>{const it=cur.it[k];return `<li class="qz-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`}).join("")}</ol>
       <div class="qz-nav"><button class="btn" type="button" id="qPrev" ${qz.i?"":"disabled"}>‹ Précédente</button>${qz.i<n-1?`<button class="btn primary" type="button" id="qNext">Suivante ›</button>`:`<button class="btn primary" type="button" id="qEnd2">Terminer</button>`}</div>
     </div>
     <aside class="panel qz-side">
+      ${chHtml("qz",qz,done)}
       <div class="bar-top"><b>Répondues</b><span class="num">${done}/${n}</span></div>
       <span class="prog"><i style="width:${done/n*100}%"></i></span>
-      <div class="qgrid">${qz.order.map((id,k)=>{const c=qAnswered(id);return `<button type="button" data-go="${k}" class="${c===5?"qfull":c?"part":""}" aria-current="${k===qz.i}" aria-label="Question ${k+1}">${k+1}</button>`}).join("")}</div>
+      <div class="qgrid">${qz.order.map((id,k)=>{const c=qAnswered(id);return `<button type="button" data-go="${k}" class="${qFull(id)?"qfull":c?"part":""}" aria-current="${k===qz.i}" aria-label="Question ${k+1}">${k+1}</button>`}).join("")}</div>
       <button class="btn primary" type="button" id="qEnd">Terminer</button>
       <p class="small" ${qz.arm?"":"hidden"} style="margin:0;color:var(--late)">${blank} proposition${blank>1?"s":""} sans réponse : ${blank>1?"elles compteront comme non sues":"elle comptera comme non sue"}. Touche encore « Terminer » pour valider.</p>
       <p class="small muted" style="margin:0">Touche une 2e fois une réponse pour l'effacer et laisser la proposition vide. Tu peux quitter : tes réponses sont gardées sur cet appareil.</p>
@@ -1685,17 +1732,19 @@ function renderQuiz(){
   $("#qPrev").onclick=()=>go(-1);if($("#qNext"))$("#qNext").onclick=()=>go(1);
   const end=()=>{if(blank&&!qz.arm){qz.arm=true;renderQuiz();return}qFinish()};
   $("#qEnd").onclick=end;if($("#qEnd2"))$("#qEnd2").onclick=end;
-  $("#qQuit").onclick=()=>{qSaveDraft();renderQcmList();qTop()};
+  $("#qQuit").onclick=()=>{qSaveDraft();qz.acc=chEl(qz);qz.run=0;renderQcmList();qTop()};
 }
 async function qFinish(){
   const q=qById(qz.id);if(!q)return;const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x]));
   let juste=0,faux=0,vide=0,pts=0;const sec={},ok={},rep={};
-  qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[];let e=0;
-    x.it.forEach((it,k)=>{const v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
-    const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=5-e;s.t+=5;
-    rep[id]=x.it.map((_,k)=>a[k]==null?"-":a[k]?"V":"F").join("");pts+=qPts(x,rep[id],barOf(q));ok[id]=e===0});
-  const nq=qz.order.length,total=nq*5;
-  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:Math.round(juste/total*100),pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round((Date.now()-qz.t0)/60000)),sec,ok,rep,order:qz.order};
+  /* les questions et propositions hors programme ne sont ni posées ni comptées (« x » dans la réponse) */
+  const order=[];let total=0;
+  qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[],idx=qActive(x);if(!idx.length)return;let e=0;
+    idx.forEach(k=>{const it=x.it[k],v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
+    const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=idx.length-e;s.t+=idx.length;total+=idx.length;
+    rep[id]=x.it.map((it,k)=>it.off?"x":a[k]==null?"-":a[k]?"V":"F").join("");pts+=qPts(x,rep[id],barOf(q));ok[id]=e===0;order.push(id)});
+  const nq=order.length;
+  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:total?Math.round(juste/total*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(chEl(qz)/60000)),dsec:Math.round(chEl(qz)/1000),sec,ok,rep,order};qz.run=0;
   qDropDraft(q.id);qShowRes(r);
   if(!db){toast("Résultat non enregistré : données indisponibles ici");return}
   try{const ref=await db.collection("qcmres").add(r);if(ref&&ref.id&&qz.res===r)r.id=ref.id;toast("Résultat enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
@@ -1703,7 +1752,7 @@ async function qFinish(){
 function qShowRes(r){qz.mode="res";qz.res=r;qz.filt="all";renderQres();qTop()}
 function renderQres(){
   const r=qz.res,q=r&&qById(r.qcm);if(!q)return renderQcmList();
-  const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]);
+  const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]&&!qs[id].off);
   const per=order.map((id,i)=>{const v=(r.ver||{})[id]||0,x=qVer(qs[id],v),rp=(r.rep||{})[id]||"-----";return{x,rp,e:rvErrs(x,rp),i,v}});
   const bar=barOf(q),note=qNote(per.reduce((a,p)=>a+qPts(p.x,p.rp,bar),0),per.length);
   const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>p.e>=3).length,nPart=per.length-nOk-nKo;
@@ -1713,7 +1762,7 @@ function renderQres(){
   const pill=v=>v==="V"?`<span class="pill ok">✓ Vrai</span>`:v==="F"?`<span class="pill late">✕ Faux</span>`:`<span class="pill nil">sans réponse</span>`;
   $("#qcmRoot").innerHTML=`
     <div class="panel" style="${mvars(q.matiere)}">
-      <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
+      <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.dsec?" · "+chFmt(r.dsec*1000)+" · "+chPer(r.dsec*1000,r.nq):r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
       <div class="stats">
         <div class="stat acc"><b class="num">${r.pct} %</b><span class="small">${r.mode==="erreurs"?"de propositions justes sur tes erreurs":r.mode==="revision"?"de propositions justes (révision espacée)":"du cours maîtrisé"}</span></div>
         <div class="stat"><b class="num">${qNum(note)}<span class="small muted">/20</span></b><span class="small muted">note · ${BARL[bar]||bar}</span></div>
@@ -1732,17 +1781,99 @@ function renderQres(){
     <div class="panel">
       <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
       ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
-        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span></header>
+        return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(x.id)}|${p.v}">✎ Corriger</button></header>
         ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
         <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
-        ${x.it.map((it,k)=>{const y=p.rp[k];if(y==="x")return"";const bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""} ${isSusIt(q.id,x.id,p.v,k)?"off":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}${!bad||isSusIt(q.id,x.id,p.v,k)?isusBtn(q.id,x.id,p.v,k):""}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
-        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>p.rp[k]==="x"?"":`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
+        ${x.it.map((it,k)=>{const y=p.rp[k];if(y==="x"||it.off)return"";const bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""} ${isSusIt(q.id,x.id,p.v,k)?"off":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}${!bad||isSusIt(q.id,x.id,p.v,k)?isusBtn(q.id,x.id,p.v,k):""}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
+        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>p.rp[k]==="x"||it.off?"":`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
     </div>`;
   const root=$("#qcmRoot");
   $("#qBack").onclick=()=>{renderQcmList();qTop()};
   root.querySelectorAll("[data-qf]").forEach(b=>b.onclick=()=>{qz.filt=b.dataset.qf;renderQres()});
   if($("#qRedo"))$("#qRedo").onclick=()=>qStart(q.id,"err",wrongIds);
   if($("#qPass"))$("#qPass").onclick=()=>{openPass(c.id,pk);$("#pm-score").value=r.juste;$("#pm-total").value=r.total;if(!$("#pm-note").value)$("#pm-note").value="QCM complet : "+r.pct+" %"};
+}
+
+/* MODIFIER UN QCM : corriger une question (sujet, texte des propositions, vrai/faux, commentaire) ou retirer ce qui n'est pas à apprendre.
+   L'ordre des propositions A à E ne bouge jamais (les réponses enregistrées sont rangées par position) : on ne change que leur contenu.
+   it.off = proposition hors programme, x.off = toute la question : plus posées, plus comptées (anciens résultats compris), et réversibles. */
+const qe={b:null,x:null,v:0,isNew:false};
+const qeClone=o=>JSON.parse(JSON.stringify(o));
+function qeOpen(b,id,v,s){const q=qById(b);if(!q)return;const qs=q.questions||[];let x=id?qs.find(y=>y.id===id):null;if(id&&!x)return;
+  const isNew=!x;
+  if(isNew){const n=qs.reduce((m,y)=>Math.max(m,parseInt(String(y.id).replace(/\D/g,""),10)||0),0)+1;
+    x={id:"q"+String(n).padStart(2,"0"),q:"",s:+s||0,it:[0,1,2,3,4].map(()=>({t:"",v:true}))}}
+  Object.assign(qe,{b,x:qeClone(x),v:Math.min(+v||0,nVer(x)-1),isNew});qeRender();$("#qmodal").hidden=false;
+  const f=$("#qe-body").querySelector(isNew?"#qe-q":".qe-t");if(f&&isNew)f.focus()}
+function qeRender(){const q=qById(qe.b),x=qe.x,nv=nVer(x),cur=qVer(x,qe.v),secs=q.sections||[];
+  $("#qe-eye").textContent=q.titre+" · "+(qe.isNew?"nouvelle question":"question "+((q.questions||[]).findIndex(y=>y.id===x.id)+1));
+  $("#qe-title").textContent=qe.isNew?"Ajouter une question":"Corriger la question";
+  $("#qe-body").innerHTML=`
+    ${secs.length?`<label>Partie du cours<select id="qe-s">${secs.map((t,i)=>`<option value="${i}" ${i===(x.s||0)?"selected":""}>${esc(t)}</option>`).join("")}</select></label>`:""}
+    ${qe.isNew?"":`<label class="toggle"><input type="checkbox" id="qe-off" ${x.off?"checked":""}> Toute la question est hors programme (je ne l'apprends pas)</label>`}
+    ${nv>1?`<div class="qe-tabs">${[...Array(nv)].map((_,v)=>`<button type="button" class="chip" data-qev="${v}" aria-pressed="${v===qe.v}">Version ${v+1}</button>`).join("")}</div>`:""}
+    <label>Sujet<span class="small muted" style="font-weight:400">« Parmi les propositions suivantes concernant <i>[sujet]</i>, laquelle ou lesquelles sont vraies ou fausses ? »</span><textarea id="qe-q" rows="2">${esc(cur.q||"")}</textarea></label>
+    ${cur.it.map((it,k)=>`<div class="qe-it ${it.off?"off":""}" data-k="${k}">
+      <div class="qe-row"><span class="lt">${LET[k]}</span><textarea class="qe-t" rows="2" aria-label="Proposition ${LET[k]}" placeholder="Texte de la proposition">${esc(it.t)}</textarea></div>
+      <div class="qe-ctl"><span class="vf"><button type="button" class="vfb v" data-vf="1" aria-pressed="${!!it.v}">Vrai ✓</button><button type="button" class="vfb f" data-vf="0" aria-pressed="${!it.v}">Faux ✕</button></span><label class="toggle"><input type="checkbox" class="qe-ioff" ${it.off?"checked":""}> Hors programme</label></div>
+      <input type="text" class="qe-c" value="${esc(it.c||"")}" placeholder="Commentaire de correction (facultatif)" aria-label="Commentaire ${LET[k]}">
+    </div>`).join("")}
+    <p class="small muted" style="margin:0">Les propositions restent dans l'ordre A à E, donc tes anciens résultats restent valables. Un vrai/faux corrigé s'applique aussi à tes anciens résultats et à tes révisions. « Hors programme » se décoche à tout moment.</p>`;
+  const box=$("#qe-body");
+  box.querySelectorAll(".qe-it").forEach(el=>{el.querySelectorAll("[data-vf]").forEach(b=>b.onclick=()=>el.querySelectorAll("[data-vf]").forEach(o=>o.setAttribute("aria-pressed",String(o===b))));
+    el.querySelector(".qe-ioff").onchange=e=>el.classList.toggle("off",e.target.checked)});
+  box.querySelectorAll("[data-qev]").forEach(b=>b.onclick=()=>{qeRead();qe.v=+b.dataset.qev;qeRender()});
+}
+/* Recopie le formulaire dans la copie de travail (version affichée). */
+function qeRead(){const x=qe.x,box=$("#qe-body");if(!box.querySelector("#qe-q"))return;
+  const s=box.querySelector("#qe-s");if(s)x.s=+s.value;
+  const off=box.querySelector("#qe-off");if(off&&off.checked)x.off=true;else delete x.off;
+  const tgt=qe.v?x.alt[qe.v-1]:x,qv=box.querySelector("#qe-q").value.trim();
+  if(qe.v){if(qv&&qv!==x.q)tgt.q=qv;else delete tgt.q}else x.q=qv;
+  box.querySelectorAll(".qe-it").forEach(el=>{const k=+el.dataset.k,it={...tgt.it[k]};
+    it.t=el.querySelector(".qe-t").value.trim();it.v=el.querySelector(".vfb.v").getAttribute("aria-pressed")==="true";
+    const c=el.querySelector(".qe-c").value.trim();if(c)it.c=c;else delete it.c;
+    if(el.querySelector(".qe-ioff").checked)it.off=true;else delete it.off;tgt.it[k]=it})}
+$("#qe-cancel").onclick=()=>{$("#qmodal").hidden=true};
+$("#qe-save").onclick=async()=>{qeRead();const x=qe.x,q=qById(qe.b);if(!q)return;
+  if(!x.q&&!x.off){toast("Écris le sujet de la question");$("#qe-q").focus();return}
+  for(let v=0;v<nVer(x);v++){const it=qVer(x,v).it;if(it.some(i=>!i.t&&!i.off)){toast("Il manque le texte d'une proposition"+(nVer(x)>1?" (version "+(v+1)+")":""));if(v!==qe.v){qe.v=v;qeRender()}return}}
+  const qs=[...(q.questions||[])],i=qs.findIndex(y=>y.id===x.id);if(i>=0)qs[i]=x;else qs.push(x);q.questions=qs;
+  /* un QCM en cours se fait sur une copie de la banque : on y reporte la correction (les positions A à E ne changent pas) */
+  if(qz.bank&&qz.id===qe.b){const j=qz.bank.findIndex(y=>y.id===x.id);if(j>=0){qz.bank[j]=qeClone(x);if(qz.mode==="quiz")qSaveDraft()}}
+  $("#qmodal").hidden=true;renderQcm();if(rv.mode==="sess")renderRevSess();else if(rv.mode==="home")renderRevHome();else rvBadge();
+  if(!db){toast("Données indisponibles ici");return}
+  try{await db.doc("qcm/"+qe.b).update({questions:qs,maj:Date.now()});toast(qe.isNew?"Question ajoutée":x.off?"Question retirée (hors programme)":"Correction enregistrée")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-qeopen]");if(!b)return;const [bk,id,v]=b.dataset.qeopen.split("|");qeOpen(bk,id,+v||0)});
+/* Titre et noms des parties du QCM. */
+async function qeMeta(patch){const q=qById(qz.id);if(!q)return;Object.assign(q,patch);if(!db)return;
+  try{await db.doc("qcm/"+q.id).update({...patch,maj:Date.now()});toast("Enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+/* Vue « Modifier le QCM » : toutes les questions, rangées par partie, avec une recherche. */
+function renderQedit(){const q=qById(qz.id);if(!q)return renderQcmList();qz.mode="edit";
+  const root=$("#qcmRoot"),ae=document.activeElement,keep=ae&&ae.id==="qeFind"?[ae.selectionStart,ae.selectionEnd]:null;
+  const secs=q.sections||[],qs=q.questions||[],f=(qz.ef||"").trim().toLowerCase();
+  const hit=x=>!f||[x.q,...x.it.map(i=>i.t),...(x.alt||[]).flatMap(a=>[a.q||"",...a.it.map(i=>i.t)])].join(" ").toLowerCase().includes(f);
+  const groups=[...new Set([...secs.map((_,i)=>i),...qs.map(x=>x.s||0)])].sort((a,b)=>a-b);
+  const nOff=qs.filter(x=>x.off).length,nIt=qs.reduce((a,x)=>a+(x.off?0:x.it.filter(i=>i.off).length),0);
+  const row=x=>{const n=qs.indexOf(x)+1,io=x.it.filter(i=>i.off).length;
+    return `<button type="button" class="qe-q ${x.off?"off":""}" data-qeopen="${esc(q.id)}|${esc(x.id)}|0"><span class="qn">${n}</span><span class="tx">${esc(x.q)}<small>${x.off?"hors programme":x.it.map((i,k)=>`${LET[k]} ${i.off?"–":i.v?"V":"F"}`).join(" · ")}${!x.off&&io?` · ${io} hors programme`:""}${nVer(x)>1?` · ${nVer(x)} versions`:""}</small></span><span class="ed">✎</span></button>`};
+  root.innerHTML=`<div class="panel" style="${mvars(q.matiere)}">
+      <header><div><span class="eyebrow">Modifier le QCM</span><h2>${esc(q.titre)}</h2></div><button class="btn primary sm" type="button" id="qeDone">Terminé</button></header>
+      <p class="small muted" style="margin:0">Touche une question pour corriger son texte, un vrai/faux ou un commentaire, ou pour retirer ce qui n'est pas à apprendre (hors programme). C'est enregistré tout de suite et tu peux tout remettre plus tard. Tu peux aussi corriger pendant un QCM ou une révision avec « ✎ Corriger ».</p>
+      <div class="qkpi"><span><b>${qs.length-nOff}</b> questions</span>${nOff?`<span>${nOff} question${nOff>1?"s":""} hors programme</span>`:""}${nIt?`<span>${nIt} proposition${nIt>1?"s":""} hors programme</span>`:""}</div>
+      <input type="search" id="qeFind" placeholder="Chercher un mot dans les questions…" value="${esc(qz.ef||"")}" autocomplete="off">
+      <details class="qe-meta"><summary>Titre et parties du cours</summary>
+        <label>Titre<input type="text" id="qeTitre" value="${esc(q.titre||"")}"></label>
+        ${secs.map((t,i)=>`<label>Partie ${i+1}<input type="text" class="qeSec" value="${esc(t)}"></label>`).join("")}
+      </details>
+    </div>
+    ${groups.map(g=>{const xs=qs.filter(x=>(x.s||0)===g&&hit(x));if(f&&!xs.length)return"";
+      return `<div class="panel"><header><h3>${esc(secs[g]||(secs.length?"Partie "+(g+1):"Questions"))}</h3><button class="link" type="button" data-qeadd="${g}">+ Ajouter une question</button></header><div class="qe-list">${xs.map(row).join("")||`<p class="small muted" style="margin:0">Aucune question.</p>`}</div></div>`}).join("")||`<p class="muted" style="margin:0">Aucune question ne contient « ${esc(qz.ef)} ».</p>`}`;
+  $("#qeDone").onclick=()=>{qz.ef="";renderQcmList();qTop()};
+  const fi=$("#qeFind");fi.oninput=()=>{qz.ef=fi.value;renderQedit()};if(keep){fi.focus();try{fi.setSelectionRange(keep[0],keep[1])}catch(_){}}
+  $("#qeTitre").onchange=e=>{const t=e.target.value.trim();if(t)qeMeta({titre:t})};
+  root.querySelectorAll(".qeSec").forEach(i=>i.onchange=()=>qeMeta({sections:[...root.querySelectorAll(".qeSec")].map((x,k)=>x.value.trim()||secs[k]||"Partie "+(k+1))}));
+  root.querySelectorAll("[data-qeadd]").forEach(b=>b.onclick=()=>qeOpen(q.id,null,0,+b.dataset.qeadd));
 }
 
 /* RÉVISIONS : répétition espacée façon Anki (algorithme FSRS, rétention visée 0,90), avec les questions des QCM pour cartes.
@@ -1770,17 +1901,24 @@ const GR={3:["ok","Bien"],2:["due","Difficile"],1:["late","À revoir"]};
 /* Comme Anki (« fuzz » + répartition de la charge) : à partir de 3 jours, l'intervalle peut bouger de ±15 % (±10 % dès 7 j,
    ±5 % dès 20 j, au moins ±1 j), et on prend le jour le moins chargé de cette fourchette. Les questions vues le même jour
    ne reviennent donc pas toutes le même jour. Une question ratée revient le lendemain, sans fourchette. */
-function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2;
+/* Gros bilan (beaucoup de QCM complets le même jour) : un jour qui a déjà sa dose (questions max par jour moins la place
+   des nouvelles) est plein. Si toute la fourchette est pleine, la question passe au premier jour suivant qui a de la place,
+   au plus 5 jours après pour une question ratée, au plus 2 × l'intervalle + 2 jours sinon. Si tout est plein jusque-là,
+   elle va au jour le moins chargé. */
+function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2,room=Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0));
   const ivl=g===1?1:Math.min(max,Math.max(1,Math.round(st.s)));let lo=ivl,hi=ivl;
   if(ivl>=3){const dl=Math.max(1,Math.round(ivl*(ivl<7?.15:ivl<20?.1:.05)));lo=Math.max(2,ivl-dl);hi=Math.min(max,ivl+dl)}
   let best=null;for(let i=lo;i<=hi;i++){let d=L+i;if(d>cap)d=Math.max(L+1,cap);const sc=(load&&load[d]||0)+Math.abs(i-ivl)*.01;if(!best||sc<best.sc)best={d,sc}}
+  if(load&&(load[best.d]||0)>=room){const far=Math.min(max,ivl<2?5:2*ivl+2);let lw=best;
+    for(let i=hi+1;i<=far&&L+i<=cap;i++){const n=load[L+i]||0;if(n<room){best={d:L+i};lw=null;break}if(n<(load[lw.d]||0))lw={d:L+i}}
+    if(lw)best=lw}
   return nIso(best.d)}
-function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x")return;if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
+function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x"||it.off)return;if(!c||c==="-"||(c==="V")!==it.v)e++});return e}
 const rpN=rp=>[...(rp||"-----")].filter(c=>c!=="x").length;
 function buildSrs(){
   const qb=Object.fromEntries(Q.map(q=>[q.id,Object.fromEntries((q.questions||[]).map(x=>[x.id,x]))])),out={},load={};
   [...QR].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>{const qs=qb[r.qcm];if(!qs)return;const d=r.date||iso(r.ts||Date.now());
-    for(const id in (r.rep||{})){const x=qs[id];if(!x)continue;const k=r.qcm+"|"+id,st=out[k];if(st&&st.last>=d)continue;
+    for(const id in (r.rep||{})){const x=qs[id];if(!x||x.off)continue;const k=r.qcm+"|"+id,st=out[k];if(st&&st.last>=d)continue;
       const ver=(r.ver||{})[id]||0,e=rvErrs(qVer(x,ver),r.rep[id]),g=rvGrade(e),nx=fNext(st,g,d);nx.ver=ver;
       if(st)load[dayN(st.due)]--;
       nx.e=e;nx.g=g;nx.rp=r.rep[id];nx.n=rpN(r.rep[id]);nx.hist=[...(st?st.hist:[]),{d,e,n:nx.n}];if(!st)nx.via=r.mode||"complet";nx.lastVia=r.mode||"complet";
@@ -1809,7 +1947,7 @@ function rvQueue(){const td=today(),T=dayN(td),due=[],nw=[];
   const dk=due.map(x=>x.k).slice(0,room);
   return{due:dk,nw:nw.slice(0,Math.max(0,Math.min((+RVC.nouv||0)-newToday,room-dk.length))),nwLeft:nw.length,dueLeft:due.length-dk.length};
 }
-function rvBank(q){const td=today(),T=dayN(td),qs=q.questions||[];let su=0,seen=0,mat=0,due=0,mem=0,next=null,nextN=0,ns=0;const days={};
+function rvBank(q){const td=today(),T=dayN(td),qs=(q.questions||[]).filter(x=>!x.off);let su=0,seen=0,mat=0,due=0,mem=0,next=null,nextN=0,ns=0;const days={};
   qs.forEach(x=>{if(isSus(q.id,x.id)){ns++;su+=5;return}const st=SRS[q.id+"|"+x.id];if(!st)return;seen++;su+=5-st.e;if(st.s>=21)mat++;mem+=fR(Math.max(0,T-dayN(st.last)),st.s);
     if(st.due<=td)due++;else if(!next||st.due<next){next=st.due;nextN=1}else if(st.due===next)nextN++;
     st.hist.forEach((h,i)=>{const o=days[h.d]=days[h.d]||{j:0,t:0,dj:0,dt:0},hn=h.n||5;o.j+=hn-h.e;o.t+=hn;
@@ -1824,10 +1962,10 @@ function rvBadge(){const b=document.querySelector('nav.tabs button[data-tab="rev
 
 /* Séance du jour : une question à la fois, correction tout de suite (comme le verso d'une carte).
    Une question ratée (2 erreurs ou plus) repasse en fin de séance, sans compter pour le calendrier. */
-const rv={mode:"home",date:"",list:[],i:0,ans:{},res:{},chk:false,tq:0,sum:null};
+const rv={mode:"home",date:"",list:[],i:0,ans:{},res:{},chk:false,tq:0,sum:null,acc:0,run:0};
 const rvKey=e=>e.k+(e.again?"#2":"");
 function rvDraft(){try{return JSON.parse(localStorage.getItem("revDraft")||"null")}catch(e){return null}}
-function rvSaveDraft(){try{localStorage.setItem("revDraft",JSON.stringify({date:rv.date,list:rv.list,i:rv.i,ans:rv.ans,res:rv.res,chk:rv.chk}))}catch(e){}}
+function rvSaveDraft(){try{localStorage.setItem("revDraft",JSON.stringify({date:rv.date,list:rv.list,i:rv.i,ans:rv.ans,res:rv.res,chk:rv.chk,acc:chEl(rv)}))}catch(e){}}
 function rvDropDraft(){try{localStorage.removeItem("revDraft")}catch(e){}}
 const rvQ=k=>{const [b,id]=k.split("|"),q=qById(b);return q?{q,x:(q.questions||[]).find(y=>y.id===id)}:{}};
 const rvTop=()=>{const r=$("#revRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
@@ -1893,6 +2031,7 @@ function renderRevHome(){
       <li><b>Les nouvelles questions</b> arrivent chaque jour, au plus ${+RVC.nouv||0} par jour, en commençant par les cours dont le P2 est le plus ancien. <b>Un cours démarre tout seul à son P2</b> (ou dès que tu fais son QCM complet dans l'onglet QCM), pour qu'aucun cours ne reste des semaines sans revenir. Tu peux aussi le démarrer plus tôt, ou le mettre en pause à tout moment.</li>
       <li><b>% du cours su</b> : la part des propositions de tout le QCM que tu as eues justes la dernière fois (une question jamais vue compte comme non sue). <b>Mémoire aujourd'hui</b> : la probabilité estimée de te souvenir aujourd'hui des questions déjà vues.</li>
       <li><b>Pas d'embouteillage</b> : comme dans Anki, les dates de retour sont légèrement étalées (± 15 % environ) vers les jours les moins chargés. Les questions d'un QCM complet ne reviennent donc pas toutes le même jour. En plus, au-delà de ${+RVC.cap} questions dans la journée, le reste passe au lendemain, les plus urgentes d'abord.</li>
+      <li><b>Gros bilan d'un coup ?</b> Tu peux faire en une soirée les QCM complets de plusieurs cours : chaque jour reçoit au plus ${Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0))} questions à revoir (questions max par jour moins les nouvelles), le reste est réparti sur les jours suivants. Les questions ratées reviennent dans les 5 jours, les réussies dans les 10 jours environ. Regarde « Les 14 prochains jours » pour voir la répartition.</li>
       <li><b>Combien de passages ?</b> Il n'y a pas de nombre fixe. Une question est acquise quand elle tient 21 jours, en général après 3 à 5 bonnes réponses d'affilée (elle revient dans 4 j, puis environ 2 semaines, puis 3 semaines). Un cours est « Acquis » quand 90 % de ses questions le sont et que tu le sais à 90 %. Il continue quand même de revenir tous les 21 jours au plus jusqu'au concours.</li>
       <li><b>Plusieurs versions par question</b> : quand un QCM en a, chaque révision te pose une autre version de la même notion (autres formulations, autres pièges, d'autres propositions vraies ou fausses), pour tester ce que tu sais et pas ta mémoire des questions. Le QCM complet de l'onglet QCM garde la version d'origine.</li>
       <li><b>Trop facile ?</b> À la correction (QCM complet ou révision), chaque item que tu as eu juste a un bouton « Trop facile » : il retire cet item de tes révisions, comme une carte suspendue dans Anki. La question est ensuite posée sans lui ; si tous ses items sont retirés, elle sort des révisions et compte comme sue. Tu peux tout remettre depuis la carte du cours.</li>
@@ -1908,7 +2047,7 @@ function renderRevHome(){
   root.querySelectorAll("[data-rvgo]").forEach(b=>b.onclick=()=>rvStart(+b.dataset.rvgo));
   root.querySelectorAll("[data-rvstart]").forEach(b=>b.onclick=()=>rvSetRev(b.dataset.rvstart,today()));
   root.querySelectorAll("[data-rvpause]").forEach(b=>b.onclick=()=>{if(b.dataset.arm){rvSetRev(b.dataset.rvpause,"")}else{b.dataset.arm=1;b.textContent="Toucher encore pour mettre en pause"}});
-  if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now()});
+  if($("#rvResume"))$("#rvResume").onclick=()=>{const d=rvDraft();if(!d)return renderRevHome();Object.assign(rv,{mode:"sess",date:d.date,list:d.list||[],i:d.i||0,ans:d.ans||{},res:d.res||{},chk:!!d.chk,tq:Date.now(),acc:d.acc||0,run:Date.now()});
     if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   if($("#rvDropDr"))$("#rvDropDr").onclick=async()=>{const d=rvDraft();if(d){Object.assign(rv,{date:d.date,list:d.list||[],ans:d.ans||{},res:d.res||{}});await rvSave()}rvDropDraft();renderRevHome()};
   if($("#rvPlan"))$("#rvPlan").onclick=()=>addTask({date:today(),heure:"",texte:`Révisions espacées · ${tot} question${tot>1?"s":""}`,matiere:""});
@@ -1939,16 +2078,17 @@ function rvCard(q){const b=rvBank(q),st=rvStage(b),m=matById(q.matiere),last=b.s
    - si la dernière fois des items étaient faux, une question de rattrapage avec seulement ces items (même version) ;
    - sinon la version suivante, sans les items retirés. Le rattrapage réussi, la question revient plus tard en entier. */
 function rvPick(k){const [b]=k.split("|"),{x}=rvQ(k),st=SRS[k];if(!x)return{k,again:false,v:0};
-  if(st&&st.e>0&&st.rp){const v=st.ver||0,it=qVer(x,v).it,wr=it.map((_,i)=>i).filter(i=>{const c=st.rp[i];return c!=="x"&&(!c||c==="-"||(c==="V")!==it[i].v)&&!isSusIt(b,x.id,v,i)});
+  if(st&&st.e>0&&st.rp){const v=st.ver||0,it=qVer(x,v).it,wr=it.map((_,i)=>i).filter(i=>{const c=st.rp[i];return c!=="x"&&!it[i].off&&(!c||c==="-"||(c==="V")!==it[i].v)&&!isSusIt(b,x.id,v,i)});
     if(wr.length)return{k,again:false,v,sub:wr,rat:true}}
   const nv=nVer(x);let v=st?((st.ver||0)+1)%nv:0;for(let t=0;t<nv&&!shownIdx(b,x,v).length;t++)v=(v+1)%nv;
   const sh=shownIdx(b,x,v);return{k,again:false,v,sub:sh.length<qVer(x,v).it.length?sh:null}}
 function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
   for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]]}
-  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null});rvSaveDraft();renderRevSess();rvTop()}
+  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null,acc:0,run:Date.now()});rvSaveDraft();renderRevSess();rvTop()}
 function renderRevSess(){
-  const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x:x0}=rvQ(e.k);if(!q||!x0){rv.i++;return renderRevSess()}
-  const x=qVer(x0,e.v||0),nv=nVer(x0),idx=e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i),ni=idx.length;
+  const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x:x0}=rvQ(e.k);if(!q||!x0||x0.off){rv.i++;rv.chk=false;return renderRevSess()}
+  const x=qVer(x0,e.v||0),nv=nVer(x0),idx=(e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i)).filter(k=>x.it[k]&&!x.it[k].off),ni=idx.length;
+  if(!ni){rv.i++;rv.chk=false;return renderRevSess()}
   const key=rvKey(e),a=rv.ans[key]||[],st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
   const done=Object.keys(rv.res).length,first=rv.list.filter(y=>!y.again).length;
   const rpOf=()=>x.it.map((_,k)=>idx.includes(k)?(a[k]==null?"-":a[k]?"V":"F"):"x").join("");
@@ -1961,7 +2101,7 @@ function renderRevSess(){
   const tag=e.again?`<span class="pill due">Rappel · tes items ratés</span>`:e.rat?`<span class="pill due">Rattrapage · ${ni>1?"les "+ni+" items ratés":"l'item raté"} la dernière fois</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`;
   $("#revRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
-      <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><button class="link" type="button" id="rvQuit">Arrêter</button></header>
+      <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><span style="display:flex;gap:10px;align-items:baseline"><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(x0.id)}|${e.v||0}">✎ Corriger</button><button class="link" type="button" id="rvQuit">Arrêter</button></span></header>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${tag}<span class="small muted">${esc((q.sections||[])[x.s]||"")}${nv>1?` · version ${(e.v||0)+1} sur ${nv}`:""}${ni<x.it.length&&!e.rat&&!e.again?` · ${x.it.length-ni} item${x.it.length-ni>1?"s":""} retiré${x.it.length-ni>1?"s":""}`:""}</span></div>
       ${qImg(x)}<p class="qz-stem">${ni<x.it.length?(ni>1?"Ces propositions":"Cette proposition")+" concernant "+esc(x.q)+" "+(ni>1?"sont-elles vraies ou fausses ?":"est-elle vraie ou fausse ?"):"Parmi les propositions suivantes concernant "+esc(x.q)+", laquelle ou lesquelles sont vraies ou fausses ?"}</p>
       <ol class="qz-items">${idx.map((k,pos)=>{const it=x.it[k];if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
@@ -1970,6 +2110,7 @@ function renderRevSess(){
       <div class="qz-nav"><span></span>${chk?`<button class="btn primary" type="button" id="rvNext">${rv.i<n-1?"Suivante ›":"Terminer"}</button>`:`<button class="btn primary" type="button" id="rvCheck">Valider</button>`}</div>
     </div>
     <aside class="panel qz-side">
+      ${chHtml("rv",rv,done)}
       <div class="bar-top"><b>Séance du jour</b><span class="num">${done}/${first}</span></div>
       <span class="prog"><i style="width:${first?done/first*100:0}%"></i></span>
       <p class="small muted" style="margin:0">Réponds aux propositions puis valide : la correction s'affiche tout de suite. Touche une 2e fois une réponse pour l'effacer. « Trop facile » sur un item juste le retire de tes révisions. Tu peux arrêter quand tu veux : ce qui est fait est enregistré, le reste attend.</p>
@@ -1988,7 +2129,7 @@ async function rvFinish(){
   const rows=Object.entries(by).map(([b,ks])=>{const q=qById(b);let j=0,t=0,cj=0,pj=0,pt=0;const g={1:0,2:0,3:0};
     ks.forEach(k=>{const r=rv.res[k],st=SRS[k],rn=r.n||5;j+=rn-r.e;t+=rn;g[rvGrade(r.e)]++;if(st&&st.last<r.d&&!r.part&&(st.n||5)===5){cj+=5-r.e;pj+=5-st.e;pt+=5}});
     return{q,n:ks.length,p:t?Math.round(j/t*100):0,dl:pt?Math.round((cj-pj)/pt*100):null,g}});
-  rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date};
+  rv.sum={rows,n:Object.values(by).reduce((s,a)=>s+a.length,0),date:rv.date,ms:chEl(rv)};rv.acc=rv.sum.ms;rv.run=0;
   rv.mode="done";renderRevDone();rvTop();
   await rvSave();rvDropDraft();
 }
@@ -2008,13 +2149,13 @@ function renderRevDone(){const s=rv.sum;if(!s)return renderRevHome();
   const tj=s.rows.reduce((a,r)=>a+r.p*r.n,0),tp=s.n?Math.round(tj/s.n):0;
   $("#revRoot").innerHTML=`<div class="panel">
     <header><div><span class="eyebrow">Séance du ${fmt(s.date)}</span><h2>${s.n?"Bien joué":"Séance arrêtée"}</h2></div><button class="link" type="button" id="rvBack">Retour aux révisions</button></header>
-    ${s.n?`<div class="stats"><div class="stat acc"><b class="num">${tp} %</b><span class="small">de propositions justes</span></div><div class="stat"><b class="num">${s.n}</b><span class="small muted">question${s.n>1?"s":""} revue${s.n>1?"s":""}</span></div></div>
+    ${s.n?`<div class="stats"><div class="stat acc"><b class="num">${tp} %</b><span class="small">de propositions justes</span></div><div class="stat"><b class="num">${s.n}</b><span class="small muted">question${s.n>1?"s":""} revue${s.n>1?"s":""}</span></div>${s.ms?`<div class="stat"><b class="num">${chFmt(s.ms)}</b><span class="small muted">${chPer(s.ms,s.n)}</span></div>`:""}</div>
     <div class="rows">${s.rows.map(r=>`<div class="secrow" style="${mvars(r.q.matiere)}"><span><b>${esc(shortNom(matById(r.q.matiere)))}</b> · ${esc(r.q.titre)} <span class="small muted">· ${r.n} q. · ${r.g[3]} bien, ${r.g[2]} difficile${r.g[2]>1?"s":""}, ${r.g[1]} à revoir${r.dl!=null?` · <span class="${r.dl>0?"up":r.dl<0?"down":""}">${r.dl>0?"+":r.dl<0?"−":"±"}${Math.abs(r.dl)} pts</span> vs la fois d'avant`:""}</span></span><span class="prog ${pctCls(r.p)}"><i style="width:${r.p}%"></i></span><span class="n">${r.p} %</span></div>`).join("")}</div>`:`<p class="muted" style="margin:0">Aucune question validée : rien n'a changé dans ton calendrier.</p>`}
   </div>`;
   $("#rvBack").onclick=()=>{rv.mode="home";rv.sum=null;renderRevHome();rvTop()};
 }
 
-function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan();if(qz.mode==="list")renderQcmList();if(rv.mode==="home")renderRevHome();else rvBadge()}
+function renderAll(){renderAuj();renderPies();renderPlanning();renderRecap();renderCours();renderKholles();renderMat();renderBilan();if(qz.mode==="list")renderQcmList();else if(qz.mode==="edit"&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)&&$("#qcmRoot").contains(document.activeElement)))renderQedit();if(rv.mode==="home")renderRevHome();else rvBadge()}
 renderSemaine();renderAll();
 
 /* DATA */
@@ -2032,3 +2173,5 @@ renderSemaine();renderAll();
 })();
 })();
 </script>
+
+</body></html>
