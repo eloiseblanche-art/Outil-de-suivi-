@@ -466,9 +466,6 @@ details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
 .rv-split b{font-family:var(--font-m);font-weight:500;color:var(--ink)}
 .rv-chips{display:flex;flex-wrap:wrap;gap:5px}
 .rv-chips .mtag{white-space:normal}
-.rv-today{display:grid;gap:10px}
-.rv-today .rv-big{font-size:2.4rem}
-.rv-warn{font-size:.86rem;font-weight:700;color:var(--late)}
 .rv-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
 @media (max-width:760px){.rv-days{grid-template-columns:repeat(2,minmax(0,1fr))}.rv-day{min-height:0}}
 .rv-day{background:var(--surface-2);border-radius:12px;padding:8px;display:grid;gap:4px;align-content:start;min-height:78px;min-width:0}
@@ -597,10 +594,6 @@ nav.tabs .tmore-list{display:contents}
       </div>
       <div class="side">
         <div class="panel">
-          <header><h2>Révisions du jour</h2><button class="link" type="button" data-goto="rev">détail</button></header>
-          <div id="rvToday" class="rv-today"></div>
-        </div>
-        <div class="panel">
           <header><h2>À reprendre</h2><span id="lateBadge"></span></header>
           <ul class="clean" id="todo"></ul>
           <button class="link" type="button" id="seeAll" data-goto="cours" hidden></button>
@@ -696,7 +689,7 @@ nav.tabs .tmore-list{display:contents}
         <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découvrir</h3><span class="small">Lire pour comprendre. Surligner d'une seule couleur ce qui mérite une carte. Regarder les QCM du cours.</span></div>
         <div class="step"><span class="k">P2 · J+1 à J+3</span><h3>S'approprier</h3><span class="small">Ardoise, schémas, voix haute, puis QCM du cours. Réactiver les cartes du cours dans Anki.</span></div>
         <div class="step"><span class="k">P3 · week-end</span><h3>Ancrer</h3><span class="small">Tout restituer de mémoire, comparer, puis QCM. Relire seulement les trous. Cours à mécanismes : redessiner chaque boucle de mémoire (variation → capteur → centre → effecteur → effet).</span></div>
-        <div class="step"><span class="k">Chaque jour, jusqu'au concours</span><h3>Entretenir</h3><span class="small">Anki le matin et les Révisions du jour (onglet Révisions) : dès le P2, les questions du cours reviennent toutes seules avant que tu les oublies.</span></div>
+        <div class="step"><span class="k">Jusqu'au concours</span><h3>Entretenir</h3><span class="small">Chaque QCM fait en entier est enregistré : ses questions reviendront dans l'onglet Révisions, au rythme fixé après le concours blanc.</span></div>
       </div>
     </div>
     <details class="panel fold">
@@ -714,7 +707,6 @@ nav.tabs .tmore-list{display:contents}
       <ul class="prose">
         <li>Organisation : 10 min par jour à 19 h, 20 min le dimanche. Un seul outil : cette page.</li>
         <li>Un retard se rattrape en un seul passage actif, dans le créneau du dimanche.</li>
-        <li><b>Les Révisions du jour passent avant tout le reste</b>, même les jours chargés : 20 questions suffisent. Un cours bien appris mais jamais repris s'efface en 2 à 3 semaines.</li>
         <li>Les cours ★ difficiles vont dans le créneau du samedi matin.</li>
         <li>−1 par item faux en chimie, histo, embryo, mais une question ne compte jamais moins de 0 : laisser vide quand on doute.</li>
         <li>Voix haute en P2 et P3, jamais en P1.</li>
@@ -1957,8 +1949,8 @@ function rvBank(q){const td=today(),T=dayN(td),qs=(q.questions||[]).filter(x=>!x
   return{n:qs.length,ns,ni,seen,mat,due,next,nextN,su:qs.length?Math.round(su/(5*qs.length)*100):0,mem:seen?Math.round(mem/seen*100):null,sess};
 }
 function rvStage(b){const n=b.n-b.ns;if(!b.seen)return["nil","Pas commencé"];if(b.mat>=.9*n&&b.su>=90)return["ok","Acquis"];if(b.seen<n)return["info","En découverte"];return["due","En consolidation"]}
-function rvBadge(){const b=document.querySelector('nav.tabs button[data-tab="rev"]');if(!b)return;buildSrs();const q=rvQueue(),n=q.due.length+q.nw.length;renderRvToday(q);
-  b.querySelector(".tl").innerHTML="Révisions"+(n?`<span class="tbadge">${n}</span>`:"");b.setAttribute("aria-label",n?`Révisions, ${n} questions aujourd'hui`:"Révisions")}
+/* Pas de compteur sur l'onglet : les révisions se font au rythme choisi, pas tous les jours. */
+function rvBadge(){}
 
 /* Séance du jour : une question à la fois, correction tout de suite (comme le verso d'une carte).
    Une question ratée (2 erreurs ou plus) repasse en fin de séance, sans compter pour le calendrier. */
@@ -1973,20 +1965,6 @@ const ago=n=>n<=0?"aujourd'hui":n===1?"hier":"il y a "+n+" j";
 const inN=n=>n<=0?"aujourd'hui":n===1?"demain":"dans "+n+" j";
 const DJC=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
 const dLbl=s=>DJC[new Date(s+"T12:00:00").getDay()]+" "+fmt(s);
-
-/* Panneau « Révisions du jour » de l'onglet Aujourd'hui : ce qui revient aujourd'hui, et depuis quand tu n'as pas révisé. */
-function renderRvToday(qq){const el=$("#rvToday");if(!el)return;
-  if(!Q.length){el.innerHTML=`<p class="muted small" style="margin:0">Pas encore de QCM.</p>`;return}
-  const nDue=qq.due.length,nNew=qq.nw.length,tot=nDue+nNew,dr=rvDraft(),drOn=dr&&dr.list&&dr.date===today()&&(dr.i||0)<dr.list.length;
-  const lastS=QR.filter(r=>r.mode==="revision").map(r=>r.date||iso(r.ts||0)).sort().pop(),gap=lastS?dayN(today())-dayN(lastS):null;
-  const per={};[...qq.due,...qq.nw].forEach(k=>{const q=qById(k.split("|")[0]);if(q)per[q.matiere]=(per[q.matiere]||0)+1});
-  const chips=Object.entries(per).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<span class="mtag" style="${mvars(m)}">${esc(shortNom(matById(m)))} · <b class="num">${n}</b></span>`).join("");
-  const warn=gap==null?(tot?"Tu n'as encore jamais fait de séance de révision.":""):gap>=2?`Dernière séance ${ago(gap)} : sans révision, un cours s'efface en 2 à 3 semaines.`:"";
-  el.innerHTML=tot||drOn?`<div class="rv-hero"><div class="rv-big num">${tot}<small>question${tot>1?"s":""} · ≈ ${Math.max(1,Math.round(tot*1.2))} min</small></div><div class="rv-split"><span><b>${nDue}</b> à revoir</span><span><b>${nNew}</b> nouvelle${nNew>1?"s":""}</span></div></div>
-    ${chips?`<div class="rv-chips">${chips}</div>`:""}${warn?`<span class="rv-warn">${esc(warn)}</span>`:""}
-    <div class="acts" style="flex-wrap:wrap;gap:6px">${drOn?`<button class="btn primary" type="button" data-rvt="resume">Reprendre la séance</button>`:`<button class="btn primary" type="button" data-rvt="${Math.min(tot,20)}">${tot>20?"Une série de 20":"Réviser"}</button>${tot>20?`<button class="btn" type="button" data-rvt="${tot}">Tout (${tot})</button>`:""}`}</div>`
-    :`<span class="muted small">Rien à revoir aujourd'hui${lastS?` · dernière séance ${ago(gap)}`:""}.</span>`;
-  el.querySelectorAll("[data-rvt]").forEach(b=>b.onclick=()=>{showTab("rev");if(b.dataset.rvt==="resume"){renderRevHome();const r=$("#rvResume");if(r)r.click()}else rvStart(+b.dataset.rvt)})}
 
 function renderRev(){if(rv.mode==="sess")renderRevSess();else if(rv.mode==="done")renderRevDone();else renderRevHome()}
 function renderRevHome(){
