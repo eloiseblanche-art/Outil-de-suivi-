@@ -7,3 +7,7 @@ Page de suivi pour préparer le concours du 17 décembre : avancement des cours 
 ## Révisions espacées
 
 L'onglet « Révisions » traite chaque question des QCM comme une carte Anki et la programme avec l'algorithme FSRS (rétention 0,90, intervalle max 21 jours, réglables). L'état de chaque question est recalculé à partir des résultats enregistrés dans `qcmres` (les séances de révision y sont enregistrées avec `mode: "revision"`). Les réglages sont dans `config/revision`.
+
+## QCM automatiques
+
+Une tâche planifiée crée le QCM de chaque nouveau cours qui a un polycopié joint et pas encore de QCM. La marche à suivre et les scripts sont dans `qcm-auto/` (`CONSIGNES.md`).
