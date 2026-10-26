@@ -1669,9 +1669,9 @@ function renderQcmList(){
   const info=k=>{const qs=Q.filter(q=>(q.matiere||"")===k).sort((a,b)=>(a.ordre||0)-(b.ordre||0)),last=qs.map(lastFull).filter(Boolean);
     return{qs,done:last.length,av:last.length?Math.round(last.reduce((s,r)=>s+(r.pct||0),0)/last.length):null,bar:barOf({matiere:k})}};
   const pies=keys.map(k=>{const m=matById(k),o=info(k),mc=(MCOL[k]||["#eee","#7c6fd6"])[1];
-    return `<button type="button" class="pie" data-qm="${esc(key(k))}" aria-pressed="${qMat===key(k)}" style="${mvars(k)}">${donut(o.av!=null?[o.av,100-o.av]:[0,1],[mc,mc+"26"],o.av!=null?o.av+" %":"–",(m.nom||"Sans matière")+" : "+o.done+" QCM faits sur "+o.qs.length+(o.av!=null?", moyenne "+o.av+" %":""),17,["Su","À revoir"],`${o.done}/${o.qs.length} faits`)}<span class="nm">${esc(shortNom(m)||"Sans matière")}</span><span class="sub">${o.qs.length} QCM · ${esc(BARS[o.bar]||o.bar)}</span></button>`}).join("");
+    return `<button type="button" class="pie" data-qm="${esc(key(k))}" aria-pressed="${qMat===key(k)}" style="${mvars(k)}">${donut([o.done,o.qs.length-o.done],[mc,mc+"26"],`${o.done}/${o.qs.length}`,(m.nom||"Sans matière")+" : "+o.done+" QCM faits sur "+o.qs.length,17,["Faits","À faire"],"faits")}<span class="nm">${esc(shortNom(m)||"Sans matière")}</span><span class="sub">${o.av!=null?`moyenne ${o.av} % · `:""}${esc(BARS[o.bar]||o.bar)}</span></button>`}).join("");
   const k=qMat?keys.find(x=>key(x)===qMat):null;
-  let body=`<p class="hint">Touche une matière pour voir ses QCM. Le % est la moyenne de tes QCM complets au dernier passage.</p>`;
+  let body=`<p class="hint">Touche une matière pour voir ses QCM. Le camembert montre combien de QCM de la matière tu as déjà faits en entier.</p>`;
   if(k!=null){const m=matById(k),o=info(k);
     body=`<div class="panel mat" style="${mvars(k)}"><div class="mat-head"><h3>${esc(m.nom||"Sans matière")} <span class="muted small">· ${o.qs.length} QCM${o.av!=null?` · moyenne ${o.av} % au dernier passage`:""}</span></h3><button class="link" type="button" id="qAllMat">‹ Toutes les matières</button></div><span class="small muted">Notation : ${esc(BARL[o.bar]||o.bar)}.</span></div>
       <div class="qcards">${o.qs.map(qCard).join("")}</div>`}
