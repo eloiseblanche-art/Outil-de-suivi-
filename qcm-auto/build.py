@@ -2,7 +2,7 @@
 Header lines: cours=, matiere=, ordre=, titre=
 '# Section' starts a section; '? sujet' starts a question (optional '@assetid' at end for photo);
 '+ texte | commentaire' true item, '- texte | commentaire' false item."""
-import json,sys,re
+import json,sys,re,random
 src,out=sys.argv[1],sys.argv[2]
 doc={"sections":[],"questions":[]};cur=None;nq=np=0
 for raw in open(src,encoding="utf-8"):
@@ -28,6 +28,8 @@ for q in doc["questions"]:
     for i in q["it"]:
         if not i["v"]:assert i["c"],(q["id"],"fausse sans commentaire",i["t"])
     assert q["s"]>=0
+# order of true/false items is randomised (a bank is never re-shuffled once saved)
+for q in doc["questions"]:random.shuffle(q["it"])
 json.dump(doc,open(out,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
 from collections import Counter
 print(out,len(doc["questions"]),"questions",Counter(sum(i["v"] for i in q["it"]) for q in doc["questions"]))

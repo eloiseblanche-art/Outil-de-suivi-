@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Carnet PASS S1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -188,13 +189,10 @@ button.pie{border:2px solid transparent;cursor:pointer;font:inherit;color:inheri
 button.pie[aria-pressed="true"]{border-color:var(--mfg)}
 .pcard{display:grid;gap:5px;align-content:start}
 .pcard button.pie{width:100%}
-.pnote{font-size:.76rem;line-height:1.3;padding:5px 7px;border-radius:8px;resize:vertical;min-height:2.4em;background:#fff;border:1px solid color-mix(in srgb,var(--mfg,#8e8e93) 25%,#fff)}
-.pnote::placeholder{color:#aeaeb2}
-.preste{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--ink-2);font-weight:400}
-.preste input{width:4.6em;padding:4px 6px;font-size:.8rem;border-radius:8px;text-align:right;background:#fff;border:1px solid color-mix(in srgb,var(--mfg,#8e8e93) 25%,#fff)}
-.ptot{display:grid;align-content:center;justify-items:center;gap:2px;text-align:center;padding:12px 8px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
-.ptot b{font-family:var(--font-d);font-size:1.6rem;line-height:1.1;white-space:nowrap}
-.ptot .sub{font-size:.75rem;color:var(--ink-2)}
+/* cours eus / total, modifiables à la main sous chaque camembert */
+.pcount{display:flex;align-items:center;justify-content:center;gap:4px;font-size:.74rem;color:var(--ink-2);font-weight:400}
+.pcount input{width:3.4em;padding:4px 5px;font-size:.8rem;border-radius:8px;text-align:center;background:#fff;border:1px solid color-mix(in srgb,var(--mfg,#8e8e93) 25%,#fff)}
+.pcount .rz{border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:.8rem;padding:0 2px}
 .pie svg{max-width:88px}
 .chip{border-color:transparent;background:#fff;box-shadow:0 1px 2px rgb(42 44 63 / .06)}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -367,12 +365,12 @@ td,th{border-bottom-color:#f0f0f5}
 /* ---- QCM ---- */
 .qcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:18px}
 .qcard{align-content:start}
-.qmat{display:grid;gap:12px}
-.qmat>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:4px 2px;border-bottom:2px solid var(--mbg,var(--line))}
-.qmat>summary::-webkit-details-marker{display:none}
-.qmat>summary h2{margin:0;color:var(--mfg,var(--ink))}
-.qmat>summary::after{content:"–";margin-left:auto;font:700 1.2rem var(--font-b);color:var(--ink-3)}
-.qmat:not([open])>summary::after{content:"+"}
+/* QCM à cocher : toute la ligne se touche, la case se coche (comme sur la grille du concours) */
+.qck{width:100%;display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:10px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;font:inherit;color:inherit;cursor:pointer}
+.qck .box{width:22px;height:22px;border:2px solid var(--ink-3);border-radius:6px;display:grid;place-items:center;background:#fff}
+.qck[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.qck[aria-pressed="true"] .box{background:var(--accent);border-color:var(--accent)}
+.qck[aria-pressed="true"] .box::after{content:"✓";color:#fff;font-weight:700;font-size:.85rem;line-height:1}
 .qcard .acts{flex-wrap:wrap;gap:6px}
 .qkpi{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;font-size:.85rem;color:var(--ink-2)}
 .qkpi b{font-family:var(--font-d);font-size:1.5rem;color:var(--mfg,var(--ink));line-height:1}
@@ -427,7 +425,7 @@ details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
 .qcorr>header{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .qn{font:500 .8rem var(--font-m);background:var(--ink);color:#fff;border-radius:7px;padding:3px 8px}
 .crows{display:grid;gap:4px}
-.crow{display:grid;grid-template-columns:auto minmax(0,1fr) 92px 92px;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:var(--ok-soft)}
+.crow{display:grid;grid-template-columns:auto minmax(0,1fr) 112px 112px;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:var(--ok-soft)}
 .crow.bad{background:var(--late-soft)}
 .crow.head{background:transparent;font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);font-weight:700;padding-block:0}
 .crow .pill{justify-self:start}
@@ -708,7 +706,8 @@ nav.tabs .tmore-list{display:contents}
         <li>Organisation : 10 min par jour à 19 h, 20 min le dimanche. Un seul outil : cette page.</li>
         <li>Un retard se rattrape en un seul passage actif, dans le créneau du dimanche.</li>
         <li>Les cours ★ difficiles vont dans le créneau du samedi matin.</li>
-        <li>−1 par item faux en chimie, histo, embryo, mais une question ne compte jamais moins de 0 : laisser vide quand on doute.</li>
+        <li>QIM (vrai/faux par item) : −1 par item faux en chimie, biochimie, histo, embryo et biomol, −0,5 en bio cell, mais une question ne compte jamais moins de 0 : laisser vide quand on doute.</li>
+        <li>QCM à cocher (anatomie OS et TC, biophysique, physio, SHS) : cocher seulement ce qui est vrai, une seule erreur et la question vaut 0.</li>
         <li>Voix haute en P2 et P3, jamais en P1.</li>
         <li>Une soirée par semaine avec la famille ou les amis, et le samedi soir libre.</li>
       </ul>
@@ -726,7 +725,7 @@ nav.tabs .tmore-list{display:contents}
       <ul class="prose">
         <li><b>Un QCM par cours, qui reprend tout le cours</b>, partie par partie et dans l'ordre, annexes comprises : chaque notion tombe au moins une fois. En général 3 à 5 questions par partie (environ 45 questions pour un cours comme Embryo 01).</li>
         <li><b>Chaque question</b> : « Parmi les propositions suivantes concernant [sujet], laquelle ou lesquelles sont vraies ou fausses ? », avec 5 propositions de A à E, chacune vraie ou fausse.</li>
-        <li><b>Le plus souvent 3 vraies et 2 fausses</b> (entre 2 et 4 vraies), jamais toutes vraies ou toutes fausses.</li>
+        <li><b>Un nombre de vraies qui change d'une question à l'autre</b> (entre 1 et 4, au moins 2 en SHS), jamais toutes vraies ou toutes fausses, et <b>les vraies placées au hasard</b> parmi A à E (build.py mélange les propositions). La page tire en plus un nouvel ordre d'affichage à chaque QCM.</li>
         <li><b>Les fausses reprennent les pièges du concours</b> : chiffre ou valeur modifiée, inversion (mitose/méiose, haploïde/diploïde, avant/après), « comme » à la place de « contrairement à », transitoire/définitif, mauvaise structure ou mauvaise étape.</li>
         <li><b>Chaque fausse a un commentaire de correction</b> qui donne la bonne réponse et la valeur exacte. Les vraies n'en ont que si c'est utile.</li>
         <li><b>Uniquement le contenu du cours</b>, avec ses termes et ses chiffres. Une proposition teste une seule info.</li>
@@ -1284,45 +1283,35 @@ function donut(parts,colors,center,sub,size,labels,under){
 function counts(cs){const n3=cs.filter(c=>c.p3).length,n2=cs.filter(c=>c.p2&&!c.p3).length,n1=cs.filter(c=>c.p1&&!c.p2).length;return [n3,n2,n1,cs.length-n3-n2-n1]}
 function avgPct(cs){const v=[];cs.forEach(c=>{const L=passList(c).reverse();for(const x of L){const q=pct(x);if(q!=null){v.push(q);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
 const isEu=c=>!!(c.donne||c.p1||!/à venir/i.test(c.titre||""));
+/* Cours eus / total d'une matière : comptés depuis la liste des cours, sauf si tu as tapé tes propres chiffres (m.eu, m.nb). */
+const hasN=v=>v!=null&&v!=="";
+function matCount(m){const cs=C.filter(c=>c.matiere===m.id),e0=cs.filter(isEu).length,n0=cs.length;
+  const nb=hasN(m.nb)?+m.nb:n0,eu=Math.min(hasN(m.eu)?+m.eu:e0,nb);return{eu,nb,e0,n0,own:hasN(m.eu)||hasN(m.nb)}}
 function renderPies(){
-  const eu=C.filter(isEu).length,tot=C.length,anc=C.filter(c=>c.p3).length;
+  let eu=C.filter(isEu).length,tot=C.length;const anc=C.filter(c=>c.p3).length;
+  M.forEach(m=>{const k=matCount(m);if(!k.own)return;eu+=k.eu-k.e0;tot+=k.nb-k.n0});tot=Math.max(tot,eu);
   $("#pieAll").innerHTML=donut([eu,tot-eu],["#7c6fd6","#ececf3"],`${eu}/${tot}`,`${eu} cours eus sur ${tot}`,20,["Déjà eus","À venir"],"cours eus");
   const av=avgPct(C);
   $("#pieLegend").innerHTML=`<span style="--c:#7c6fd6">Déjà eus <b class="num">${eu}</b></span><span style="--c:#ececf3">À venir <b class="num">${tot-eu}</b></span><span class="small muted" style="margin-top:6px">dont <b class="num">${anc}</b> déjà vus 3 fois${av!=null?` · QCM moyen <b class="num">${av} %</b>`:""}</span>`;
-  const pa=document.activeElement,keepN=pa&&pa.dataset&&(pa.dataset.pnote||pa.dataset.preste)?[pa.dataset.pnote?"pnote":"preste",pa.dataset.pnote||pa.dataset.preste,pa.value,pa.selectionStart,pa.selectionEnd]:null;
-  $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length)return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const e=cs.filter(isEu).length,k3=cs.filter(c=>c.p3).length;const a=avgPct(cs);
-    return `<div class="pcard" style="${mvars(m.id)}"><button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut([e,cs.length-e],[mc,mc+"26"],`${e}/${cs.length}`,m.nom+" : "+e+" cours eus sur "+cs.length,17,["Déjà eus","À venir"],"eus")}<span class="nm">${esc(shortNom(m))}</span><span class="sub">${k3} vus 3 fois${a!=null?" · QCM "+a+" %":""}</span></button><textarea class="pnote" rows="2" data-pnote="${esc(m.id)}" placeholder="Où j'en suis…" aria-label="Où j'en suis en ${esc(m.nom)}">${esc(m.ou||"")}</textarea><label class="preste">Encore<input type="text" inputmode="decimal" autocomplete="off" data-preste="${esc(m.id)}" value="${m.reste!=null&&m.reste!==""?esc(String(m.reste).replace(".",",")):""}" placeholder="?" aria-label="Heures de révision qu'il me reste en ${esc(m.nom)}">h</label></div>`}).join("")+`<div class="ptot" id="ptot"></div>`;
-  paintTot();
+  const pa=document.activeElement,keepN=pa&&pa.dataset&&pa.dataset.pc?[pa.dataset.pc,pa.dataset.m,pa.value,pa.selectionStart,pa.selectionEnd]:null;
+  $("#pies").innerHTML=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0)).map(m=>{const cs=C.filter(c=>c.matiere===m.id);if(!cs.length&&!hasN(m.nb))return"";const mc=(MCOL[m.id]||["#eee","#7c6fd6"])[1];const {eu:e,nb,own}=matCount(m),k3=cs.filter(c=>c.p3).length;const a=avgPct(cs);
+    return `<div class="pcard" style="${mvars(m.id)}"><button type="button" class="pie" data-f="${esc(m.id)}" aria-pressed="${filt===m.id}" style="${mvars(m.id)}">${donut([e,nb-e],[mc,mc+"26"],`${e}/${nb}`,m.nom+" : "+e+" cours eus sur "+nb,17,["Déjà eus","À venir"],"eus")}<span class="nm">${esc(shortNom(m))}</span><span class="sub">${k3} vus 3 fois${a!=null?" · QCM "+a+" %":""}</span></button><div class="pcount"><input type="text" inputmode="numeric" autocomplete="off" data-pc="eu" data-m="${esc(m.id)}" value="${e}" aria-label="Cours eus en ${esc(m.nom)}"><span>sur</span><input type="text" inputmode="numeric" autocomplete="off" data-pc="nb" data-m="${esc(m.id)}" value="${nb}" aria-label="Nombre de cours au total en ${esc(m.nom)}">${own?`<button type="button" class="rz" data-pcrz="${esc(m.id)}" title="Revenir au compte automatique" aria-label="Revenir au compte automatique en ${esc(m.nom)}">↺</button>`:""}</div></div>`}).join("");
   $("#pies").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=filt===b.dataset.f?"all":b.dataset.f;renderPies();renderCours()});
-  $("#pies").querySelectorAll("[data-pnote]").forEach(t=>{t.oninput=()=>saveOu(t.dataset.pnote,t.value);t.onblur=()=>saveOu(t.dataset.pnote,t.value,true)});
-  $("#pies").querySelectorAll("[data-preste]").forEach(t=>{t.oninput=()=>saveReste(t.dataset.preste,t.value);t.onblur=()=>saveReste(t.dataset.preste,t.value,true)});
-  if(keepN){const t=$("#pies").querySelector(`[data-${keepN[0]}="${keepN[1]}"]`);if(t){t.value=keepN[2];t.focus();try{t.setSelectionRange(keepN[3],keepN[4])}catch(_){}}}
+  $("#pies").querySelectorAll("[data-pc]").forEach(t=>{t.oninput=()=>saveCount(t.dataset.m,t.dataset.pc,t.value);t.onchange=()=>saveCount(t.dataset.m,t.dataset.pc,t.value,true);t.onfocus=()=>t.select()});
+  $("#pies").querySelectorAll("[data-pcrz]").forEach(b=>b.onclick=()=>saveCount(b.dataset.pcrz,"reset"));
+  if(keepN){const t=$("#pies").querySelector(`[data-pc="${keepN[0]}"][data-m="${keepN[1]}"]`);if(t){t.value=keepN[2];t.focus();try{t.setSelectionRange(keepN[3],keepN[4])}catch(_){}}}
 }
-/* Échéance des révisions : mardi 6 octobre après-midi. On compte les demi-journées (matin 8 h–12 h, après-midi 13 h 30–18 h)
-   qui restent d'ici là, celle en cours comprise ; l'après-midi de mardi lui-même n'est pas compté. */
-const ECHEANCE="2026-10-06";
-function halfDaysLeft(){const now=new Date();let n=0;
-  for(let d=new Date(now);iso(d)<=ECHEANCE;d=addDays(d,1)){const day=iso(d);
-    [["12:00",true],["18:00",day<ECHEANCE]].forEach(([fin,ok])=>{if(ok&&new Date(day+"T"+fin)>now)n++})}
-  return n}
-/* Total des heures de révision estimées, toutes matières confondues. */
-function paintTot(){const el=$("#ptot");if(!el)return;
-  const ms=M.filter(m=>C.some(c=>c.matiere===m.id)),v=ms.filter(m=>m.reste!=null&&m.reste!=="").map(m=>+m.reste);
-  const tot=v.reduce((a,b)=>a+b,0),nd=halfDaysLeft(),f=x=>String(Math.round(x*10)/10).replace(".",",");
-  el.innerHTML=`<span class="small">Il me reste en tout</span><b class="num">${f(tot)} h</b><span class="sub">${v.length?`${nd?`soit ≈ ${(x=>{const mn=Math.round(x*60);return mn<60?mn+" min":Math.floor(mn/60)+" h"+(mn%60?" "+String(mn%60).padStart(2,"0"):"")})(tot/nd)} par demi-journée d'ici mardi après-midi (${nd} demi-journée${nd>1?"s":""})`:"Échéance de mardi après-midi passée"}`:"Remplis le temps sous chaque matière"}${v.length&&v.length<ms.length?` · ${ms.length-v.length} matière${ms.length-v.length>1?"s":""} sans estimation`:""}</span>`}
-const resteTimers={};
-function saveReste(mid,raw,now){
-  clearTimeout(resteTimers[mid]);const t=String(raw).trim().replace(",",".").replace(/\s*h$/i,""),v=t===""||isNaN(+t)?null:Math.max(0,+t);
-  const m=M.find(x=>x.id===mid);if(m)m.reste=v;paintTot();
-  const go=async()=>{if(!db)return;try{await db.doc("matieres/"+mid).update({reste:v})}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
-  if(now)go();else resteTimers[mid]=setTimeout(go,700);
-}
-/* Petit mot « où j'en suis » par matière, enregistré dans la matière elle-même. */
-const ouTimers={};
-function saveOu(mid,v,now){
-  clearTimeout(ouTimers[mid]);const m=M.find(x=>x.id===mid);if(m)m.ou=v;
-  const go=async()=>{if(!db)return;try{await db.doc("matieres/"+mid).update({ou:v})}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
-  if(now)go();else ouTimers[mid]=setTimeout(go,700);
+/* Enregistre « cours eus » ou « au total » tapés à la main pour une matière (vide = compte automatique). */
+const countTimers={};
+function saveCount(mid,k,raw,now){
+  const m=M.find(x=>x.id===mid);if(!m)return;clearTimeout(countTimers[mid+k]);
+  let patch;
+  if(k==="reset")patch={eu:null,nb:null};
+  else{const t=String(raw).trim();if(t!==""&&!/^\d+$/.test(t))return;patch={[k]:t===""?null:+t}}
+  Object.assign(m,patch);
+  const go=async()=>{if(!db)return;try{await db.doc("matieres/"+mid).update(patch)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+  /* camemberts redessinés seulement en quittant la case (après que le curseur est passé à la case suivante) */
+  if(now||k==="reset"){go();setTimeout(()=>{renderPies();renderCours()},0)}else countTimers[mid+k]=setTimeout(go,700);
 }
 
 /* COURS */
@@ -1341,7 +1330,7 @@ function renderCours(){
     if((filt==="late"||filt==="star")&&!cs.length)continue;
     const mc=MCOL[m.id]||["#eee","#7c6fd6"];
     const n3=C.filter(c=>c.matiere===m.id&&c.p3).length,n2=C.filter(c=>c.matiere===m.id&&c.p2&&!c.p3).length,n1=C.filter(c=>c.matiere===m.id&&c.p1&&!c.p2).length,tot=Math.max(all,1);
-    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${C.filter(c=>c.matiere===m.id&&isEu(c)).length} / ${all} cours eus</span></div>
+    html+=`<div class="panel mat" style="${mvars(m.id)}"><div class="mat-head"><h3>${esc(m.nom)} <span class="muted small">· coef ${esc(m.coef??"?")}</span></h3><span class="small muted num">${matCount(m).eu} / ${matCount(m).nb} cours eus</span></div>
      <div class="rows">${cs.map(c=>{const s=status(c);return `<div class="row"><div class="t"><button class="star ${c.difficile?"on":""}" data-star="${esc(c.id)}" aria-label="Marquer difficile" aria-pressed="${!!c.difficile}">★</button><span>${esc(c.titre)}${c.note?` <span class="small muted">· ${esc(c.note)}</span>`:""}${qline(c)}</span></div>
        <div class="passes">${["p1","p2","p3"].map(p=>{const r=(c.r||{})[p]||{};const pc=pct(r);return `<button class="pass ${c[p]?(r.diff?"d"+r.diff:"on"):s[p]||""}" data-id="${esc(c.id)}" data-p="${p}" title="${c[p]?"Fait le "+fmt(c[p])+(pc!=null?" · QCM "+pc+" %":"")+(r.diff?" · "+DIFF[r.diff]:""):p.toUpperCase()+" à faire"}">${c[p]?fmt(c[p]):p.toUpperCase()}${c[p]&&pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${(c.extra||[]).map((e,i)=>{const pc=pct(e);return `<button class="pass ${e.diff?"d"+e.diff:"on"}" data-id="${esc(c.id)}" data-p="x${i}" title="P${i+4} · ${fmt(e.date)}">${fmt(e.date)}${pc!=null?`<small>${pc} %</small>`:""}</button>`}).join("")}${c.p3?`<button class="pass" data-id="${esc(c.id)}" data-p="xnew" title="Ajouter un passage" aria-label="Ajouter un passage">+</button>`:""}${m.mode!=="qcm"?`<button class="pass ${c.anki?"on":""}" data-id="${esc(c.id)}" data-p="anki">Anki</button>`:""}${c.poly?`<button class="pass poly" type="button" data-poly="${esc(c.id)}" title="Ouvrir le polycopié" aria-label="Ouvrir le polycopié">📄</button>`:c.lien?`<a class="pass poly" href="${esc(c.lien)}" target="_blank" rel="noopener" title="Ouvrir le polycopié" aria-label="Ouvrir le polycopié">📄</a>`:""}<button class="pass" data-edit="${esc(c.id)}" aria-label="Modifier">✎</button></div></div>`}).join("")}</div>
      ${filt==="all"||filt===m.id?`<form class="addc" data-add="${esc(m.id)}"><input type="text" name="t" placeholder="+ Ajouter un cours en ${esc(shortNom(m))}" aria-label="Nouveau cours en ${esc(m.nom)}" autocomplete="off"><button class="btn sm primary" type="submit">Ajouter</button></form>`:""}</div>`;
@@ -1593,7 +1582,7 @@ $("#j-save").onclick=async()=>{const blocs=[...$("#j-rows").querySelectorAll(".j
 let Q=[],QR=[];
 /* qz.bank : copie des questions prise au début du QCM. Le QCM se fait et se corrige sur cette copie, pour qu'une modification
    de la banque pendant le QCM (ordre des propositions, texte) ne décale pas les réponses déjà données. */
-const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null,acc:0,run:0};
+const qz={mode:"list",id:null,order:[],i:0,ans:{},only:false,t0:0,arm:false,res:null,filt:"all",bank:null,acc:0,run:0,perm:{}};
 /* CHRONO : temps passé (acc) + depuis la reprise (run, 0 = en pause). Quitter ou fermer la page ne compte pas :
    au retour, le chrono repart de ce qui était enregistré. */
 const chEl=o=>(o.acc||0)+(o.run?Date.now()-o.run:0);
@@ -1609,11 +1598,25 @@ const qById=id=>Q.find(x=>x.id===id);
 /* Barème de la matière (champ « bareme » de la matière), ramené à 1 point par question puis sur 20 :
    "items" = +1 par item juste, −1 par item faux, 0 sans réponse (soit +0,2 / −0,2 / 0 par proposition) ; "items05" = pareil avec −0,5 par item faux ; une question ne descend jamais sous 0 (pas de point négatif) ;
    sinon barème prépa par question (0 erreur = 1, 1 erreur = 0,6, 2 = 0,2, au-delà 0 ; une case vide compte comme une erreur). */
-const barOf=q=>matById(q.matiere).bareme||"prepa";
-const BARL={items:"barème +1 / −1 / 0 par item, 0 minimum par question",items05:"barème +1 / −0,5 / 0 par item, 0 minimum par question",prepa:"barème par question"};
+/* Barème de chaque matière d'après les guides matière 2026-2027 (le champ « bareme » de la matière, s'il existe, prime) :
+   QIM (vrai/faux par item) en chimie, biochimie, histo, embryo, biomol (−1 par item faux) et biocell (−0,5) ;
+   QCM « coche ce qui est vrai », 0 ou 1 par question (une seule erreur = 0), en anatomie OS et TC, biophysique, physio et SHS. */
+const BAR0={chimie:"items",biochimie:"items",histo:"items",embryo:"items",biomol:"items",biocell:"items05",anatos:"qcm",anattc:"qcm",biophysique:"qcm",physio:"qcm",shs:"qcm"};
+const barOf=q=>matById(q.matiere).bareme||BAR0[q.matiere]||"prepa";
+/* QCM à cocher : on ne coche que les propositions vraies ; une case laissée vide veut dire « fausse ». */
+const isCo=q=>barOf(q)==="qcm";
+const BARL={items:"QIM : +1 / −1 / 0 par item, 0 minimum par question",items05:"QIM : +1 / −0,5 / 0 par item, 0 minimum par question",qcm:"QCM : coche ce qui est vrai · une erreur = 0 à la question",prepa:"barème par question"};
+const BARS={items:"QIM vrai/faux · −1 par item faux",items05:"QIM vrai/faux · −0,5 par item faux",qcm:"QCM à cocher · tout ou rien",prepa:"barème prépa"};
+/* Ordre d'affichage des propositions, tiré au hasard à chaque QCM et à chaque révision. Les réponses restent rangées
+   par position d'origine (A à E dans la banque) : seul l'affichage est mélangé. */
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const qOrd=(perm,idx)=>Array.isArray(perm)?perm.filter(k=>idx.includes(k)).concat(idx.filter(k=>!perm.includes(k))):idx;
+const permOf=x=>shuf((x&&x.it||[]).map((_,k)=>k));
+const stemOf=(co,s)=>co?`Parmi les propositions suivantes concernant ${esc(s)}, laquelle ou lesquelles sont exactes ?`:`Parmi les propositions suivantes concernant ${esc(s)}, laquelle ou lesquelles sont vraies ou fausses ?`;
 /* Dans une réponse (rp), « x » = item non posé (retiré « trop facile », ou absent d'une question de rattrapage) : il ne compte pas. */
 /* it.off = proposition hors programme (marquée par toi dans « Modifier ») : comme « x », elle ne compte nulle part, même dans les anciens résultats. */
-function qPts(x,rp,bar){if(bar==="items"||bar==="items05"){const neg=bar==="items05"?.1:.2;let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(it.off)return;if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-neg});return Math.max(0,Math.round(p*100)/100)}
+function qPts(x,rp,bar){if(bar==="qcm")return rvErrs(x,rp)?0:1;
+  if(bar==="items"||bar==="items05"){const neg=bar==="items05"?.1:.2;let p=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(it.off)return;if(c&&c!=="-"&&c!=="x")p+=(c==="V")===it.v?.2:-neg});return Math.max(0,Math.round(p*100)/100)}
   let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x"||it.off)return;if(!c||c==="-"||(c==="V")!==it.v)e++});return QPTS[Math.min(e,3)]}
 const qImg=x=>x.img?`<figure class="qimg"><img src="/_blob/${esc(x.img)}" alt="Photo de microscopie de la question" loading="lazy"></figure>`:"";
 document.addEventListener("click",e=>{const f=e.target.closest&&e.target.closest(".qimg");if(f)f.classList.toggle("big")});
@@ -1640,33 +1643,43 @@ const qNote=(pts,nq)=>nq?Math.round(Math.max(0,pts)/nq*2000)/100:0;
 const qNum=x=>String(Math.round(x*100)/100).replace(".",",");
 const pctCls=p=>p>=80?"ok":p>=50?"due":"late";
 let qShuffle=true;try{qShuffle=localStorage.getItem("qcmShuffle")!=="0"}catch(e){}
-/* Matières repliées dans l'onglet QCM (souvenir propre à ce navigateur). */
-let qClosed=new Set();try{qClosed=new Set(JSON.parse(localStorage.getItem("qcmClosed")||"[]"))}catch(e){}
+/* Matière ouverte dans l'onglet QCM, comme le filtre de l'onglet Cours (souvenir propre à ce navigateur ; "" = toutes, "_" = sans matière). */
+let qMat="";try{qMat=localStorage.getItem("qcmMat")||""}catch(e){}
 /* Dernier résultat connu de chaque question (true = les 5 propositions justes). */
 function qLastOk(id){const m={};QR.filter(r=>r.qcm===id).sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>Object.assign(m,r.ok||{}));return m}
 function qErrIds(q){const m=qLastOk(q.id);return q.questions.filter(x=>!x.off&&m[x.id]===false).map(x=>x.id)}
 function qDraft(id){try{return JSON.parse(localStorage.getItem("qcmDraft:"+id)||"null")}catch(e){return null}}
-function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank,acc:chEl(qz)}))}catch(e){}}
+function qSaveDraft(){try{localStorage.setItem("qcmDraft:"+qz.id,JSON.stringify({order:qz.order,i:qz.i,ans:qz.ans,only:qz.only,t0:qz.t0,bank:qz.bank,perm:qz.perm,acc:chEl(qz)}))}catch(e){}}
 function qDropDraft(id){try{localStorage.removeItem("qcmDraft:"+id)}catch(e){}}
 const qTop=()=>{const r=$("#qcmRoot");if(r&&r.getBoundingClientRect().top<70)window.scrollTo({top:Math.max(0,r.getBoundingClientRect().top+window.scrollY-70)})};
 /* Propositions posées d'une question : toutes sauf celles hors programme (aucune si toute la question l'est). */
 const qActive=x=>x&&!x.off?x.it.map((_,k)=>k).filter(k=>!x.it[k].off):[];
 const qBankX=id=>(qz.bank||(qById(qz.id)||{}).questions||[]).find(x=>x.id===id);
 const qAnswered=id=>{const a=qz.ans[id]||[];return qActive(qBankX(id)).filter(k=>a[k]!=null).length};
-const qFull=id=>qAnswered(id)===qActive(qBankX(id)).length;
+/* QCM à cocher : une question compte comme répondue dès qu'une case est cochée. */
+const qFull=id=>isCo(qById(qz.id)||{})?qActive(qBankX(id)).some(k=>(qz.ans[id]||[])[k]===1):qAnswered(id)===qActive(qBankX(id)).length;
 
 function renderQcm(){if(qz.mode==="quiz")renderQuiz();else if(qz.mode==="res")renderQres();else if(qz.mode==="edit")renderQedit();else renderQcmList()}
 function renderQcmList(){
   const root=$("#qcmRoot");qz.mode="list";
   if(!Q.length){root.innerHTML=`<div class="panel"><h2>Mes QCM</h2><p class="muted" style="margin:0">Aucun QCM pour l'instant. Envoie un cours à Claude : il ajoutera ici un QCM qui reprend tout le cours.</p></div>`;return}
-  const list=[...Q].sort((a,b)=>(matById(a.matiere).ordre||0)-(matById(b.matiere).ordre||0)||(a.ordre||0)-(b.ordre||0));
-  const groups=[];list.forEach(q=>{const k=q.matiere||"";let g=groups[groups.length-1];if(!g||g.k!==k)groups.push(g={k,qs:[]});g.qs.push(q)});
-  root.innerHTML=`<div class="bar-top"><p class="muted small" style="margin:0">Chaque QCM reprend tout le cours : ton score est la part des propositions que tu connais.</p><label class="toggle"><input type="checkbox" id="qShuf" ${qShuffle?"checked":""}> Mélanger les questions</label></div>
-    ${groups.map(g=>{const m=matById(g.k),last=g.qs.map(q=>QR.filter(r=>r.qcm===q.id&&r.mode!=="erreurs"&&r.mode!=="revision").sort((a,b)=>(a.ts||0)-(b.ts||0)).pop()).filter(Boolean);
-      const av=last.length?Math.round(last.reduce((s,r)=>s+(r.pct||0),0)/last.length):null;
-      return `<details class="qmat" data-qmat="${esc(g.k||"_")}" style="${mvars(g.k)}"${qClosed.has(g.k||"_")?"":" open"}><summary><h2>${esc(m.nom||"Sans matière")}</h2><span class="small muted">${g.qs.length} QCM${av!=null?` · moyenne ${av} % au dernier passage`:""}</span></summary>
-      <div class="qcards">${g.qs.map(qCard).join("")}</div></details>`}).join("")}`;
-  root.querySelectorAll("details.qmat").forEach(d=>d.addEventListener("toggle",()=>{const k=d.dataset.qmat;d.open?qClosed.delete(k):qClosed.add(k);try{localStorage.setItem("qcmClosed",JSON.stringify([...qClosed]))}catch(e){}}));
+  const keys=[...new Set(Q.map(q=>q.matiere||""))].sort((a,b)=>(matById(a).ordre||0)-(matById(b).ordre||0));
+  const key=k=>k||"_";if(qMat&&!keys.some(k=>key(k)===qMat))qMat="";
+  const lastFull=q=>QR.filter(r=>r.qcm===q.id&&r.mode!=="erreurs"&&r.mode!=="revision").sort((a,b)=>(a.ts||0)-(b.ts||0)).pop();
+  const info=k=>{const qs=Q.filter(q=>(q.matiere||"")===k).sort((a,b)=>(a.ordre||0)-(b.ordre||0)),last=qs.map(lastFull).filter(Boolean);
+    return{qs,done:last.length,av:last.length?Math.round(last.reduce((s,r)=>s+(r.pct||0),0)/last.length):null,bar:barOf({matiere:k})}};
+  const pies=keys.map(k=>{const m=matById(k),o=info(k),mc=(MCOL[k]||["#eee","#7c6fd6"])[1];
+    return `<button type="button" class="pie" data-qm="${esc(key(k))}" aria-pressed="${qMat===key(k)}" style="${mvars(k)}">${donut(o.av!=null?[o.av,100-o.av]:[0,1],[mc,mc+"26"],o.av!=null?o.av+" %":"–",(m.nom||"Sans matière")+" : "+o.done+" QCM faits sur "+o.qs.length+(o.av!=null?", moyenne "+o.av+" %":""),17,["Su","À revoir"],`${o.done}/${o.qs.length} faits`)}<span class="nm">${esc(shortNom(m)||"Sans matière")}</span><span class="sub">${o.qs.length} QCM · ${esc(BARS[o.bar]||o.bar)}</span></button>`}).join("");
+  const k=qMat?keys.find(x=>key(x)===qMat):null;
+  let body=`<p class="hint">Touche une matière pour voir ses QCM. Le % est la moyenne de tes QCM complets au dernier passage.</p>`;
+  if(k!=null){const m=matById(k),o=info(k);
+    body=`<div class="panel mat" style="${mvars(k)}"><div class="mat-head"><h3>${esc(m.nom||"Sans matière")} <span class="muted small">· ${o.qs.length} QCM${o.av!=null?` · moyenne ${o.av} % au dernier passage`:""}</span></h3><button class="link" type="button" id="qAllMat">‹ Toutes les matières</button></div><span class="small muted">Notation : ${esc(BARL[o.bar]||o.bar)}.</span></div>
+      <div class="qcards">${o.qs.map(qCard).join("")}</div>`}
+  root.innerHTML=`<div class="bar-top"><p class="muted small" style="margin:0">Chaque QCM reprend tout le cours. L'ordre des propositions est tiré au hasard à chaque fois.</p><label class="toggle"><input type="checkbox" id="qShuf" ${qShuffle?"checked":""}> Mélanger les questions</label></div>
+    <div class="pies">${pies}</div>${body}`;
+  const pick=v=>{qMat=v;try{localStorage.setItem("qcmMat",qMat)}catch(e){}renderQcmList()};
+  root.querySelectorAll("[data-qm]").forEach(b=>b.onclick=()=>pick(qMat===b.dataset.qm?"":b.dataset.qm));
+  if($("#qAllMat"))$("#qAllMat").onclick=()=>{pick("");qTop()};
   $("#qShuf").onchange=e=>{qShuffle=e.target.checked;try{localStorage.setItem("qcmShuffle",qShuffle?"1":"0")}catch(_){}};
   root.querySelectorAll("[data-qstart]").forEach(b=>b.onclick=()=>qStart(b.dataset.qstart,b.dataset.how));
   root.querySelectorAll("[data-qedit]").forEach(b=>b.onclick=()=>{qz.id=b.dataset.qedit;qz.ef="";renderQedit();qTop()});
@@ -1692,20 +1705,21 @@ function qCard(q){
 }
 function qStart(id,how,only){
   const q=qById(id);if(!q)return;const all=q.questions.map(x=>x.id),ids=q.questions.filter(x=>!x.off).map(x=>x.id);
-  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>all.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null,acc:d.acc||0,run:Date.now()});renderQuiz();qTop();return}}
+  if(how==="resume"){const d=qDraft(id);if(d&&Array.isArray(d.order)&&d.order.length&&d.order.every(x=>all.includes(x))){Object.assign(qz,{mode:"quiz",id,order:d.order,i:Math.min(d.i||0,d.order.length-1),ans:d.ans||{},only:!!d.only,t0:d.t0||Date.now(),arm:false,bank:Array.isArray(d.bank)?d.bank:null,perm:d.perm||{},acc:d.acc||0,run:Date.now()});renderQuiz();qTop();return}}
   const order=only?only.filter(x=>ids.includes(x)):how==="err"?qErrIds(q):ids.slice();if(!order.length)return;
   if(qShuffle)for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
-  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank:JSON.parse(JSON.stringify(q.questions)),acc:0,run:Date.now()});qSaveDraft();renderQuiz();qTop();
+  const bank=JSON.parse(JSON.stringify(q.questions));
+  Object.assign(qz,{mode:"quiz",id,order,i:0,ans:{},only:how==="err",t0:Date.now(),arm:false,bank,perm:Object.fromEntries(bank.map(x=>[x.id,permOf(x)])),acc:0,run:Date.now()});qSaveDraft();renderQuiz();qTop();
 }
 function renderQuiz(){
   const q=qById(qz.id);if(!q)return renderQcmList();
   const qs=Object.fromEntries((qz.bank||q.questions).map(x=>[x.id,x])),n=qz.order.length,cur=qs[qz.order[qz.i]];if(!cur)return renderQcmList();
-  const a=qz.ans[cur.id]||[],done=qz.order.filter(qFull).length,blank=qz.order.reduce((s,id)=>s+qActive(qBankX(id)).length-qAnswered(id),0),idx=qActive(cur);
+  const co=isCo(q),a=qz.ans[cur.id]||[],done=qz.order.filter(qFull).length,blank=co?qz.order.filter(id=>qActive(qBankX(id)).length&&!qFull(id)).length:qz.order.reduce((s,id)=>s+qActive(qBankX(id)).length-qAnswered(id),0),idx=qOrd(qz.perm&&qz.perm[cur.id],qActive(cur));
   $("#qcmRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">${esc(q.titre)}${qz.only?" · mes erreurs":""}</span><h2>Question ${qz.i+1} <span class="muted small">/ ${n}</span></h2></div><span style="display:flex;gap:10px;align-items:baseline"><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(cur.id)}|0">✎ Corriger</button><button class="link" type="button" id="qQuit">Quitter</button></span></header>
-      ${idx.length?`${qImg(cur)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(cur.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>`:`<p class="notice" style="margin:0">Tu as mis cette question hors programme : elle ne compte pas. Passe à la suivante.</p>`}
-      <ol class="qz-items">${idx.map((k,pos)=>{const it=cur.it[k];return `<li class="qz-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`}).join("")}</ol>
+      ${idx.length?`${qImg(cur)}<p class="qz-stem">${stemOf(co,cur.q)}</p>${co?`<p class="small muted" style="margin:0">Coche seulement les propositions vraies. Une seule erreur sur la question et elle vaut 0.</p>`:""}`:`<p class="notice" style="margin:0">Tu as mis cette question hors programme : elle ne compte pas. Passe à la suivante.</p>`}
+      <ol class="qz-items">${idx.map((k,pos)=>{const it=cur.it[k];if(co)return `<li><button type="button" class="qck" data-ck="${k}" aria-pressed="${a[k]===1}"><span class="lt">${LET[pos]}</span><span class="box" aria-hidden="true"></span><span class="tx">${esc(it.t)}</span></button></li>`;return `<li class="qz-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`}).join("")}</ol>
       <div class="qz-nav"><button class="btn" type="button" id="qPrev" ${qz.i?"":"disabled"}>‹ Précédente</button>${qz.i<n-1?`<button class="btn primary" type="button" id="qNext">Suivante ›</button>`:`<button class="btn primary" type="button" id="qEnd2">Terminer</button>`}</div>
     </div>
     <aside class="panel qz-side">
@@ -1714,11 +1728,12 @@ function renderQuiz(){
       <span class="prog"><i style="width:${done/n*100}%"></i></span>
       <div class="qgrid">${qz.order.map((id,k)=>{const c=qAnswered(id);return `<button type="button" data-go="${k}" class="${qFull(id)?"qfull":c?"part":""}" aria-current="${k===qz.i}" aria-label="Question ${k+1}">${k+1}</button>`}).join("")}</div>
       <button class="btn primary" type="button" id="qEnd">Terminer</button>
-      <p class="small" ${qz.arm?"":"hidden"} style="margin:0;color:var(--late)">${blank} proposition${blank>1?"s":""} sans réponse : ${blank>1?"elles compteront comme non sues":"elle comptera comme non sue"}. Touche encore « Terminer » pour valider.</p>
-      <p class="small muted" style="margin:0">Touche une 2e fois une réponse pour l'effacer et laisser la proposition vide. Tu peux quitter : tes réponses sont gardées sur cet appareil.</p>
+      <p class="small" ${qz.arm?"":"hidden"} style="margin:0;color:var(--late)">${co?`${blank} question${blank>1?"s":""} sans aucune case cochée : ${blank>1?"elles vaudront":"elle vaudra"} 0.`:`${blank} proposition${blank>1?"s":""} sans réponse : ${blank>1?"elles compteront comme non sues":"elle comptera comme non sue"}.`} Touche encore « Terminer » pour valider.</p>
+      <p class="small muted" style="margin:0">${co?"Touche une proposition pour la cocher, touche-la encore pour la décocher.":"Touche une 2e fois une réponse pour l'effacer et laisser la proposition vide."} Tu peux quitter : tes réponses sont gardées sur cet appareil.</p>
     </aside></div>`;
   const root=$("#qcmRoot");
   root.querySelectorAll(".vfb").forEach(b=>b.onclick=()=>{const k=+b.dataset.k,v=+b.dataset.a,arr=[...(qz.ans[cur.id]||[null,null,null,null,null])];arr[k]=arr[k]===v?null:v;qz.ans[cur.id]=arr;qz.arm=false;qSaveDraft();renderQuiz()});
+  root.querySelectorAll("[data-ck]").forEach(b=>b.onclick=()=>{const k=+b.dataset.ck,arr=[...(qz.ans[cur.id]||[null,null,null,null,null])];arr[k]=arr[k]===1?null:1;qz.ans[cur.id]=arr;qz.arm=false;qSaveDraft();renderQuiz()});
   root.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{qz.i=+b.dataset.go;qz.arm=false;qSaveDraft();renderQuiz();qTop()});
   const go=d=>{qz.i=Math.max(0,Math.min(n-1,qz.i+d));qz.arm=false;qSaveDraft();renderQuiz();qTop()};
   $("#qPrev").onclick=()=>go(-1);if($("#qNext"))$("#qNext").onclick=()=>go(1);
@@ -1731,12 +1746,14 @@ async function qFinish(){
   let juste=0,faux=0,vide=0,pts=0;const sec={},ok={},rep={};
   /* les questions et propositions hors programme ne sont ni posées ni comptées (« x » dans la réponse) */
   const order=[];let total=0;
-  qz.order.forEach(id=>{const x=qs[id],a=qz.ans[id]||[],idx=qActive(x);if(!idx.length)return;let e=0;
+  /* QCM à cocher : une case non cochée est une réponse « fausse », pas un vide */
+  const co=isCo(q);
+  qz.order.forEach(id=>{const x=qs[id],a0=qz.ans[id]||[],a=co?x.it.map((_,k)=>a0[k]===1?1:0):a0,idx=qActive(x);if(!idx.length)return;let e=0;
     idx.forEach(k=>{const it=x.it[k],v=a[k];if(v==null){vide++;e++}else if((v===1)===it.v)juste++;else{faux++;e++}});
     const s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=idx.length-e;s.t+=idx.length;total+=idx.length;
     rep[id]=x.it.map((it,k)=>it.off?"x":a[k]==null?"-":a[k]?"V":"F").join("");pts+=qPts(x,rep[id],barOf(q));ok[id]=e===0;order.push(id)});
   const nq=order.length;
-  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:total?Math.round(juste/total*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(chEl(qz)/60000)),dsec:Math.round(chEl(qz)/1000),sec,ok,rep,order};qz.run=0;
+  const r={qcm:q.id,cours:q.cours||"",date:today(),ts:Date.now(),mode:qz.only?"erreurs":"complet",nq,juste,faux,vide,total,pct:total?Math.round(juste/total*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(chEl(qz)/60000)),dsec:Math.round(chEl(qz)/1000),sec,ok,rep,order,perm:Object.fromEntries(order.map(id=>[id,(qz.perm||{})[id]]).filter(p=>Array.isArray(p[1])))};qz.run=0;
   qDropDraft(q.id);qShowRes(r);
   if(!db){toast("Résultat non enregistré : données indisponibles ici");return}
   try{const ref=await db.collection("qcmres").add(r);if(ref&&ref.id&&qz.res===r)r.id=ref.id;toast("Résultat enregistré")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}
@@ -1745,13 +1762,15 @@ function qShowRes(r){qz.mode="res";qz.res=r;qz.filt="all";renderQres();qTop()}
 function renderQres(){
   const r=qz.res,q=r&&qById(r.qcm);if(!q)return renderQcmList();
   const qs=Object.fromEntries(q.questions.map(x=>[x.id,x])),order=(r.order||Object.keys(r.rep||{})).filter(id=>qs[id]&&!qs[id].off);
-  const per=order.map((id,i)=>{const v=(r.ver||{})[id]||0,x=qVer(qs[id],v),rp=(r.rep||{})[id]||"-----";return{x,rp,e:rvErrs(x,rp),i,v}});
-  const bar=barOf(q),note=qNote(per.reduce((a,p)=>a+qPts(p.x,p.rp,bar),0),per.length);
-  const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>p.e>=3).length,nPart=per.length-nOk-nKo;
+  const per=order.map((id,i)=>{const v=(r.ver||{})[id]||0,x=qVer(qs[id],v),rp=(r.rep||{})[id]||"-----";
+    const ord=qOrd((r.perm||{})[id],x.it.map((_,k)=>k).filter(k=>rp[k]!=="x"&&!x.it[k].off));return{x,rp,e:rvErrs(x,rp),i,v,ord}});
+  const bar=barOf(q),co=bar==="qcm",note=qNote(per.reduce((a,p)=>a+qPts(p.x,p.rp,bar),0),per.length);
+  const nOk=per.filter(p=>!p.e).length,nKo=per.filter(p=>co?p.e:p.e>=3).length,nPart=per.length-nOk-nKo;
   const secs=Object.entries(r.sec||{}).map(([k,v])=>({k:+k,j:v.j,t:v.t,p:Math.round(v.j/v.t*100)})).sort((a,b)=>a.k-b.k);
   const c=C.find(x=>x.id===r.cours),pk=c?(["p1","p2","p3"].find(p=>!c[p])||"xnew"):null;
   const wrongIds=per.filter(p=>p.e).map(p=>p.x.id),show=qz.filt==="err"?per.filter(p=>p.e):per;
-  const pill=v=>v==="V"?`<span class="pill ok">✓ Vrai</span>`:v==="F"?`<span class="pill late">✕ Faux</span>`:`<span class="pill nil">sans réponse</span>`;
+  const pill=(v,exp)=>co?(v==="V"?`<span class="pill ok">☑ ${exp?"À cocher":"Cochée"}</span>`:v==="F"?`<span class="pill nil">☐ ${exp?"Ne pas cocher":"Non cochée"}</span>`:`<span class="pill nil">☐ Non cochée</span>`)
+    :v==="V"?`<span class="pill ok">✓ Vrai</span>`:v==="F"?`<span class="pill late">✕ Faux</span>`:`<span class="pill nil">sans réponse</span>`;
   $("#qcmRoot").innerHTML=`
     <div class="panel" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">Résultats · ${fmt(r.date)}${r.dsec?" · "+chFmt(r.dsec*1000)+" · "+chPer(r.dsec*1000,r.nq):r.duree?" · "+r.duree+" min":""}${r.mode==="erreurs"?" · révision des erreurs":r.mode==="revision"?" · révision espacée":""}</span><h2>${esc(q.titre)}</h2></div><button class="link" type="button" id="qBack">Tous les QCM</button></header>
@@ -1772,12 +1791,12 @@ function renderQres(){
     </div>
     <div class="panel">
       <header><h2>Correction</h2><div class="chips"><button class="chip" type="button" data-qf="all" aria-pressed="${qz.filt==="all"}">Toutes (${per.length})</button><button class="chip" type="button" data-qf="err" aria-pressed="${qz.filt==="err"}">Mes erreurs (${wrongIds.length})</button></div></header>
-      ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3?["due","Partielle"]:["late","Incorrecte"];
+      ${show.map(p=>{const x=p.x,st=!p.e?["ok","Correcte"]:p.e<3&&!co?["due","Partielle"]:["late","Incorrecte"];
         return `<div class="qcorr"><header><span class="qn">${p.i+1}</span><span class="pill ${st[0]}">${st[1]} · ${qNum(qPts(p.x,p.rp,bar))} / 1</span><span class="muted small">${esc((q.sections||[])[x.s]||"")}</span><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(x.id)}|${p.v}">✎ Corriger</button></header>
-        ${qImg(x)}<p class="qz-stem">Parmi les propositions suivantes concernant ${esc(x.q)}, laquelle ou lesquelles sont vraies ou fausses ?</p>
+        ${qImg(x)}<p class="qz-stem">${stemOf(co,x.q)}</p>
         <div class="crows"><div class="crow head"><span></span><span>Proposition</span><span>Ta réponse</span><span>Attendue</span></div>
-        ${x.it.map((it,k)=>{const y=p.rp[k];if(y==="x"||it.off)return"";const bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""} ${isSusIt(q.id,x.id,p.v,k)?"off":""}"><span class="lt">${LET[k]}</span><span>${esc(it.t)}${!bad||isSusIt(q.id,x.id,p.v,k)?isusBtn(q.id,x.id,p.v,k):""}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F")}</span></div>`}).join("")}</div>
-        <div class="cmt"><b>Commentaire de correction</b>${x.it.map((it,k)=>p.rp[k]==="x"||it.off?"":`<span>${LET[k]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
+        ${p.ord.map((k,pos)=>{const it=x.it[k],y=p.rp[k];const bad=y==="-"||(y==="V")!==it.v;return `<div class="crow ${bad?"bad":""} ${isSusIt(q.id,x.id,p.v,k)?"off":""}"><span class="lt">${LET[pos]}</span><span>${esc(it.t)}${!bad||isSusIt(q.id,x.id,p.v,k)?isusBtn(q.id,x.id,p.v,k):""}</span><span class="ya"><span class="lab">Toi :</span>${pill(y)}</span><span class="ex"><span class="lab">Attendue :</span>${pill(it.v?"V":"F",1)}</span></div>`}).join("")}</div>
+        <div class="cmt"><b>Commentaire de correction</b>${p.ord.map((k,pos)=>{const it=x.it[k];return `<span>${LET[pos]}. ${it.v?"VRAI.":"FAUX."}${it.c?" "+esc(it.c):""}</span>`}).join("")}</div></div>`}).join("<hr style='border:0;border-top:1px solid var(--line);margin:4px 0'>")||`<p class="muted" style="margin:0">Aucune erreur, bravo !</p>`}
     </div>`;
   const root=$("#qcmRoot");
   $("#qBack").onclick=()=>{renderQcmList();qTop()};
@@ -2062,12 +2081,12 @@ function rvPick(k){const [b]=k.split("|"),{x}=rvQ(k),st=SRS[k];if(!x)return{k,ag
   const sh=shownIdx(b,x,v);return{k,again:false,v,sub:sh.length<qVer(x,v).it.length?sh:null}}
 function rvStart(n){buildSrs();const qq=rvQueue();let keys=qq.due.slice(0,n);if(keys.length<n)keys=keys.concat(qq.nw.slice(0,n-keys.length));if(!keys.length)return;
   for(let i=keys.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[keys[i],keys[j]]=[keys[j],keys[i]]}
-  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(rvPick),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null,acc:0,run:Date.now()});rvSaveDraft();renderRevSess();rvTop()}
+  Object.assign(rv,{mode:"sess",date:today(),list:keys.map(k=>({...rvPick(k),perm:permOf(rvQ(k).x)})),i:0,ans:{},res:{},chk:false,tq:Date.now(),sum:null,acc:0,run:Date.now()});rvSaveDraft();renderRevSess();rvTop()}
 function renderRevSess(){
   const e=rv.list[rv.i];if(!e)return rvFinish();const {q,x:x0}=rvQ(e.k);if(!q||!x0||x0.off){rv.i++;rv.chk=false;return renderRevSess()}
-  const x=qVer(x0,e.v||0),nv=nVer(x0),idx=(e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i)).filter(k=>x.it[k]&&!x.it[k].off),ni=idx.length;
+  const x=qVer(x0,e.v||0),nv=nVer(x0),idx=qOrd(e.perm,(e.sub&&e.sub.length?e.sub:x.it.map((_,i)=>i)).filter(k=>x.it[k]&&!x.it[k].off)),ni=idx.length,co=isCo(q);
   if(!ni){rv.i++;rv.chk=false;return renderRevSess()}
-  const key=rvKey(e),a=rv.ans[key]||[],st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
+  const key=rvKey(e),a0=rv.ans[key]||[],a=co?a0.map(v=>v===1?1:0).concat(Array(Math.max(0,x.it.length-a0.length)).fill(0)):a0,st=SRS[e.k],m=matById(q.matiere),n=rv.list.length,chk=rv.chk;
   const done=Object.keys(rv.res).length,first=rv.list.filter(y=>!y.again).length;
   const rpOf=()=>x.it.map((_,k)=>idx.includes(k)?(a[k]==null?"-":a[k]?"V":"F"):"x").join("");
   let verdict="";
@@ -2075,14 +2094,14 @@ function renderRevSess(){
     if(e.again)verdict=`<span class="pill ${gr[0]}">${err?err+" erreur"+(err>1?"s":""):"Tout juste"}</span><span class="small muted">Rappel de fin de séance : ne compte pas pour le calendrier.</span>`;
     else{const pre=st&&st.last<rv.date?st:null,nx=fNext(pre,g,rv.date),due=rvDue(nx,g,LOAD);
       verdict=`<span class="pill ${gr[0]}">${gr[1]} · ${err?err+" erreur"+(err>1?"s":""):ni+"/"+ni}</span><span class="small">${err?"Tes items ratés reviennent seuls":"La question revient en entier"} ${dLbl(due)} (${inN(dayN(due)-dayN(rv.date))})${err?", et une 2e fois en fin de séance":""}.</span><span class="small muted">${pt>0?"+":""}${qNum(pt)} pt au concours</span>`}}
-  const pill=v=>v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
+  const pill=v=>co?(v===1?`<span class="pill ok">☑ cochée</span>`:`<span class="pill nil">☐ non cochée</span>`):v===1?`<span class="pill ok">Vrai</span>`:v===0?`<span class="pill late">Faux</span>`:`<span class="pill nil">vide</span>`;
   const tag=e.again?`<span class="pill due">Rappel · tes items ratés</span>`:e.rat?`<span class="pill due">Rattrapage · ${ni>1?"les "+ni+" items ratés":"l'item raté"} la dernière fois</span>`:st&&st.last<rv.date?`<span class="pill info">Revue · vue ${ago(dayN(rv.date)-dayN(st.last))}</span>`:`<span class="pill info">Nouvelle question</span>`;
   $("#revRoot").innerHTML=`<div class="qz">
     <div class="panel qz-main" style="${mvars(q.matiere)}">
       <header><div><span class="eyebrow">${esc(shortNom(m))} · ${esc(q.titre)}</span><h2>Question ${rv.i+1} <span class="muted small">/ ${n}</span></h2></div><span style="display:flex;gap:10px;align-items:baseline"><button class="qeopen" type="button" data-qeopen="${esc(q.id)}|${esc(x0.id)}|${e.v||0}">✎ Corriger</button><button class="link" type="button" id="rvQuit">Arrêter</button></span></header>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${tag}<span class="small muted">${esc((q.sections||[])[x.s]||"")}${nv>1?` · version ${(e.v||0)+1} sur ${nv}`:""}${ni<x.it.length&&!e.rat&&!e.again?` · ${x.it.length-ni} item${x.it.length-ni>1?"s":""} retiré${x.it.length-ni>1?"s":""}`:""}</span></div>
-      ${qImg(x)}<p class="qz-stem">${ni<x.it.length?(ni>1?"Ces propositions":"Cette proposition")+" concernant "+esc(x.q)+" "+(ni>1?"sont-elles vraies ou fausses ?":"est-elle vraie ou fausse ?"):"Parmi les propositions suivantes concernant "+esc(x.q)+", laquelle ou lesquelles sont vraies ou fausses ?"}</p>
-      <ol class="qz-items">${idx.map((k,pos)=>{const it=x.it[k];if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
+      ${qImg(x)}<p class="qz-stem">${ni<x.it.length?(ni>1?"Ces propositions":"Cette proposition")+" concernant "+esc(x.q)+(co?" : coche "+(ni>1?"celles qui sont vraies":"si elle est vraie"):" "+(ni>1?"sont-elles vraies ou fausses ?":"est-elle vraie ou fausse ?")):stemOf(co,x.q)}</p>
+      <ol class="qz-items">${idx.map((k,pos)=>{const it=x.it[k];if(!chk&&co)return `<li><button type="button" class="qck" data-ck="${k}" aria-pressed="${a[k]===1}"><span class="lt">${LET[pos]}</span><span class="box" aria-hidden="true"></span><span class="tx">${esc(it.t)}</span></button></li>`;if(!chk)return `<li class="qz-it rv-it"><span class="lt">${LET[pos]}</span><span class="tx">${esc(it.t)}</span><span class="vf"><button type="button" class="vfb v" data-k="${k}" data-a="1" aria-pressed="${a[k]===1}">Vrai ✓</button><button type="button" class="vfb f" data-k="${k}" data-a="0" aria-pressed="${a[k]===0}">Faux ✕</button></span></li>`;
         const ok=a[k]!=null&&(a[k]===1)===it.v,off=isSusIt(q.id,x.id,e.v||0,k);return `<li class="qz-it rv-it chk ${ok?"ok":"bad"} ${off?"off":""}"><span class="lt">${LET[pos]}</span><span class="tx"><b>${it.v?"VRAI":"FAUX"}</b> · ${esc(it.t)}</span><span class="yo">Ta réponse : ${pill(a[k])}${ok||off?isusBtn(q.id,x.id,e.v||0,k):""}</span>${it.c?`<span class="cm">${esc(it.c)}</span>`:""}</li>`}).join("")}</ol>
       ${chk?`<div class="rv-verdict">${verdict}</div>`:""}
       <div class="qz-nav"><span></span>${chk?`<button class="btn primary" type="button" id="rvNext">${rv.i<n-1?"Suivante ›":"Terminer"}</button>`:`<button class="btn primary" type="button" id="rvCheck">Valider</button>`}</div>
@@ -2095,8 +2114,9 @@ function renderRevSess(){
     </aside></div>`;
   const root=$("#revRoot");
   root.querySelectorAll(".vfb").forEach(b=>b.onclick=()=>{const k=+b.dataset.k,v=+b.dataset.a,arr=[...(rv.ans[key]||[null,null,null,null,null])];arr[k]=arr[k]===v?null:v;rv.ans[key]=arr;rvSaveDraft();renderRevSess()});
+  root.querySelectorAll("[data-ck]").forEach(b=>b.onclick=()=>{const k=+b.dataset.ck,arr=[...(rv.ans[key]||[null,null,null,null,null])];arr[k]=arr[k]===1?null:1;rv.ans[key]=arr;rvSaveDraft();renderRevSess()});
   if($("#rvCheck"))$("#rvCheck").onclick=()=>{const rp=rpOf(),err=rvErrs(x,rp),wr=idx.filter(k=>a[k]==null||(a[k]===1)!==x.it[k].v);
-    if(!e.again){rv.res[e.k]={rp,e:err,n:ni,part:ni<x.it.length,v:e.v||0,ms:Math.min(600000,Date.now()-rv.tq),d:rv.date};if(err>=1)rv.list.push({k:e.k,again:true,v:e.v||0,sub:wr})}
+    if(!e.again){rv.res[e.k]={rp,e:err,n:ni,part:ni<x.it.length,v:e.v||0,perm:e.perm,ms:Math.min(600000,Date.now()-rv.tq),d:rv.date};if(err>=1)rv.list.push({k:e.k,again:true,v:e.v||0,sub:wr,perm:permOf(x)})}
     rv.chk=true;rvSaveDraft();renderRevSess()};
   if($("#rvNext"))$("#rvNext").onclick=()=>{rv.i++;rv.chk=false;rv.tq=Date.now();rvSaveDraft();if(rv.i>=rv.list.length)return rvFinish();renderRevSess();rvTop()};
   $("#rvQuit").onclick=()=>rvFinish();
@@ -2114,12 +2134,12 @@ async function rvFinish(){
 async function rvSave(){
   const by={};for(const k in rv.res){const r=rv.res[k];if(r.saved)continue;const b=k.split("|")[0];(by[b]=by[b]||[]).push(k)}
   if(!Object.keys(by).length)return;if(!db){toast("Non enregistré : données indisponibles ici");return}
-  for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0,tot=0;const sec={},ok={},rep={},order=[],ver={};
+  for(const b in by){const q=qById(b);if(!q)continue;const ks=by[b];let juste=0,faux=0,vide=0,pts=0,ms=0,tot=0;const sec={},ok={},rep={},order=[],ver={},perm={};
     ks.forEach(k=>{const r=rv.res[k],id=k.split("|")[1],x0=(q.questions||[]).find(y=>y.id===id);if(!x0)return;const x=qVer(x0,r.v||0);ver[id]=r.v||0;
       x.it.forEach((it,i)=>{const c=r.rp[i];if(c==="x")return;if(c==="-")vide++;else if((c==="V")===it.v)juste++;else faux++});
-      const rn=r.n||5,s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=rn-r.e;s.t+=rn;tot+=rn;pts+=qPts(x,r.rp,barOf(q));ok[id]=r.e===0;rep[id]=r.rp;order.push(id);ms+=r.ms||0});
+      const rn=r.n||5,s=sec[x.s]=sec[x.s]||{j:0,t:0};s.j+=rn-r.e;s.t+=rn;tot+=rn;pts+=qPts(x,r.rp,barOf(q));ok[id]=r.e===0;rep[id]=r.rp;if(Array.isArray(r.perm))perm[id]=r.perm;order.push(id);ms+=r.ms||0});
     const nq=order.length;if(!nq)continue;
-    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:tot,pct:tot?Math.round(juste/tot*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order,ver};
+    const doc={qcm:q.id,cours:q.cours||"",date:rv.res[ks[0]].d||today(),ts:Date.now(),mode:"revision",nq,juste,faux,vide,total:tot,pct:tot?Math.round(juste/tot*100):0,pts:Math.round(pts*100)/100,note:qNote(pts,nq),duree:Math.max(1,Math.round(ms/60000)),sec,ok,rep,order,ver,perm};
     try{await db.collection("qcmres").add(doc);ks.forEach(k=>rv.res[k].saved=true);rvSaveDraft()}catch(e){toast("Pas enregistré : "+(e.code||"erreur"));return}}
   toast("Séance enregistrée");
 }
@@ -2152,4 +2172,5 @@ renderSemaine();renderAll();
 })();
 </script>
 
+</body></html>
 </body></html>
