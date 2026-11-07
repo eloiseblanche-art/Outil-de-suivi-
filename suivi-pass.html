@@ -174,6 +174,23 @@ h2{font-size:1.15rem}
 .auj{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
 .auj .side{display:grid;gap:18px}
 @media (max-width:860px){.auj{grid-template-columns:1fr}}
+.auj.one{grid-template-columns:1fr}
+.tops{display:flex;align-items:center;gap:10px}
+#cfgBtn{flex:none;font-size:1.1rem;color:var(--ink-2)}
+.sp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.sp-box{background:var(--surface-2);border-radius:12px;padding:12px 14px;display:grid;gap:6px;align-content:start}
+.sp-box b.big{font-family:var(--font-d);font-size:1.7rem;line-height:1.05}
+.sp-box b.big small{font:700 .8rem var(--font-b);color:var(--ink-2);margin-left:4px}
+.sp-box.hot{background:var(--accent-soft)} .sp-box.hot b.big{color:var(--accent)}
+.sp-weak{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.sp-weak li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--mbg,var(--surface-2))}
+.sp-weak li .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-weak li .t small{display:block;color:var(--ink-2)}
+.sp-mats{display:flex;flex-wrap:wrap;gap:6px}
+.cfg-grp{display:grid;gap:6px;border:0;margin:0;padding:0}
+.cfg-grp legend{font:700 .8rem var(--font-b);color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;padding:0;margin-bottom:4px}
+.cfg-grp .toggle{color:var(--ink);font-weight:400;font-size:.95rem;align-items:flex-start}.cfg-grp .toggle input{margin-top:4px}
+.dzone{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
 #todayDay{display:grid;gap:5px}
 #todayDay .pitem.tpl{background:transparent;opacity:1;border-left:3px solid var(--c);border-radius:0 6px 6px 0;color:var(--ink-2)}
 .addf{margin-top:8px}
@@ -510,7 +527,7 @@ nav.tabs .tmore-list{display:contents}
   .countdown b{font-size:1.5rem}
   .countdown span{font-size:.68rem}
   /* onglets en barre fixe en bas, à portée du pouce */
-  nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:12;display:grid;grid-template-columns:1.3fr repeat(5,minmax(0,1fr));gap:0;overflow:visible;
+  nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:12;display:grid;grid-template-columns:1.3fr;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;overflow:visible;
     padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));background:rgb(255 255 255 / .96);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);box-shadow:0 -4px 18px rgb(42 44 63 / .06)}
   nav.tabs button{display:grid;justify-items:center;gap:2px;padding:6px 0 4px;border-radius:12px;font:700 .64rem var(--font-b);color:var(--ink-3);min-height:52px;position:relative;box-shadow:none!important;background:transparent}
   nav.tabs button[aria-selected="true"],nav.tabs .tmore.on{color:var(--accent);background:var(--accent-soft)}
@@ -567,7 +584,7 @@ nav.tabs .tmore-list{display:contents}
       <h1>Carnet PASS</h1>
       <p id="hello">Concours le jeudi 17 décembre</p>
     </div>
-    <div class="countdown"><b class="num" id="jminus">J-?</b><span class="small" id="jtxt"></span></div>
+    <div class="tops"><div class="countdown"><b class="num" id="jminus">J-?</b><span class="small" id="jtxt"></span></div><button class="btn icon" type="button" id="cfgBtn" aria-label="Personnaliser la page : masquer des onglets ou des blocs, mode sprint" title="Personnaliser la page">⚙</button></div>
   </header>
   <nav class="tabs" role="tablist" aria-label="Sections">
     <button role="tab" data-tab="auj" aria-selected="true"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><span class="tl">Aujourd'hui</span></button>
@@ -585,18 +602,19 @@ nav.tabs .tmore-list{display:contents}
 
   <!-- AUJOURD'HUI -->
   <section class="view" id="v-auj">
+    <div class="panel" id="sprint" data-blk="sprint" data-blk-n="Sprint final"></div>
     <div class="auj">
-      <div class="panel">
+      <div class="panel" data-blk="journee" data-blk-n="Ma journée">
         <header><h2>Ma journée</h2><span class="muted small" id="todayLabel"></span></header>
         <div id="todayDay"></div>
       </div>
       <div class="side">
-        <div class="panel">
+        <div class="panel" data-blk="reprendre" data-blk-n="À reprendre">
           <header><h2>À reprendre</h2><span id="lateBadge"></span></header>
           <ul class="clean" id="todo"></ul>
           <button class="link" type="button" id="seeAll" data-goto="cours" hidden></button>
         </div>
-        <div class="panel">
+        <div class="panel" data-blk="avancement" data-blk-n="Avancement">
           <header><h2>Avancement</h2><button class="link" type="button" data-goto="cours">par matière</button></header>
           <div class="pie-main"><div id="pieAll"></div><div id="pieLegend" class="legend-col"></div></div>
         </div>
@@ -621,8 +639,8 @@ nav.tabs .tmore-list{display:contents}
         <div class="cal" id="cal"></div>
       </div>
     </div>
-    <p class="hint">Glisse le calendrier vers la gauche ou la droite pour changer de jours · touche un créneau vide pour ajouter une tâche · fais glisser un bloc (tâche ou kholle) pour le déplacer, tire sa poignée du bas pour changer sa durée · touche une kholle ou un événement pour changer son nom, son jour ou ses horaires.</p>
-    <details class="panel fold">
+    <p class="hint" data-blk="planaide" data-blk-n="Aide du calendrier">Glisse le calendrier vers la gauche ou la droite pour changer de jours · touche un créneau vide pour ajouter une tâche · fais glisser un bloc (tâche ou kholle) pour le déplacer, tire sa poignée du bas pour changer sa durée · touche une kholle ou un événement pour changer son nom, son jour ou ses horaires.</p>
+    <details class="panel fold" data-blk="bilan" data-blk-n="Bilan de la semaine">
       <summary><h2>Bilan de la semaine</h2><span class="muted small num" id="wkId"></span></summary>
       <form class="f" id="bilanForm">
         <label class="full">Ce qui a bien marché<textarea id="b-ok"></textarea></label>
@@ -638,7 +656,7 @@ nav.tabs .tmore-list{display:contents}
 
   <!-- COURS -->
   <section class="view" id="v-cours" hidden>
-    <div class="pies" id="pies"></div>
+    <div class="pies" id="pies" data-blk="pies" data-blk-n="Camemberts par matière"></div>
     <div class="chips" id="matChips"></div>
     <div id="coursList" style="display:grid;gap:16px"></div>
   </section>
@@ -655,11 +673,11 @@ nav.tabs .tmore-list{display:contents}
 
   <!-- KHOLLES -->
   <section class="view" id="v-kholles" hidden>
-    <div class="panel">
+    <div class="panel" data-blk="classements" data-blk-n="Classements">
       <header><h2>Classements</h2><span class="muted small" id="refTxt"></span></header>
       <div class="chart" id="chart"></div>
     </div>
-    <div class="panel">
+    <div class="panel" data-blk="khliste" data-blk-n="Liste des kholles">
       <header><h2>Kholles</h2><button class="link" type="button" id="khAddBtn">+ Ajouter</button></header>
       <form class="f" id="khForm" hidden>
         <label>Date<input type="date" id="kh-date" required></label>
@@ -673,7 +691,7 @@ nav.tabs .tmore-list{display:contents}
       </form>
       <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Matière</th><th class="n">Rang</th><th class="n">Top %</th><th>Retour</th><th></th></tr></thead><tbody id="khRows"></tbody></table></div>
     </div>
-    <div class="panel">
+    <div class="panel" data-blk="semaines" data-blk-n="Jusqu'au concours">
       <header><h2>Jusqu'au concours</h2></header>
       <div class="weeks" id="weeks"></div>
     </div>
@@ -681,7 +699,7 @@ nav.tabs .tmore-list{display:contents}
 
   <!-- METHODE -->
   <section class="view" id="v-methode" hidden>
-    <div class="panel">
+    <div class="panel" data-blk="cycle" data-blk-n="Le cycle d'un cours">
       <header><h2>Le cycle d'un cours</h2></header>
       <div class="steps">
         <div class="step"><span class="k">P1 · J ou J+1</span><h3>Découvrir</h3><span class="small">Lire pour comprendre. Surligner d'une seule couleur ce qui mérite une carte. Regarder les QCM du cours.</span></div>
@@ -690,7 +708,7 @@ nav.tabs .tmore-list{display:contents}
         <div class="step"><span class="k">Jusqu'au concours</span><h3>Entretenir</h3><span class="small">Chaque QCM fait en entier est enregistré : ses questions reviendront dans l'onglet Révisions, au rythme fixé après le concours blanc.</span></div>
       </div>
     </div>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="anki" data-blk-n="Anki">
       <summary><h2>Anki</h2></summary>
       <ul class="prose">
         <li>Chaque jour, vider les cartes « à revoir » du paquet parent.</li>
@@ -700,7 +718,7 @@ nav.tabs .tmore-list{display:contents}
         <li>Indicateur : 45 à 60 min par jour. Au-delà de 1 h 15 plusieurs jours de suite, surligner moins.</li>
       </ul>
     </details>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="regles" data-blk-n="Règles pour tenir">
       <summary><h2>Règles pour tenir</h2></summary>
       <ul class="prose">
         <li>Organisation : 10 min par jour à 19 h, 20 min le dimanche. Un seul outil : cette page.</li>
@@ -712,15 +730,15 @@ nav.tabs .tmore-list{display:contents}
         <li>Une soirée par semaine avec la famille ou les amis, et le samedi soir libre.</li>
       </ul>
     </details>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="semtype" data-blk-n="Semaine type">
       <summary><h2>Semaine type</h2><span class="muted small">lever 6 h 30 · coucher 23 h 30</span></summary>
       <div class="week" id="week"></div>
     </details>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="mats" data-blk-n="Mes matières">
       <summary><h2>Mes matières</h2></summary>
       <div class="tbl-wrap"><table><thead><tr><th>Matière</th><th class="n">Coef</th><th>Épreuve</th><th>Fin</th><th>Priorité</th></tr></thead><tbody id="matRows"></tbody></table></div>
     </details>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="regqcm" data-blk-n="Règles pour créer les QCM">
       <summary><h2>Règles pour créer les QCM</h2></summary>
       <ul class="prose">
         <li><b>Un QCM par cours, qui reprend tout le cours</b>, partie par partie et dans l'ordre, annexes comprises : chaque notion tombe au moins une fois. En général 3 à 5 questions par partie (environ 45 questions pour un cours comme Embryo 01).</li>
@@ -736,7 +754,7 @@ nav.tabs .tmore-list{display:contents}
         <li><b>Rangement</b> : document qcm/[id du cours] avec cours, matiere, ordre, titre (« 01 · Titre »), sections (les parties du cours) et questions (id « q01 », q = sujet, s = numéro de partie, it = 5 propositions {t, v, c}, et img = id d'une photo pour les questions sur photo, id « p01 »). Le cours n'est pas démarré dans les révisions : c'est toi qui le lances.</li>
       </ul>
     </details>
-    <details class="panel fold">
+    <details class="panel fold" data-blk="promptia" data-blk-n="Demande de cartes à l'IA">
       <summary><h2>Demande de cartes à l'IA</h2></summary>
       <div style="display:flex;justify-content:flex-end"><button class="btn" id="copyPrompt" type="button">Copier</button></div>
       <pre class="prompt" id="promptTxt">Voici mon cours de [MATIÈRE] – [TITRE DU COURS], en PDF. J'ai surligné les passages à mettre en cartes.
@@ -871,7 +889,12 @@ Ensuite, sous le TSV : liste au maximum 10 infos importantes du cours que je n'a
 <div class="modal" id="qmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="qe-title">
   <div><span class="eyebrow" id="qe-eye"></span><h3 id="qe-title">Modifier la question</h3></div>
   <div id="qe-body" style="display:grid;gap:12px"></div>
-  <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" id="qe-cancel" type="button">Annuler</button><button class="btn primary" id="qe-save" type="button">Enregistrer</button></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn danger" id="qe-del" type="button" style="margin-right:auto">Supprimer la question</button><button class="btn ghost" id="qe-cancel" type="button">Annuler</button><button class="btn primary" id="qe-save" type="button">Enregistrer</button></div>
+</div></div>
+<div class="modal" id="cmodal" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="c-title">
+  <div><h3 id="c-title">Personnaliser la page</h3><p class="small muted" style="margin:4px 0 0">Décoche ce que tu ne veux plus voir. Rien n'est effacé : tu peux tout remettre ici. C'est enregistré pour tous tes appareils.</p></div>
+  <div id="c-body" style="display:grid;gap:16px"></div>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap"><button class="btn ghost" id="c-all" type="button">Tout réafficher</button><button class="btn primary" id="c-ok" type="button">Terminé</button></div>
 </div></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -927,6 +950,42 @@ try{const t=localStorage.getItem("tab");if(t&&$("#v-"+t))showTab(t)}catch(e){}
 showTpl=false;
 const hsh=(location.hash||"").slice(1);if(hsh&&$("#v-"+hsh))showTab(hsh);
 
+/* AFFICHAGE : onglets et blocs masqués, mode sprint (document config/affichage, le même sur tous les appareils).
+   Masquer un onglet ou un bloc n'efface aucune donnée : tout se remet depuis ⚙. */
+let AFF={tabs:{},blk:{},sprint:true};try{const a=JSON.parse(localStorage.getItem("aff")||"null");if(a)AFF={...AFF,...a}}catch(e){}
+const TABN={planning:"Planning",cours:"Cours",qcm:"QCM",rev:"Révisions",kholles:"Kholles",methode:"Méthode"};
+const tabOn=t=>t==="auj"||(AFF.tabs||{})[t]!==false;
+const sprintOn=()=>AFF.sprint!==false;
+function applyAff(){
+  document.querySelectorAll("nav.tabs button[data-tab]").forEach(b=>b.hidden=!tabOn(b.dataset.tab));
+  $("#tMore").hidden=![...$("#tMoreList").querySelectorAll("[data-tab]")].some(b=>!b.hidden);
+  document.querySelectorAll("[data-blk]").forEach(el=>el.hidden=(AFF.blk||{})[el.dataset.blk]===false);
+  const auj=$(".auj"),main=auj.firstElementChild,side=auj.querySelector(".side"),sideOn=[...side.children].some(x=>!x.hidden);
+  side.hidden=!sideOn;auj.hidden=main.hidden&&!sideOn;auj.classList.toggle("one",main.hidden||!sideOn);
+  const cur=document.querySelector("nav.tabs button[data-tab][aria-selected=true]");if(cur&&cur.hidden)showTab("auj");
+}
+applyAff();
+async function saveAff(){try{localStorage.setItem("aff",JSON.stringify(AFF))}catch(e){}
+  if(!db){toast("Enregistré sur cet appareil seulement");return}
+  try{await db.doc("config/affichage").set(AFF)}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}}
+function openCfg(){
+  const cb=(attr,key,label,on)=>`<label class="toggle"><input type="checkbox" ${attr}="${esc(key)}" ${on?"checked":""}> ${esc(label)}</label>`;
+  const grp=(t,items)=>items.length?`<fieldset class="cfg-grp"><legend>${t}</legend>${items.join("")}</fieldset>`:"";
+  const blks=v=>[...document.querySelectorAll(`#v-${v} [data-blk]`)].map(el=>cb("data-cb",el.dataset.blk,el.dataset.blkN,(AFF.blk||{})[el.dataset.blk]!==false));
+  $("#c-body").innerHTML=`<fieldset class="cfg-grp"><legend>Dernier mois</legend>${cb("data-cs","1","Mode sprint : les révisions se resserrent pour que chaque question revienne encore au moins 3 fois avant le concours",sprintOn())}</fieldset>
+    ${grp("Onglets",Object.entries(TABN).map(([k,n])=>cb("data-ct",k,n,tabOn(k))))}
+    ${grp("Aujourd'hui",blks("auj"))}${grp("Planning",blks("planning"))}${grp("Cours",blks("cours"))}${grp("Kholles",blks("kholles"))}${grp("Méthode",blks("methode"))}`;
+  $("#cmodal").hidden=false}
+$("#cfgBtn").onclick=openCfg;
+$("#c-ok").onclick=()=>{$("#cmodal").hidden=true};
+$("#c-all").onclick=()=>{AFF={...AFF,tabs:{},blk:{}};applyAff();renderAll();saveAff();openCfg()};
+$("#c-body").addEventListener("change",e=>{const i=e.target;if(!i.matches("input[type=checkbox]"))return;
+  if(i.dataset.cs)AFF.sprint=i.checked;
+  else if(i.dataset.ct)AFF.tabs={...AFF.tabs,[i.dataset.ct]:i.checked?undefined:false};
+  else if(i.dataset.cb)AFF.blk={...AFF.blk,[i.dataset.cb]:i.checked?undefined:false};
+  AFF.tabs=JSON.parse(JSON.stringify(AFF.tabs||{}));AFF.blk=JSON.parse(JSON.stringify(AFF.blk||{}));
+  applyAff();renderAll();saveAff()});
+
 /* countdown */
 const jm=dayN(CONCOURS)-dayN(today());$("#jminus").textContent=jm>0?"J-"+jm:"J";
 $("#jtxt").textContent=jm>0?Math.ceil(jm/7)+" semaines":"c'est aujourd'hui";
@@ -977,6 +1036,43 @@ function renderAuj(){
   $("#todayDay").innerHTML=dayHtml(today(),true);
   wireDay($("#todayDay"));
   renderWeeks();
+  renderSprint();
+}
+/* SPRINT FINAL (dernier mois) : les révisions du jour en un clic, ce qui n'a jamais été vu, et les points faibles. */
+function renderSprint(){const el=$("#sprint");if(!el||el.hidden)return;
+  const T=dayN(today()),left=dayN(CONCOURS)-T;
+  if(!Q.length){el.innerHTML=`<header><h2>Sprint final</h2><span class="muted small">${left>0?left+" jours avant le concours":"Jour J"}</span></header><p class="muted" style="margin:0">Les révisions du jour et tes points faibles apparaîtront ici dès que tu auras des QCM.</p>`;return}
+  buildSrs();const qq=rvQueue(),nDue=qq.due.length,nNew=qq.nw.length,tot=nDue+nNew,dr=rvDraft(),drOn=!!(dr&&Array.isArray(dr.list)&&dr.list.length);
+  const pl=(n,w)=>n+" "+w+(n>1?"s":"");
+  let unseen=0;Q.filter(rvActive).forEach(q=>(q.questions||[]).forEach(x=>{if(!x.off&&!isSus(q.id,x.id)&&!SRS[q.id+"|"+x.id])unseen++}));
+  const inact=Q.filter(q=>!rvActive(q)&&q.rev==null),paused=Q.filter(q=>q.rev==="").length;
+  const dNew=Math.max(1,left-7),need=Math.ceil(unseen/dNew),nouv=+RVC.nouv||0;
+  const noP1=C.filter(c=>!c.p1).length,noP3=C.filter(c=>c.p1&&!c.p3).length;
+  /* points faibles : part des propositions justes la dernière fois, sur les questions déjà vues */
+  const okOf=qs=>{let j=0,t=0;qs.forEach(q=>(q.questions||[]).forEach(x=>{if(x.off||isSus(q.id,x.id))return;const st=SRS[q.id+"|"+x.id];if(!st)return;const n=st.n||5;j+=n-st.e;t+=n}));return t?Math.round(j/t*100):null};
+  const weak=Q.map(q=>({q,p:okOf([q]),e:qErrIds(q).length})).filter(o=>o.p!=null&&o.p<85).sort((a,b)=>a.p-b.p).slice(0,5);
+  const mats=[...new Set(Q.map(q=>q.matiere||""))].map(id=>({id,p:okOf(Q.filter(q=>(q.matiere||"")===id))})).filter(o=>o.p!=null).sort((a,b)=>a.p-b.p);
+  const go=drOn?`<button class="btn primary" type="button" id="spGo">Reprendre ma séance</button>`:tot?`<button class="btn primary" type="button" id="spGo">Lancer mes révisions</button>`:"";
+  el.innerHTML=`<header><h2>Sprint final</h2><span class="muted small">${left>0?pl(left,"jour")+" avant le concours":"Jour J"}${sprintOn()?" · mode sprint":""}</span></header>
+    <div class="sp-grid">
+      <div class="sp-box hot"><span class="small muted">Révisions du jour</span><b class="big num">${tot}<small>question${tot>1?"s":""}</small></b>
+        <span class="small">${nDue} à revoir · ${pl(nNew,"nouvelle")}${tot?` · ≈ ${Math.max(1,Math.round(tot*1.2))} min`:""}</span>${go?`<div>${go}</div>`:`<span class="small muted">Rien à revoir aujourd'hui : avance tes P2/P3 ou fais un QCM complet.</span>`}</div>
+      <div class="sp-box"><span class="small muted">Jamais vues</span><b class="big num">${unseen}<small>question${unseen>1?"s":""}</small></b>
+        <span class="small">${unseen?`Pour toutes les voir avant le ${fmt(nIso(T+dNew))} : <b>${need}</b> nouvelle${need>1?"s":""} par jour (réglage : ${nouv}).`:"Tu as tout vu au moins une fois."}</span>
+        ${unseen&&need>nouv?`<div><button class="btn sm" type="button" id="spPace">Passer à ${need} nouvelles par jour</button></div>`:""}</div>
+      <div class="sp-box"><span class="small muted">Cours</span><b class="big num">${noP3}<small>sans P3</small></b>
+        <span class="small">${pl(noP1,"cours")} pas encore vu${noP1>1?"s":""}${paused?` · ${pl(paused,"QCM")} en pause`:""}${inact.length?` · ${pl(inact.length,"QCM")} pas encore dans les révisions`:""}</span>
+        ${inact.length?`<div><button class="btn sm" type="button" id="spAll">Tout mettre dans les révisions</button></div>`:""}</div>
+    </div>
+    ${weak.length?`<div style="display:grid;gap:8px"><h3>Points faibles <span class="muted small" style="font-weight:400">· propositions justes la dernière fois</span></h3><ul class="sp-weak">${weak.map(o=>`<li style="${mvars(o.q.matiere)}"><span class="t"><b>${esc(o.q.titre)}</b><small>${esc(shortNom(matById(o.q.matiere)))}</small></span><span class="pill ${pctCls(o.p)}">${o.p} %</span>${o.e?`<button class="btn sm" type="button" data-sperr="${esc(o.q.id)}">Mes ${o.e} erreur${o.e>1?"s":""}</button>`:`<button class="btn sm" type="button" data-spfull="${esc(o.q.id)}">Refaire</button>`}</li>`).join("")}</ul></div>`:""}
+    ${mats.length>1?`<div class="sp-mats">${mats.map(o=>`<span class="mtag" style="${mvars(o.id)}">${esc(shortNom(matById(o.id))||"Sans matière")} · <b class="num">${o.p} %</b></span>`).join("")}</div>`:""}
+    <p class="small muted" style="margin:0">${sprintOn()?`Mode sprint : une question réussie revient au plus tard dans ${rvMaxAt(T)} j (le tiers des jours restants), pour la revoir encore au moins 3 fois avant le concours. Se règle avec ⚙ en haut.`:`Mode sprint désactivé : les révisions gardent leur intervalle max de ${+RVC.max||21} j. Active-le avec ⚙ en haut.`}</p>`;
+  const sg=$("#spGo");if(sg)sg.onclick=()=>{showTab("rev");if(!drOn&&rv.mode==="home")rvStart(tot);else renderRev();rvTop()};
+  const sp=$("#spPace");if(sp)sp.onclick=async()=>{RVC={...RVC,nouv:need,cap:Math.max(+RVC.cap||40,need+25)};renderAll();if(!db)return;try{await db.doc("config/revision").set(RVC);toast("Nouvelles questions : "+need+" par jour")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+  const sa=$("#spAll");if(sa)sa.onclick=async()=>{const td=today();inact.forEach(q=>q.rev=td);renderAll();if(!db)return;
+    try{await Promise.all(inact.map(q=>db.doc("qcm/"+q.id).update({rev:td})));toast(pl(inact.length,"cours")+" ajouté"+(inact.length>1?"s":"")+" aux révisions")}catch(e){toast("Pas enregistré : "+(e.code||"erreur"))}};
+  el.querySelectorAll("[data-sperr]").forEach(b=>b.onclick=()=>{showTab("qcm");qStart(b.dataset.sperr,"err")});
+  el.querySelectorAll("[data-spfull]").forEach(b=>b.onclick=()=>{showTab("qcm");qStart(b.dataset.spfull,"new")});
 }
 function renderWeeks(){
   const start=mondayOf(new Date());
@@ -1556,8 +1652,10 @@ const WK=isoWeek();$("#wkId").textContent="semaine "+WK;
 function renderBilan(){
   const cur=B.find(b=>b.id===WK);
   if(cur&&!renderBilan.filled){$("#b-ok").value=cur.ok||"";$("#b-ko").value=cur.ko||"";$("#b-change").value=cur.change||"";$("#b-energie").value=cur.energie||"";$("#b-stress").value=cur.stress||"";renderBilan.filled=true}
-  $("#bilans").innerHTML=[...B].sort((a,b)=>a.id<b.id?1:-1).map(b=>`<div class="panel" style="gap:4px"><span class="eyebrow">${esc(b.id)} · énergie ${esc(b.energie||"–")} · stress ${esc(b.stress||"–")}</span>${b.ok?`<span class="small"><b>✓</b> ${esc(b.ok)}</span>`:""}${b.ko?`<span class="small"><b>✗</b> ${esc(b.ko)}</span>`:""}${b.change?`<span class="small"><b>→</b> ${esc(b.change)}</span>`:""}</div>`).join("")||`<p class="muted small">Ton premier bilan apparaîtra ici.</p>`;
+  $("#bilans").innerHTML=[...B].sort((a,b)=>a.id<b.id?1:-1).map(b=>`<div class="panel" style="gap:4px"><span class="eyebrow">${esc(b.id)} · énergie ${esc(b.energie||"–")} · stress ${esc(b.stress||"–")}</span>${b.ok?`<span class="small"><b>✓</b> ${esc(b.ok)}</span>`:""}${b.ko?`<span class="small"><b>✗</b> ${esc(b.ko)}</span>`:""}${b.change?`<span class="small"><b>→</b> ${esc(b.change)}</span>`:""}<div><button class="link" type="button" data-bdel="${esc(b.id)}" style="color:var(--late)">Supprimer</button></div></div>`).join("")||`<p class="muted small">Ton premier bilan apparaîtra ici.</p>`;
 }
+$("#bilans").addEventListener("click",e=>{const b=e.target.closest("[data-bdel]");if(!b)return;armDel(b,"Toucher encore pour supprimer",async()=>{const id=b.dataset.bdel;B=B.filter(x=>x.id!==id);if(id===WK){renderBilan.filled=false;["#b-ok","#b-ko","#b-change","#b-energie","#b-stress"].forEach(s=>$(s).value="")}renderBilan();
+  if(!db)return;try{await db.doc("bilans/"+id).delete();toast("Bilan supprimé")}catch(err){toast("Suppression impossible")}})});
 $("#bilanForm").addEventListener("submit",async e=>{e.preventDefault();if(!db)return;
   try{await db.doc("bilans/"+WK).set({ok:$("#b-ok").value.trim(),ko:$("#b-ko").value.trim(),change:$("#b-change").value.trim(),energie:$("#b-energie").value,stress:$("#b-stress").value,date:today()});toast("Bilan enregistré")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 
@@ -1782,6 +1880,7 @@ function renderQres(){
       </div>
       <div class="acts" style="flex-wrap:wrap;gap:6px">
         ${wrongIds.length?`<button class="btn primary" type="button" id="qRedo">Refaire mes ${wrongIds.length} question${wrongIds.length>1?"s":""} ratée${wrongIds.length>1?"s":""}</button>`:""}
+        ${r.id?`<button class="btn danger" type="button" id="qResDel">Supprimer ce résultat</button>`:""}
         ${c&&r.mode!=="erreurs"&&r.mode!=="revision"?`<button class="btn" type="button" id="qPass">Noter ${r.juste}/${r.total} dans mon ${pk==="xnew"?"passage suivant":pk.toUpperCase()}</button>`:""}
       </div>
     </div>
@@ -1802,6 +1901,7 @@ function renderQres(){
   $("#qBack").onclick=()=>{renderQcmList();qTop()};
   root.querySelectorAll("[data-qf]").forEach(b=>b.onclick=()=>{qz.filt=b.dataset.qf;renderQres()});
   if($("#qRedo"))$("#qRedo").onclick=()=>qStart(q.id,"err",wrongIds);
+  if($("#qResDel"))$("#qResDel").onclick=e=>armDel(e.currentTarget,"Toucher encore pour supprimer",()=>qResDelete(r));
   if($("#qPass"))$("#qPass").onclick=()=>{openPass(c.id,pk);$("#pm-score").value=r.juste;$("#pm-total").value=r.total;if(!$("#pm-note").value)$("#pm-note").value="QCM complet : "+r.pct+" %"};
 }
 
@@ -1815,6 +1915,7 @@ function qeOpen(b,id,v,s){const q=qById(b);if(!q)return;const qs=q.questions||[]
   if(isNew){const n=qs.reduce((m,y)=>Math.max(m,parseInt(String(y.id).replace(/\D/g,""),10)||0),0)+1;
     x={id:"q"+String(n).padStart(2,"0"),q:"",s:+s||0,it:[0,1,2,3,4].map(()=>({t:"",v:true}))}}
   Object.assign(qe,{b,x:qeClone(x),v:Math.min(+v||0,nVer(x)-1),isNew});qeRender();$("#qmodal").hidden=false;
+  const del=$("#qe-del");del.hidden=isNew;delete del.dataset.arm;del.textContent="Supprimer la question";
   const f=$("#qe-body").querySelector(isNew?"#qe-q":".qe-t");if(f&&isNew)f.focus()}
 function qeRender(){const q=qById(qe.b),x=qe.x,nv=nVer(x),cur=qVer(x,qe.v),secs=q.sections||[];
   $("#qe-eye").textContent=q.titre+" · "+(qe.isNew?"nouvelle question":"question "+((q.questions||[]).findIndex(y=>y.id===x.id)+1));
@@ -1846,6 +1947,12 @@ function qeRead(){const x=qe.x,box=$("#qe-body");if(!box.querySelector("#qe-q"))
     const c=el.querySelector(".qe-c").value.trim();if(c)it.c=c;else delete it.c;
     if(el.querySelector(".qe-ioff").checked)it.off=true;else delete it.off;tgt.it[k]=it})}
 $("#qe-cancel").onclick=()=>{$("#qmodal").hidden=true};
+/* Supprimer une question pour de bon (toutes ses versions). Ses réponses dans les anciens résultats ne comptent plus. */
+$("#qe-del").onclick=e=>armDel(e.currentTarget,"Toucher encore pour supprimer",async()=>{const q=qById(qe.b),id=qe.x&&qe.x.id;if(!q||!id)return;
+  const qs=(q.questions||[]).filter(y=>y.id!==id);q.questions=qs;$("#qmodal").hidden=true;
+  renderQcm();if(rv.mode==="sess")renderRevSess();else if(rv.mode==="home")renderRevHome();renderAuj();
+  if(!db){toast("Données indisponibles ici");return}
+  try{await db.doc("qcm/"+qe.b).update({questions:qs,maj:Date.now()});toast("Question supprimée")}catch(err){toast("Pas enregistré : "+(err.code||"erreur"))}});
 $("#qe-save").onclick=async()=>{qeRead();const x=qe.x,q=qById(qe.b);if(!q)return;
   if(!x.q&&!x.off){toast("Écris le sujet de la question");$("#qe-q").focus();return}
   for(let v=0;v<nVer(x);v++){const it=qVer(x,v).it;if(it.some(i=>!i.t&&!i.off)){toast("Il manque le texte d'une proposition"+(nVer(x)>1?" (version "+(v+1)+")":""));if(v!==qe.v){qe.v=v;qeRender()}return}}
@@ -1877,6 +1984,7 @@ function renderQedit(){const q=qById(qz.id);if(!q)return renderQcmList();qz.mode
         <label>Titre<input type="text" id="qeTitre" value="${esc(q.titre||"")}"></label>
         ${secs.map((t,i)=>`<label>Partie ${i+1}<input type="text" class="qeSec" value="${esc(t)}"></label>`).join("")}
       </details>
+      <div class="dzone"><button class="btn danger sm" type="button" id="qeDel">Supprimer ce QCM</button><span class="small muted">Efface le QCM, ses ${QR.filter(r=>r.qcm===q.id).length} résultats et ses révisions, pour de bon.</span></div>
     </div>
     ${groups.map(g=>{const xs=qs.filter(x=>(x.s||0)===g&&hit(x));if(f&&!xs.length)return"";
       return `<div class="panel"><header><h3>${esc(secs[g]||(secs.length?"Partie "+(g+1):"Questions"))}</h3><button class="link" type="button" data-qeadd="${g}">+ Ajouter une question</button></header><div class="qe-list">${xs.map(row).join("")||`<p class="small muted" style="margin:0">Aucune question.</p>`}</div></div>`}).join("")||`<p class="muted" style="margin:0">Aucune question ne contient « ${esc(qz.ef)} ».</p>`}`;
@@ -1885,7 +1993,17 @@ function renderQedit(){const q=qById(qz.id);if(!q)return renderQcmList();qz.mode
   $("#qeTitre").onchange=e=>{const t=e.target.value.trim();if(t)qeMeta({titre:t})};
   root.querySelectorAll(".qeSec").forEach(i=>i.onchange=()=>qeMeta({sections:[...root.querySelectorAll(".qeSec")].map((x,k)=>x.value.trim()||secs[k]||"Partie "+(k+1))}));
   root.querySelectorAll("[data-qeadd]").forEach(b=>b.onclick=()=>qeOpen(q.id,null,0,+b.dataset.qeadd));
+  $("#qeDel").onclick=e=>armDel(e.currentTarget,"Toucher encore pour tout effacer",()=>qDelete(q.id));
 }
+const armDel=(b,txt,fn)=>{if(b.dataset.arm){fn();return}b.dataset.arm=1;const t0=b.textContent;b.textContent=txt;setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent=t0}},4000)};
+/* Supprimer un QCM entier : le document qcm, tous ses résultats (qcmres) et ses items retirés (qcmsusp). */
+async function qDelete(id){const rs=QR.filter(r=>r.qcm===id);
+  Q=Q.filter(x=>x.id!==id);QR=QR.filter(r=>r.qcm!==id);delete SUS[id];qDropDraft(id);qz.ef="";qz.id=null;renderQcmList();renderAll();qTop();
+  if(!db){toast("Données indisponibles ici");return}
+  try{await Promise.all([db.doc("qcm/"+id).delete(),...rs.map(r=>db.doc("qcmres/"+r.id).delete()),db.doc("qcmsusp/"+id).delete().catch(()=>{})]);toast("QCM supprimé")}catch(e){toast("Suppression impossible : "+(e.code||"erreur"))}}
+/* Supprimer un résultat (QCM complet, erreurs ou séance de révision de ce cours) : il ne compte plus nulle part, ni dans le calendrier des révisions. */
+async function qResDelete(r){QR=QR.filter(x=>x.id!==r.id);renderQcmList();renderAll();qTop();
+  if(!db)return;try{await db.doc("qcmres/"+r.id).delete();toast("Résultat supprimé")}catch(e){toast("Suppression impossible : "+(e.code||"erreur"))}}
 
 /* RÉVISIONS : répétition espacée façon Anki (algorithme FSRS, rétention visée 0,90), avec les questions des QCM pour cartes.
    L'état de chaque question est recalculé à partir de l'historique « qcmres » : rien d'autre n'est stocké.
@@ -1916,7 +2034,10 @@ const GR={3:["ok","Bien"],2:["due","Difficile"],1:["late","À revoir"]};
    des nouvelles) est plein. Si toute la fourchette est pleine, la question passe au premier jour suivant qui a de la place,
    au plus 5 jours après pour une question ratée, au plus 2 × l'intervalle + 2 jours sinon. Si tout est plein jusque-là,
    elle va au jour le moins chargé. */
-function rvDue(st,g,load){const max=+RVC.max||21,L=dayN(st.last),cap=dayN(CONCOURS)-2,room=Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0));
+/* Mode sprint (dernier mois) : l'intervalle max d'une révision faite le jour L est ramené au tiers des jours qui restent
+   jusqu'au 15 décembre (au moins 2 j), pour que chaque question revienne encore au moins 3 fois avant le concours. */
+const rvMaxAt=L=>{const base=+RVC.max||21;return sprintOn()?Math.max(2,Math.min(base,Math.floor((dayN(CONCOURS)-2-L)/3))):base};
+function rvDue(st,g,load){const L=dayN(st.last),max=rvMaxAt(L),cap=dayN(CONCOURS)-2,room=Math.max(10,(+RVC.cap||40)-(+RVC.nouv||0));
   const ivl=g===1?1:Math.min(max,Math.max(1,Math.round(st.s)));let lo=ivl,hi=ivl;
   if(ivl>=3){const dl=Math.max(1,Math.round(ivl*(ivl<7?.15:ivl<20?.1:.05)));lo=Math.max(2,ivl-dl);hi=Math.min(max,ivl+dl)}
   let best=null;for(let i=lo;i<=hi;i++){let d=L+i;if(d>cap)d=Math.max(L+1,cap);const sc=(load&&load[d]||0)+Math.abs(i-ivl)*.01;if(!best||sc<best.sc)best={d,sc}}
@@ -2010,7 +2131,7 @@ function renderRevHome(){
       </div>
     </div>
     ${btns?`<div class="acts" style="flex-wrap:wrap;gap:6px">${btns}</div>`:""}
-    <p class="small muted" style="margin:0">Indicatif : cette page ne touche pas à ton planning. Fais-la quand tu veux dans la journée, même en plusieurs fois.</p>
+    <p class="small muted" style="margin:0">Indicatif : cette page ne touche pas à ton planning. Fais-la quand tu veux dans la journée, même en plusieurs fois.${sprintOn()?` Mode sprint : une question réussie aujourd'hui revient au plus tard dans ${rvMaxAt(T)} j.`:""}</p>
   </div>
   <div class="panel">
     <header><h2>Les 14 prochains jours</h2><span class="muted small">cours à revoir chaque jour · nombre de questions</span></header>
@@ -2166,6 +2287,7 @@ renderSemaine();renderAll();
   const sub=(col,fn)=>db.collection(col).onSnapshot(s=>{fn(s.docs.map(d=>({id:d.id,...d.data()})));later()},e=>toast("Synchro interrompue : "+e.code));
   sub("matieres",a=>M=a);sub("cours",a=>C=a);sub("kholles",a=>K=a);sub("evenements",a=>E=a);sub("bilans",a=>B=a);sub("taches",a=>T=a);sub("qcm",a=>Q=a);sub("qcmres",a=>QR=a);sub("qcmsusp",a=>{SUS={};a.forEach(d=>SUS[d.id]=d.ids||{})});
   db.doc("config/revision").onSnapshot(s=>{if(s.exists)RVC={...RVC,...s.data()};later()});
+  db.doc("config/affichage").onSnapshot(s=>{if(s.exists){AFF={tabs:{},blk:{},sprint:true,...s.data()};try{localStorage.setItem("aff",JSON.stringify(AFF))}catch(e){}applyAff()}later()});
   db.doc("config/general").onSnapshot(s=>{window.__cfg=s.exists?s.data():{};later()});
   db.doc("config/journee").onSnapshot(s=>{const d=s.exists?s.data():null;if(d&&Array.isArray(d.blocs))J=d.blocs;later()});
 })();
