@@ -828,7 +828,7 @@ const DCOL={1:"#3f9e62",2:"#7cae3c",3:"#c9a21c",4:"#d9793a",5:"#cc4b52"};
 function pct(r){return r&&r.total&&r.score!=null&&r.score!==""?Math.round(r.score/r.total*100):null}
 function passList(c){const r=c.r||{};const L=["p1","p2","p3"].map((p,i)=>({key:p,n:i+1,date:c[p],...(r[p]||{})}));(c.extra||[]).forEach((e,i)=>L.push({key:"x"+i,n:i+4,...e}));return L}
 function qline(c){const parts=passList(c).filter(x=>pct(x)!=null||x.diff).map(x=>`P${x.n} <b>${pct(x)!=null?pct(x)+" %":"–"}</b>${x.diff?` <span class="mdot" style="--mfg:${DCOL[x.diff]}" title="${DIFF[x.diff]}"></span>`:""}`);
-  const bits=[];if(c.donne)bits.push(`cours du ${fmt(c.donne)}`);if(parts.length)bits.push("QCM · "+parts.join(" · "));return bits.length?`<span class="qline">${bits.join(" · ")}</span>`:""}
+  const bits=[];if(c.donne)bits.push(c.donne>today()&&!c.p1?`<b>à venir le ${fmt(c.donne)}</b>`:`cours du ${fmt(c.donne)}`);else if(!c.p1)bits.push("date à préciser");if(parts.length)bits.push("QCM · "+parts.join(" · "));return bits.length?`<span class="qline">${bits.join(" · ")}</span>`:""}
 let pEdit=null,pDiff=null;
 function openPass(id,p){
   const c=C.find(x=>x.id===id);if(!c)return;
@@ -866,7 +866,8 @@ function donut(parts,colors,center,sub,size,labels,under){
 }
 function counts(cs){const n3=cs.filter(c=>c.p3).length,n2=cs.filter(c=>c.p2&&!c.p3).length,n1=cs.filter(c=>c.p1&&!c.p2).length;return [n3,n2,n1,cs.length-n3-n2-n1]}
 function avgPct(cs){const v=[];cs.forEach(c=>{const L=passList(c).reverse();for(const x of L){const q=pct(x);if(q!=null){v.push(q);break}}});return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}
-const isEu=c=>!!(c.donne||c.p1||!/à venir/i.test(c.titre||""));
+/* Un cours est « eu » dès son 1er passage, ou une fois sa date passée (« Cours donné le ») ; avant, il est à venir. */
+const isEu=c=>!!(c.p1||(c.donne&&c.donne<=today()));
 /* Cours eus / total d'une matière : comptés depuis la liste des cours, sauf si tu as tapé tes propres chiffres (m.eu, m.nb). */
 const hasN=v=>v!=null&&v!=="";
 function matCount(m){const cs=C.filter(c=>c.matiere===m.id),e0=cs.filter(isEu).length,n0=cs.length;
