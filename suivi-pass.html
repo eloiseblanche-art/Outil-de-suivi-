@@ -516,13 +516,17 @@ details.rv-sus summary{cursor:pointer;font-size:.8rem;color:var(--ink-2)}
 .jnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .jnav h2{flex:1;min-width:12ch;text-transform:capitalize}
 .jlist{display:grid;gap:8px}
-.jit{display:grid;grid-template-columns:auto 58px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--mbg,var(--surface-2));border-left:4px solid var(--mfg,var(--ink-3));cursor:pointer}
-.jit input{width:22px;height:22px;margin:0;accent-color:var(--mfg,var(--accent))}
+.jit{display:grid;grid-template-columns:auto 58px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--mbg,var(--surface-2));border-left:4px solid var(--mfg,var(--ink-3))}
+.jit input[type="checkbox"]{width:22px;height:22px;margin:0;accent-color:var(--mfg,var(--accent))}
 .jit .h{font:500 .78rem var(--font-m);color:var(--ink-2);line-height:1.3}
 .jit .tx{overflow-wrap:anywhere;line-height:1.35}
 .jit.done{opacity:.55}.jit.done .tx{text-decoration:line-through}
 .jit.opt{background:transparent;border:1px dashed var(--line);border-left:4px dashed var(--ink-3)}
 .jit.kh{cursor:default;font-weight:700}
+.jit:not(.kh){grid-template-columns:auto 58px minmax(0,1fr) auto}
+.jed{border:0;background:transparent;color:var(--ink-3);cursor:pointer;font-size:.95rem;padding:4px 6px;border-radius:8px}
+.jedf{grid-column:3/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px}
+.jedf input{padding:6px 8px}
 .jweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .jday{border:0;border-radius:10px;padding:6px 2px;background:var(--surface-2);font:700 .72rem var(--font-b);color:var(--ink-2);cursor:pointer;display:grid;gap:2px;justify-items:center}
 .jday b{font:500 1rem var(--font-m);color:var(--ink)}
@@ -1500,29 +1504,31 @@ function rvErrs(x,rp){let e=0;x.it.forEach((it,k)=>{const c=rp&&rp[k];if(c==="x"
 /* PLANNING : un document par pack dans « taches » {date, heure, fin, texte, matiere, fait}. On coche ce qui est fait. */
 let jDay=null;
 const DJL=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"],DJC=["L","M","M","J","V","S","D"];
-const isOpt=t=>/^⭐/.test(t.texte||"");
-function renderJour(){
-  const root=$("#jourRoot");if(!root)return;const td=today();
+const isOpt=t=>!!t.opt||/^⭐/.test(t.texte||"");
+let jEdit=null;
+function renderJour(force){
+  const root=$("#jourRoot");if(!root)return;if(jEdit&&root.contains(document.activeElement)&&!force)return;const td=today();
   if(!jDay){const first=T.filter(t=>t.date>=td).map(t=>t.date).sort()[0];jDay=T.some(t=>t.date===td)?td:(first||td)}
   const d=new Date(jDay+"T12:00:00"),mon=mondayOf(d);
   const its=[...T.filter(t=>t.date===jDay).map(t=>({t,m:toMin(t.heure)})),...K.filter(k=>k.date===jDay).map(k=>({k,m:toMin(khStart(k))}))].sort((a,b)=>a.m-b.m);
   const tasks=T.filter(t=>t.date===jDay&&!isOpt(t)),nd=tasks.filter(t=>t.fait).length;
   const week=[...Array(7)].map((_,i)=>{const di=iso(addDays(mon,i)),ts=T.filter(t=>t.date===di&&!isOpt(t)),dn=ts.filter(t=>t.fait).length;
     return `<button type="button" class="jday ${di===td?"today":""}" data-jd="${di}" aria-pressed="${di===jDay}" aria-label="${DJL[(i+1)%7]} ${fmt(di)}">${DJC[i]}<b>${+di.slice(8)}</b><span class="pg"><i style="width:${ts.length?Math.round(dn/ts.length*100):0}%"></i></span></button>`}).join("");
-  const late=T.filter(t=>t.date<td&&!t.fait&&!isOpt(t)&&t.date>="2026-11-16").length;
   root.innerHTML=`<div class="panel">
     <div class="jnav"><button class="btn icon" type="button" data-jmv="-7" aria-label="Semaine précédente">‹</button><h2>${jDay===td?"Aujourd'hui · ":""}${DJL[d.getDay()]} ${d.getDate()} ${d.toLocaleDateString("fr-FR",{month:"long"})}</h2>${jDay!==td?`<button class="btn sm" type="button" id="jToday">Aujourd'hui</button>`:""}<button class="btn icon" type="button" data-jmv="7" aria-label="Semaine suivante">›</button></div>
     <div class="jweek">${week}</div>
     ${tasks.length?`<div class="bar-top"><span class="small muted">${nd} / ${tasks.length} packs faits</span><span class="prog ok" style="flex:1;max-width:220px"><i style="width:${Math.round(nd/tasks.length*100)}%"></i></span></div>`:""}
     <div class="jlist">${its.map(({t,k})=>{if(k)return `<div class="jit kh" style="${mvars(k.matiere)}"><span></span><span class="h">${khStart(k)}</span><span class="tx">${esc(khNom(k))}</span></div>`;
       const m=t.matiere?matById(t.matiere):null;
-      return `<label class="jit ${t.fait?"done":""} ${isOpt(t)?"opt":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tf="${esc(t.id)}" ${t.fait?"checked":""}><span class="h">${esc(t.heure||"")}${t.fin?"<br>"+esc(t.fin):""}</span><span class="tx">${esc(t.texte)}${m&&!/^(📝|🎯)/.test(t.texte)?"":""}</span></label>`}).join("")||`<p class="muted" style="margin:0">Rien de prévu ce jour-là.</p>`}</div>
-    ${late?`<p class="small" style="margin:0;color:var(--late)">${late} pack${late>1?"s":""} des jours passés pas coché${late>1?"s":""}. Pas grave : décale-les, et parles-en au bilan du dimanche.</p>`:""}
-    <p class="small muted" style="margin:0">Chaque pack commence par 20-30 min de repasse rapide. 📝 = annales (toujours la plus ancienne pas faite, coche-la dans l'onglet Annales). 🎯 = session de questions de la prépa (3 h + 1 h de correction). ⭐ = 5e heure, optionnelle.</p>
+      const ed=jEdit===t.id;
+      return `<div class="jit ${t.fait?"done":""} ${isOpt(t)?"opt":""}" style="${mvars(t.matiere)}"><input type="checkbox" data-tf="${esc(t.id)}" ${t.fait?"checked":""} aria-label="Fait"><span class="h">${esc(t.heure||"")}${t.fin?"<br>"+esc(t.fin):""}</span>${ed?`<form class="jedf" data-jsave="${esc(t.id)}"><input type="text" name="t" value="${esc(t.texte)}" aria-label="Texte du pack" autocomplete="off"><button class="btn sm primary" type="submit">OK</button></form>`:`<span class="tx">${esc(t.texte)}</span><button class="jed" type="button" data-jed="${esc(t.id)}" aria-label="Modifier le texte">✎</button>`}</div>`}).join("")||`<p class="muted" style="margin:0">Rien de prévu ce jour-là.</p>`}</div>
   </div>`;
   root.querySelectorAll("[data-tf]").forEach(c=>c.onchange=()=>setTask(c.dataset.tf,{fait:c.checked}));
-  root.querySelectorAll("[data-jd]").forEach(b=>b.onclick=()=>{jDay=b.dataset.jd;renderJour()});
-  root.querySelectorAll("[data-jmv]").forEach(b=>b.onclick=()=>{jDay=iso(addDays(new Date(jDay+"T12:00:00"),+b.dataset.jmv));renderJour()});
+  root.querySelectorAll("[data-jd]").forEach(b=>b.onclick=()=>{jDay=b.dataset.jd;jEdit=null;renderJour()});
+  root.querySelectorAll("[data-jed]").forEach(b=>b.onclick=()=>{jEdit=b.dataset.jed;renderJour(true);const i=root.querySelector("form.jedf input");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}});
+  root.querySelectorAll("form.jedf").forEach(f=>{const save=()=>{if(jEdit!==f.dataset.jsave)return;const v=f.elements.t.value.trim(),t=T.find(x=>x.id===f.dataset.jsave);jEdit=null;if(v&&t&&v!==t.texte)setTask(t.id,{texte:v});else renderJour()};
+    f.addEventListener("submit",e=>{e.preventDefault();save()});f.elements.t.addEventListener("keydown",e=>{if(e.key==="Escape"){jEdit=null;renderJour()}});f.elements.t.addEventListener("blur",()=>setTimeout(save,150))});
+  root.querySelectorAll("[data-jmv]").forEach(b=>b.onclick=()=>{jEdit=null;jDay=iso(addDays(new Date(jDay+"T12:00:00"),+b.dataset.jmv));renderJour()});
   if($("#jToday"))$("#jToday").onclick=()=>{jDay=td;renderJour()};
 }
 async function setTask(id,patch){const t=T.find(x=>x.id===id);if(t)Object.assign(t,patch);renderJour();
@@ -1536,10 +1542,10 @@ function renderAnnales(){
   const mats=[...M].sort((a,b)=>(a.ordre||0)-(b.ordre||0));
   const done=new Set(AN.map(a=>a.id)),tot=mats.length*AN_L.length,nd=AN.filter(a=>mats.some(m=>m.id===a.matiere)).length;
   const td=today(),nToday=AN.filter(a=>a.date===td).length,jr=Math.max(1,dayN(CONCOURS)-dayN(td)),rest=tot-nd;
-  root.innerHTML=`<div class="panel"><header><h2>Annales 2020 → 2025</h2><span class="muted small">toujours la plus ancienne pas encore faite</span></header>
+  root.innerHTML=`<div class="panel"><header><h2>Annales 2020 → 2025</h2></header>
   <div class="stats"><div class="stat acc"><b class="num">${nd} / ${tot}</b><span class="small">annales faites</span></div><div class="stat"><b class="num">${nToday}</b><span class="small muted">aujourd'hui</span></div><div class="stat"><b class="num">${rest?(rest/jr).toFixed(1).replace(".",","):"0"}</b><span class="small muted">par jour pour tout finir (${rest} restantes)</span></div></div>
   <span class="prog ok"><i style="width:${tot?Math.round(nd/tot*100):0}%"></i></span>
-  <p class="small muted" style="margin:0">Touche une case pour la cocher (elle prend la date du jour), ou « ✓ … faite » pour cocher la prochaine. Touche deux fois une case cochée pour la décocher. 30 min d'épreuve + 15 min de correction : chaque erreur → flashcards de la notion + feuille de points faibles.</p></div>
+</div>
   <div class="panel">${mats.map(m=>{const n=AN_L.filter(([y,ss])=>done.has(anId(m.id,y,ss))).length,nx=AN_L.find(([y,ss])=>!done.has(anId(m.id,y,ss)));
     return `<div class="an-mat" style="${mvars(m.id)}"><div class="an-head"><span><span class="mtag">${esc(shortNom(m))}</span> <span class="small muted">${n}/12${nx?` · prochaine : <b>${nx[0]} S${nx[1]}</b>`:" · terminé ✓"}</span></span>${nx?`<button class="btn sm" type="button" data-annext="${esc(m.id)}">✓ ${nx[0]} S${nx[1]} faite</button>`:""}</div>
     <div class="an-grid">${AN_L.map(([y,ss])=>{const id=anId(m.id,y,ss),a=AN.find(x=>x.id===id),isN=nx&&nx[0]===y&&nx[1]===ss;
