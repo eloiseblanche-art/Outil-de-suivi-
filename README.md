@@ -11,3 +11,8 @@ L'onglet « Révisions » traite chaque question des QCM comme une carte Anki et
 ## QCM automatiques
 
 Une tâche planifiée crée le QCM de chaque nouveau cours qui a un polycopié joint et pas encore de QCM. La marche à suivre et les scripts sont dans `qcm-auto/` (`CONSIGNES.md`).
+
+## Planning et annales (dernier mois)
+
+- Onglet « Planning » : les packs de chaque jour jusqu'au concours (collection `taches`, documents `pl-MMJJ-NN` : date, heure, fin, texte, matiere, fait), à cocher au fur et à mesure. Les kholles du jour s'y affichent aussi.
+- Onglet « Annales » : 12 annales par matière (2020 S1 → 2025 S2), toujours la plus ancienne non faite en premier. Une annale faite = un document `annales/<matiere>_<année>_s<session>` (matiere, annee, session, date).
